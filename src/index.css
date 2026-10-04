@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Sora", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "Space Mono", monospace;
+
+  --color-bmic-blue: #2F6296;
+  --color-bmic-blue-deep: #1A3E63;
+  --color-bmic-blue-light: #4A83BE;
+  --color-bmic-magenta: #D61356;
+  --color-bmic-magenta-dark: #A50B3F;
+  --color-bmic-magenta-light: #F03474;
+
+  --color-navy-950: #07101F;
+  --color-navy-900: #0B1B33;
+  --color-navy-850: #102444;
+  --color-navy-800: #163056;
+  --color-offwhite: #F6F8FC;
+}
+
+:root {
+  color-scheme: dark light;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+p {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+/* Glassmorphism helpers */
+.glass-panel-dark {
+  background: rgba(11, 27, 51, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #4A83BE 0%, #2F6296 40%, #D61356 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-border-glow {
+  position: relative;
+}
+.gradient-border-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(47, 98, 150, 0.6), rgba(214, 19, 86, 0.6));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Dot grid background pattern */
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-dot-grid-light {
+  background-image: radial-gradient(rgba(47, 98, 150, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Halftone / Fading signal dot row animation */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 4s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media print {
+  header, footer, button, input {
+    display: none !important;
+  }
+  #agenda {
+    padding: 0 !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+

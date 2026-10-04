@@ -1,0 +1,6 @@
+{
+  "name": "Botswana Mobile & Internet Congress 2026",
+  "description": "Official portal for the Botswana Mobile & Internet Congress 2026 (BMIC 2026). Transforming Botswana into the Digital Valley of SADC · Friday, 30 October 2026 at Royal Aria Conference Centre, Gaborone.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
