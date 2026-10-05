@@ -50,10 +50,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onDownloadIcs }) => 
               <MapPin className="w-3.5 h-3.5 text-[#F03474]" />
               <span>Royal Aria Conference Centre, Gaborone</span>
             </div>
-            <span className="text-slate-600 hidden sm:inline" aria-hidden="true">·</span>
-            <span className="px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-[#F03474] bg-[#D61356]/15 rounded-lg border border-[#D61356]/30">
-              National Congress
-            </span>
           </div>
         </div>
 

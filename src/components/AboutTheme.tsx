@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { EVENT_DETAILS, PROBLEMS_WE_ARE_SOLVING } from '../data/bmicContent';
 import { HeaderDots } from './HeaderDots';
-import { BmicLogo } from './BmicLogo';
 import { Radio, ShieldAlert, Rocket, Building2, ShoppingBag, TrendingUp, ArrowRight, Zap, Target } from 'lucide-react';
 
 export const AboutTheme: React.FC = () => {
@@ -36,56 +35,32 @@ export const AboutTheme: React.FC = () => {
           <HeaderDots dotSize="sm" theme="light" />
         </div>
 
-        {/* Split Layout: Strategic Thesis */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2F6296]/10 text-xs font-bold text-[#2F6296] uppercase tracking-wider">
-              <Target className="w-3.5 h-3.5" />
-              <span>National Strategic Context</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-              THREE DECADES OF INVESTMENT.{' '}
-              <span className="text-[#D61356]">ONE MISSING CONVERSION.</span>
-            </h2>
-
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal">
-              {EVENT_DETAILS.threeDecadesDescription}
-            </p>
-
-            {/* Why Now Highlight Box */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-md relative overflow-hidden">
-              <div className="absolute top-0 left-0 bottom-0 w-2 bg-gradient-to-b from-[#2F6296] to-[#D61356]" />
-              <div className="pl-3">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#D61356] bg-pink-50 px-2 py-0.5 rounded border border-pink-200 inline-block mb-2">
-                  Why Now
-                </span>
-                <p className="text-slate-800 text-sm sm:text-base font-medium leading-relaxed">
-                  {EVENT_DETAILS.whyNow}
-                </p>
-              </div>
-            </div>
+        {/* Strategic Thesis */}
+        <div className="max-w-4xl mx-auto mb-20 space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2F6296]/10 text-xs font-bold text-[#2F6296] uppercase tracking-wider">
+            <Target className="w-3.5 h-3.5" />
+            <span>National Strategic Context</span>
           </div>
 
-          {/* Animated Dot-Matrix Visual */}
-          <div className="lg:col-span-5 flex justify-center">
-            <div className="relative p-8 sm:p-12 rounded-3xl bg-white border border-slate-200/90 shadow-xl overflow-hidden group">
-              {/* Subtle pulsing background glow */}
-              <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#D61356]/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
-              <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-[#2F6296]/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
+            THREE DECADES OF INVESTMENT.{' '}
+            <span className="text-[#D61356]">ONE MISSING CONVERSION.</span>
+          </h2>
 
-              <div className="flex flex-col items-center text-center relative z-10">
-                <BmicLogo variant="stacked" size="lg" theme="light" />
+          <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal">
+            {EVENT_DETAILS.threeDecadesDescription}
+          </p>
 
-                <div className="mt-8 pt-6 border-t border-slate-100 text-center w-full">
-                  <div className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold mb-1">
-                    Connecting Network Signal
-                  </div>
-                  <div className="text-sm font-semibold text-slate-800">
-                    Botswana to SADC Digital Corridor
-                  </div>
-                </div>
-              </div>
+          {/* Why Now Highlight Box */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-md relative overflow-hidden">
+            <div className="absolute top-0 left-0 bottom-0 w-2 bg-gradient-to-b from-[#2F6296] to-[#D61356]" />
+            <div className="pl-3">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#D61356] bg-pink-50 px-2 py-0.5 rounded border border-pink-200 inline-block mb-2">
+                Why Now
+              </span>
+              <p className="text-slate-800 text-sm sm:text-base font-medium leading-relaxed">
+                {EVENT_DETAILS.whyNow}
+              </p>
             </div>
           </div>
         </div>
