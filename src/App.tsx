@@ -8,7 +8,6 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { AboutTheme } from './components/AboutTheme';
 import { Speakers } from './components/Speakers';
-import { TopicsTracks } from './components/TopicsTracks';
 import { FullAgenda } from './components/FullAgenda';
 import { Deliverables } from './components/Deliverables';
 import { SponsorsMarquee } from './components/SponsorsMarquee';
@@ -67,10 +66,7 @@ export default function App() {
         {/* 4. Speakers & Panel Chairs (Modern Cards with Grayscale-to-Color & Carousel) */}
         <Speakers />
 
-        {/* 5. Topics / Tracks (Bento Grid of Cards with Hover Glow) */}
-        <TopicsTracks />
-
-        {/* 6. Programme / Agenda (Tabbed Timeline with Color-Coded Pills & Expand/Collapse) */}
+        {/* 5. Programme / Agenda (Tabbed Timeline with Color-Coded Pills & Expand/Collapse) */}
         <FullAgenda
           onDownloadIcs={handleDownloadIcs}
         />

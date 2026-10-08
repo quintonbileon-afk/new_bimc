@@ -32,8 +32,9 @@ export const Footer: React.FC = () => {
             <div className="text-xs font-mono text-slate-400">
               ONE DAY. ONE NATIONAL DIGITAL CONVERSATION. ONE ACTION AGENDA.
             </div>
-            <div className="pt-2 text-xs text-slate-300">
-              Convened by: <span className="text-white font-semibold">{EVENT_DETAILS.organiser}</span>
+            <div className="pt-2 text-xs text-slate-300 space-y-1">
+              <div>Organised by: <span className="text-white font-semibold">{EVENT_DETAILS.organiser}</span></div>
+              <div>Empowered by: <span className="text-white font-semibold">{EVENT_DETAILS.empoweredBy}</span></div>
             </div>
           </div>
 
@@ -50,12 +51,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a href="#speakers" className="hover:text-white transition-colors">
-                  Speakers &amp; Chairs
-                </a>
-              </li>
-              <li>
-                <a href="#tracks" className="hover:text-white transition-colors">
-                  Congress Tracks
+                  Who Will Be In The Room
                 </a>
               </li>
               <li>
@@ -70,7 +66,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a href="#passes" className="hover:text-white transition-colors">
-                  Delegate Passes
+                  Corporate Rate Card
                 </a>
               </li>
             </ul>
@@ -92,13 +88,15 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#2F6296] shrink-0" />
-                <a href="tel:+26771843386" className="font-mono hover:text-white transition-colors">
+                <a href="tel:+26773953199" className="font-mono hover:text-white transition-colors">
                   {EVENT_DETAILS.enquiriesPhone}
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <Globe className="w-4 h-4 text-[#2F6296] shrink-0" />
-                <span className="font-mono">{EVENT_DETAILS.website}</span>
+                <a href={`mailto:${EVENT_DETAILS.contactEmail}`} className="font-mono hover:text-white transition-colors">
+                  {EVENT_DETAILS.contactEmail}
+                </a>
               </div>
             </div>
           </div>

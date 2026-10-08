@@ -30,13 +30,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenRegister, onDownloadIcs })
 
   const navLinks = [
     { label: 'Theme', href: '#about' },
-    { label: 'Speakers', href: '#speakers' },
-    { label: 'Tracks', href: '#tracks' },
+    { label: 'Attendees', href: '#speakers' },
     { label: 'Programme', href: '#agenda' },
     { label: 'Deliverables', href: '#deliverables' },
     { label: 'Partners', href: '#partners' },
     { label: 'Venue', href: '#venue' },
-    { label: 'Passes', href: '#passes' },
+    { label: 'Rate Card', href: '#passes' },
   ];
 
   return (

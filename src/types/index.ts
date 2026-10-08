@@ -79,3 +79,17 @@ export interface PartnerLogo {
   tier: string;
   category: string;
 }
+
+export interface CorporateRateItem {
+  id: string;
+  category: 'delegate' | 'partnership' | 'exhibition';
+  title: string;
+  description: string;
+  price: string;
+  priceRaw: number;
+  currency: string;
+  badge?: string;
+  features?: string[];
+  isPopular?: boolean;
+}
+
