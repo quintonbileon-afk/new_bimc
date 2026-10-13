@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Registration": {
+      "title": "Congress Registration",
+      "description": "Delegate, sponsor, or exhibitor booking registration for BMIC 2026",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "description": "Full name of the delegate or registrant",
+          "maxLength": 150
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Official business email address",
+          "maxLength": 150
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact telephone number",
+          "maxLength": 50
+        },
+        "organization": {
+          "type": "string",
+          "description": "Company, ministry, or institution name",
+          "maxLength": 150
+        },
+        "passOrTier": {
+          "type": "string",
+          "description": "Selected delegate tier, sponsorship track, or exhibition stand",
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Special delegation notes or requests",
+          "maxLength": 1000
+        },
+        "status": {
+          "type": "string",
+          "description": "Registration approval and payment status",
+          "enum": ["pending", "contacted", "approved", "confirmed", "cancelled"]
+        },
+        "adminNotes": {
+          "type": "string",
+          "description": "Internal secretariat notes",
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Submission timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["fullName", "email", "passOrTier", "status"]
+    },
+    "Admin": {
+      "title": "Congress Admin",
+      "description": "Authorized secretariat administrator",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Admin email"
+        },
+        "role": {
+          "type": "string",
+          "description": "Administrative access role",
+          "enum": ["admin", "superadmin"]
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/registrations/{registrationId}": {
+      "schema": "Registration",
+      "description": "Public submissions and secretariat managed delegate reservations"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "System admin whitelist"
+    }
+  }
+}

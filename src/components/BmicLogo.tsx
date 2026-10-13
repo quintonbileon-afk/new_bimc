@@ -141,7 +141,7 @@ export const BmicLogo: React.FC<BmicLogoProps> = ({
     return (
       <div className={`flex flex-col items-center text-center gap-3 ${className}`}>
         {renderMark()}
-        <div className="font-serif uppercase font-bold select-none">
+        <div className="font-sans uppercase font-bold select-none">
           <div style={{ color: lightBlueColor }} className={textSizes[size]}>BOTSWANA</div>
           <div style={{ color: magentaColor }} className={textSizes[size]}>MOBILE &amp;</div>
           <div style={{ color: magentaColor }} className={textSizes[size]}>INTERNET</div>
@@ -155,7 +155,7 @@ export const BmicLogo: React.FC<BmicLogoProps> = ({
     return (
       <div className={`inline-flex items-center gap-3.5 ${className}`}>
         {renderMark()}
-        <div className="flex flex-col justify-center font-serif uppercase font-bold select-none">
+        <div className="flex flex-col justify-center font-sans uppercase font-bold select-none">
           <span style={{ color: lightBlueColor }} className={`${textSizes[size]} transition-colors`}>
             BOTSWANA
           </span>
@@ -173,7 +173,7 @@ export const BmicLogo: React.FC<BmicLogoProps> = ({
   return (
     <div className={`inline-flex items-center gap-3.5 ${className}`}>
       {renderMark()}
-      <div className="flex flex-col justify-center font-serif uppercase font-bold select-none">
+      <div className="flex flex-col justify-center font-sans uppercase font-bold select-none">
         <span style={{ color: lightBlueColor }} className={`${textSizes[size]} transition-colors`}>
           BOTSWANA
         </span>

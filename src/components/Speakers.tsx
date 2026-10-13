@@ -1,196 +1,310 @@
 import React from 'react';
-import { HeaderDots } from './HeaderDots';
 import {
+  ArrowRight,
   Landmark,
-  Rocket,
   ShieldCheck,
-  Building,
   Radio,
-  Cpu,
-  Coins,
-  GraduationCap,
-  Users2,
+  Network,
+  Banknote,
+  Rocket,
   Code2,
-  Palette,
+  Video,
+  Sparkles,
+  TrendingUp,
   CheckCircle2,
-  ArrowRight
+  LucideIcon,
 } from 'lucide-react';
 
+interface StakeholderGroup {
+  name: string;
+  category: string;
+  description: string;
+  icon: LucideIcon;
+  badge: string;
+}
+
 export const Speakers: React.FC = () => {
-  const decisionMakerTags = [
-    'Government Ministries',
-    'Telecommunications Regulators',
-    'Mobile Network Operators (MNOs)',
-    'Internet Service Providers (ISPs)',
-    'Financial Institutions & Banks',
-    'Development Finance Institutions (DFIs)',
-    'Policy & Legislative Leaders',
-    'Sovereign Infrastructure Custodians'
+  const decisionMakers: StakeholderGroup[] = [
+    {
+      name: 'Government Ministries & Departments',
+      category: 'Sovereign Policy',
+      description: 'Communications, Digital Economy, Trade, Finance & Regional Integration',
+      icon: Landmark,
+      badge: 'Policy & Direction',
+    },
+    {
+      name: 'Regulators & Policy Authorities',
+      category: 'Regulatory Framework',
+      description: 'BOCRA, Competition Authority, Data Protection Office & Standards',
+      icon: ShieldCheck,
+      badge: 'Compliance & Spectrum',
+    },
+    {
+      name: 'Mobile Network Operators (MNOs)',
+      category: 'Telecom Leadership',
+      description: 'Mascom, BTC, Orange & regional connectivity infrastructure leaders',
+      icon: Radio,
+      badge: '5G, 4G & Fibre Backbone',
+    },
+    {
+      name: 'ISPs & Infrastructure Enablers',
+      category: 'Core Connectivity',
+      description: 'BoFiNet, carrier neutral data centres, subsea/satellite links',
+      icon: Network,
+      badge: 'Universal Access',
+    },
+    {
+      name: 'Financial Institutions & DFIs',
+      category: 'Institutional Capital',
+      description: 'Commercial banks, BDC, CEDA, regional development finance bodies',
+      icon: Banknote,
+      badge: 'Project & Debt Capital',
+    },
   ];
 
-  const builderTags = [
-    'Startups & Tech Founders',
-    'Software Developers & Engineers',
-    'Digital Content Creators',
-    'Innovation Hubs & Incubators',
-    'Venture Investors & Angel Syndicates',
-    'Universities & Research Academics',
-    'Tertiary Technology Students',
-    'Industry Technology Practitioners'
+  const builders: StakeholderGroup[] = [
+    {
+      name: 'Startups & Tech Founders',
+      category: 'Venture Creation',
+      description: 'Fintech, healthtech, agritech, logistics & local SaaS innovators',
+      icon: Rocket,
+      badge: 'Seed & Series Stage',
+    },
+    {
+      name: 'Software Developers & Engineers',
+      category: 'Technical Architecture',
+      description: 'System architects, AI practitioners, cloud, fullstack & API builders',
+      icon: Code2,
+      badge: 'Implementation',
+    },
+    {
+      name: 'Digital Content Creators & Media',
+      category: 'Creator Economy',
+      description: 'Streaming talent, digital publishers, podcast networks & influencers',
+      icon: Video,
+      badge: 'Monetisation & Rails',
+    },
+    {
+      name: 'Innovation Hubs & Accelerators',
+      category: 'Ecosystem Cultivation',
+      description: 'BIH, university tech labs, incubator programmes & developer circles',
+      icon: Sparkles,
+      badge: 'Pipeline Growth',
+    },
+    {
+      name: 'Venture Investors & Angel Syndicates',
+      category: 'Risk Capital',
+      description: 'Pan-African VC funds, angel syndicates, private equity & LP investors',
+      icon: TrendingUp,
+      badge: 'Equity Investment',
+    },
   ];
 
   return (
-    <section id="speakers" className="py-24 bg-[#0B1B33] text-white border-b border-white/10 relative overflow-hidden">
-      {/* Anchor for attendee links */}
+    <section id="speakers" className="py-[72px] lg:py-[120px] bg-[#0A1428] text-white border-b border-white/[0.08] relative">
       <div id="attendees" className="absolute -top-24" />
 
-      {/* Background ambient lighting */}
-      <div
-        className="absolute top-1/3 -left-20 w-96 h-96 bg-[#2F6296]/20 rounded-full blur-[140px] pointer-events-none"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-10 -right-20 w-96 h-96 bg-[#FF2A7A]/15 rounded-full blur-[140px] pointer-events-none"
-        aria-hidden="true"
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex justify-center mb-6">
-          <HeaderDots dotSize="sm" theme="dark" />
-        </div>
-
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <p className="text-xs uppercase font-mono font-bold tracking-[0.2em] text-[#82B4EE] mb-2">
-            Congress Delegation &amp; Attendees
-          </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight uppercase">
+        <div className="max-w-3xl mb-16 lg:mb-20">
+          <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#B8C2D6]">
+              02 / Delegation
+            </p>
+          </div>
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.03em] leading-[1.12] mb-4 font-display">
             WHO WILL BE IN THE ROOM
           </h2>
-          <p className="text-sm sm:text-base text-slate-300 mt-4 leading-relaxed font-normal">
-            A high-convening summit uniting the institutional decision-makers who govern sovereign capital and infrastructure with the on-the-ground builders driving digital innovation across Botswana and the SADC region.
+          <p className="text-base sm:text-lg text-[#B8C2D6] leading-relaxed font-normal">
+            Uniting institutional leadership with ecosystem innovators driving Botswana's digital economy forward.
           </p>
         </div>
 
-        {/* 2-Column High-Impact Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Card 1: Decision-Makers */}
-          <div className="rounded-3xl glass-panel-dark border border-white/10 p-8 sm:p-10 relative overflow-hidden group hover:border-[#82B4EE]/50 transition-all duration-300 flex flex-col justify-between shadow-2xl">
-            {/* Top Accent Gradient Border */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2F6296] via-[#82B4EE] to-transparent" />
-            <div className="absolute top-0 right-0 w-44 h-44 bg-[#82B4EE]/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+        {/* 2-Column Editorial Structure with Refined Interactive Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-16">
+          {/* Column 1: Institutional Leadership */}
+          <div className="rounded-2xl p-5 sm:p-6 bg-[#0D1C3C]/60 border border-white/[0.08] backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group">
+            {/* Ambient subtle glow */}
+            <div className="absolute top-0 right-0 w-56 h-56 bg-[#2F6DB5]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div>
-              <div className="flex items-center justify-between gap-4 mb-6">
-                <div className="p-3.5 rounded-2xl bg-[#82B4EE]/10 border border-[#82B4EE]/25 text-[#82B4EE]">
-                  <Landmark className="w-7 h-7" />
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-2xl sm:text-3xl font-bold text-[#2F6DB5] tabular-nums">
+                    01
+                  </span>
+                  <div>
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-300 block">
+                      Institutional Leadership
+                    </span>
+                    <span className="text-[11px] text-white/40">Sovereign &amp; Telecom Core</span>
+                  </div>
                 </div>
-                <span className="text-[11px] font-mono uppercase font-bold tracking-widest px-3 py-1 rounded-full bg-[#82B4EE]/15 text-[#82B4EE] border border-[#82B4EE]/30">
-                  Institutional Leadership
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[9px] font-mono text-[#B8C2D6]">
+                  5 Pillars
                 </span>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-4 flex items-center gap-3">
-                <span>Decision-Makers</span>
+              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-1.5 font-display">
+                Decision-Makers &amp; Regulators
               </h3>
 
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal mb-8">
-                Government ministries, regulators, mobile network operators, ISPs, financial institutions, development finance institutions and policy leaders.
+              <p className="text-xs sm:text-sm text-[#B8C2D6] leading-relaxed mb-4 font-normal">
+                Government ministries, regulators, telecom operators, ISPs, financial institutions, and policy leaders shaping regulation and sovereign investment.
               </p>
 
-              {/* Stakeholder tags */}
-              <div className="space-y-3 mb-6">
-                <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold">
-                  Key Representations:
+              {/* Redesigned List of Represented Institutions with Better Spacing */}
+              <div>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-semibold">
+                    Represented Institutions
+                  </p>
+                  <span className="font-mono text-[9px] text-[#2F6DB5] font-medium">Policy &amp; Capital</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {decisionMakerTags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-slate-200 hover:bg-[#82B4EE]/10 hover:border-[#82B4EE]/30 hover:text-white transition-colors cursor-default"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#82B4EE] shrink-0" />
-                      <span>{tag}</span>
-                    </span>
-                  ))}
+
+                <div className="space-y-1.5">
+                  {decisionMakers.map((item, idx) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <div
+                        key={item.name}
+                        className="group/item relative overflow-hidden px-3 py-2.5 rounded-xl bg-[#0A1428]/80 hover:bg-[#112140] border border-white/[0.06] hover:border-[#2F6DB5]/60 hover:shadow-[0_6px_20px_-6px_rgba(47,109,181,0.35)] transition-all duration-200 flex items-center gap-3 cursor-default hover:-translate-y-0.5 hover:translate-x-0.5"
+                      >
+                        {/* Illuminating left edge accent bar */}
+                        <div className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-r bg-[#2F6DB5] opacity-0 group-hover/item:opacity-100 transition-opacity" />
+
+                        <div className="w-7 h-7 rounded-lg bg-[#2F6DB5]/15 border border-[#2F6DB5]/30 flex items-center justify-center shrink-0 text-[#60A5FA] group-hover/item:bg-[#2F6DB5] group-hover/item:text-white group-hover/item:scale-105 group-hover/item:shadow-[0_0_12px_rgba(47,109,181,0.5)] transition-all">
+                          <IconComponent className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="text-xs sm:text-[13px] font-semibold text-white tracking-tight truncate group-hover/item:text-white transition-colors">
+                              {item.name}
+                            </h4>
+                            <span className="font-mono text-[9px] text-slate-400 group-hover/item:text-[#60A5FA] shrink-0 font-medium transition-colors">
+                              0{idx + 1}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-[#B8C2D6]/80 leading-normal line-clamp-1 mt-0.5 group-hover/item:text-slate-200 transition-colors">
+                            {item.description}
+                          </p>
+                        </div>
+
+                        {/* Sliding arrow indicator */}
+                        <ArrowRight className="w-3.5 h-3.5 text-[#60A5FA] opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all shrink-0" />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <span className="font-mono">Policy, Capital &amp; Infrastructure</span>
-              <span className="text-[#82B4EE] font-semibold">Institutional Seats</span>
+            <div className="pt-4 mt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
+              <span className="font-mono text-[10px] text-[#B8C2D6] truncate mr-2">
+                Mandate: Spectrum allocation, policy harmonization &amp; infrastructure
+              </span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6DB5] shrink-0" />
             </div>
           </div>
 
-          {/* Card 2: Builders */}
-          <div className="rounded-3xl glass-panel-dark border border-white/10 p-8 sm:p-10 relative overflow-hidden group hover:border-[#FF2A7A]/50 transition-all duration-300 flex flex-col justify-between shadow-2xl">
-            {/* Top Accent Gradient Border */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF2A7A] via-[#D61356] to-transparent" />
-            <div className="absolute top-0 right-0 w-44 h-44 bg-[#FF2A7A]/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+          {/* Column 2: Ecosystem Builders */}
+          <div className="rounded-2xl p-5 sm:p-6 bg-[#0D1C3C]/60 border border-white/[0.08] backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group">
+            {/* Ambient subtle glow */}
+            <div className="absolute top-0 right-0 w-56 h-56 bg-[#D81B60]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div>
-              <div className="flex items-center justify-between gap-4 mb-6">
-                <div className="p-3.5 rounded-2xl bg-[#FF2A7A]/10 border border-[#FF2A7A]/25 text-[#FF2A7A]">
-                  <Rocket className="w-7 h-7" />
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-2xl sm:text-3xl font-bold text-[#D81B60] tabular-nums">
+                    02
+                  </span>
+                  <div>
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-300 block">
+                      Ecosystem Builders
+                    </span>
+                    <span className="text-[11px] text-white/40">Commercial Execution &amp; Scale</span>
+                  </div>
                 </div>
-                <span className="text-[11px] font-mono uppercase font-bold tracking-widest px-3 py-1 rounded-full bg-[#FF2A7A]/15 text-pink-300 border border-[#FF2A7A]/30">
-                  Innovation &amp; Execution
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[9px] font-mono text-[#B8C2D6]">
+                  5 Segments
                 </span>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-4 flex items-center gap-3">
-                <span>Builders</span>
+              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-1.5 font-display">
+                Builders, Founders &amp; Creators
               </h3>
 
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal mb-8">
-                Startups, founders, software developers, digital content creators, innovation hubs, investors, universities, students and technology practitioners.
+              <p className="text-xs sm:text-sm text-[#B8C2D6] leading-relaxed mb-4 font-normal">
+                Early-stage founders, software engineers, content creators, accelerators, researchers, and venture investors driving scalable technology products and digital commerce.
               </p>
 
-              {/* Stakeholder tags */}
-              <div className="space-y-3 mb-6">
-                <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold">
-                  Key Representations:
+              {/* Redesigned List of Participating Groups with Better Spacing */}
+              <div>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-semibold">
+                    Participating Groups
+                  </p>
+                  <span className="font-mono text-[9px] text-[#D81B60] font-medium">Innovation &amp; Scale</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {builderTags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-slate-200 hover:bg-[#FF2A7A]/10 hover:border-[#FF2A7A]/30 hover:text-white transition-colors cursor-default"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#FF2A7A] shrink-0" />
-                      <span>{tag}</span>
-                    </span>
-                  ))}
+
+                <div className="space-y-1.5">
+                  {builders.map((item, idx) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <div
+                        key={item.name}
+                        className="group/item relative overflow-hidden px-3 py-2.5 rounded-xl bg-[#0A1428]/80 hover:bg-[#1E1128] border border-white/[0.06] hover:border-[#D81B60]/60 hover:shadow-[0_6px_20px_-6px_rgba(216,27,96,0.35)] transition-all duration-200 flex items-center gap-3 cursor-default hover:-translate-y-0.5 hover:translate-x-0.5"
+                      >
+                        {/* Illuminating left edge accent bar */}
+                        <div className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-r bg-[#D81B60] opacity-0 group-hover/item:opacity-100 transition-opacity" />
+
+                        <div className="w-7 h-7 rounded-lg bg-[#D81B60]/15 border border-[#D81B60]/30 flex items-center justify-center shrink-0 text-[#F472B6] group-hover/item:bg-[#D81B60] group-hover/item:text-white group-hover/item:scale-105 group-hover/item:shadow-[0_0_12px_rgba(216,27,96,0.5)] transition-all">
+                          <IconComponent className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="text-xs sm:text-[13px] font-semibold text-white tracking-tight truncate group-hover/item:text-white transition-colors">
+                              {item.name}
+                            </h4>
+                            <span className="font-mono text-[9px] text-slate-400 group-hover/item:text-[#F472B6] shrink-0 font-medium transition-colors">
+                              0{idx + 1}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-[#B8C2D6]/80 leading-normal line-clamp-1 mt-0.5 group-hover/item:text-slate-200 transition-colors">
+                            {item.description}
+                          </p>
+                        </div>
+
+                        {/* Sliding arrow indicator */}
+                        <ArrowRight className="w-3.5 h-3.5 text-[#F472B6] opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all shrink-0" />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <span className="font-mono">Startups, Engineering &amp; Creation</span>
-              <span className="text-[#FF2A7A] font-semibold">Ecosystem Builders</span>
+            <div className="pt-4 mt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
+              <span className="font-mono text-[10px] text-[#B8C2D6] truncate mr-2">
+                Mandate: Commercialization, product development &amp; tech venture creation
+              </span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#D81B60] shrink-0" />
             </div>
           </div>
         </div>
 
-        {/* Bottom Convergence Callout */}
-        <div className="mt-12 max-w-4xl mx-auto rounded-2xl glass-panel-dark border border-white/10 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex items-center gap-3.5">
-            <div className="p-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white shrink-0">
-              <Users2 className="w-5 h-5 text-[#82B4EE]" />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-white">Direct Dialogue Between Policymakers &amp; Builders</div>
-              <div className="text-xs text-slate-400">Breaking silos to accelerate national digital infrastructure and commercial scale.</div>
-            </div>
-          </div>
-
+        {/* Thin 1px Divider Strip with Action */}
+        <div className="pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-[#B8C2D6]">
+            Structured bilateral convening connecting sovereign policymakers, commercial operators, and technology builders under one roof.
+          </p>
           <a
             href="#passes"
-            className="inline-flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-[#2F6296] to-[#FF2A7A] px-5 py-2.5 rounded-xl shadow-lg hover:brightness-110 transition-all shrink-0"
+            className="group text-xs font-semibold text-white hover:text-[#B8C2D6] inline-flex items-center gap-1.5 transition-colors py-2"
           >
-            <span>Join the Room</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>View Delegate Passes</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
           </a>
         </div>
       </div>

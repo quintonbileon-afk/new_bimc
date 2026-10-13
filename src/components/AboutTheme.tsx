@@ -1,117 +1,416 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EVENT_DETAILS, PROBLEMS_WE_ARE_SOLVING } from '../data/bmicContent';
-import { HeaderDots } from './HeaderDots';
-import { Radio, ShieldAlert, Rocket, Building2, ShoppingBag, TrendingUp, ArrowRight, Zap, Target } from 'lucide-react';
+import {
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  ArrowUpRight,
+  CheckCircle2,
+  Sparkles,
+} from 'lucide-react';
+
+interface ProblemEnrichment {
+  pillarCode: string;
+  bottleneck: string;
+  solutionMandate: string;
+  targetMilestone: string;
+}
+
+const PROBLEM_ENRICHMENTS: Record<string, ProblemEnrichment> = {
+  infrastructure: {
+    pillarCode: 'INF-01',
+    bottleneck: 'High backhaul and wholesale transit tariffs leading to prohibitively expensive end-user mobile data bundles.',
+    solutionMandate: 'BOCRA regulatory intervention to reduce transit tariffs & mandate infrastructure sharing among MNOs.',
+    targetMilestone: '40% reduction in retail gigabyte cost within 12 months.',
+  },
+  cybersecurity: {
+    pillarCode: 'SEC-02',
+    bottleneck: 'Fragmented defensive postures across private and public sectors with no unified sovereign CERT coordination.',
+    solutionMandate: 'Operationalize National Cyber Security Incident Response standard with mandatory sector reporting.',
+    targetMilestone: '100% compliance audit for critical national infrastructure.',
+  },
+  startups: {
+    pillarCode: 'STP-03',
+    bottleneck: 'Severe early-stage capital shortage with domestic pension funds blocked from venture asset class participation.',
+    solutionMandate: 'Establish the BWP 50M Seed & Growth Syndicate co-investment facility backed by regional DFIs.',
+    targetMilestone: 'Fund 15 scalable Botswana tech startups by Q3 2026.',
+  },
+  egovernment: {
+    pillarCode: 'EGOV-04',
+    bottleneck: 'Siloed ministerial databases requiring manual citizen in-person verification and fragmented logins.',
+    solutionMandate: 'Unified citizen digital identity API layer connected to real-time public service delivery channels.',
+    targetMilestone: 'Single-sign-on access to top 20 essential public services.',
+  },
+  ecommerce: {
+    pillarCode: 'ECM-05',
+    bottleneck: 'Absence of national interoperable QR code standard and excessive merchant acquiring fees on local card rails.',
+    solutionMandate: 'Deploy Bank of Botswana interoperable instant payment rails with zero merchant fees on micro-transfers.',
+    targetMilestone: '10,000 active digital SME merchant terminals by 2027.',
+  },
+  monetisation: {
+    pillarCode: 'MNT-06',
+    bottleneck: 'Creators forced to rely on foreign payout channels with punitive currency exchange losses and high payout thresholds.',
+    solutionMandate: 'Direct carrier billing and local mobile wallet settlement rails integrated into digital content platforms.',
+    targetMilestone: 'Instant Pula creator payouts for over 5,000 digital entrepreneurs.',
+  },
+};
 
 export const AboutTheme: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
 
-  const getProblemIcon = (id: string) => {
-    switch (id) {
-      case 'infrastructure':
-        return <Radio className="w-5 h-5 text-[#2F6296]" />;
-      case 'cybersecurity':
-        return <ShieldAlert className="w-5 h-5 text-[#D61356]" />;
-      case 'startups':
-        return <Rocket className="w-5 h-5 text-[#2F6296]" />;
-      case 'egovernment':
-        return <Building2 className="w-5 h-5 text-[#D61356]" />;
-      case 'ecommerce':
-        return <ShoppingBag className="w-5 h-5 text-[#2F6296]" />;
-      case 'monetisation':
-        return <TrendingUp className="w-5 h-5 text-[#D61356]" />;
-      default:
-        return <Zap className="w-5 h-5 text-[#2F6296]" />;
-    }
+  const total = PROBLEMS_WE_ARE_SOLVING.length;
+
+  const handleNext = () => {
+    setActiveCardIndex((prev) => (prev + 1) % total);
   };
 
+  const handlePrev = () => {
+    setActiveCardIndex((prev) => (prev - 1 + total) % total);
+  };
+
+  // Mobile Touch Swipe Handlers (swipes instead of arrows)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null || touchStartY === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+      if (deltaX < 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+    setTouchStartX(null);
+    setTouchStartY(null);
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [total]);
+
   return (
-    <section id="about" className="py-24 bg-[#F6F8FC] text-slate-900 border-b border-slate-200 relative overflow-hidden">
-      {/* Background dot grid for light section */}
-      <div className="absolute inset-0 bg-dot-grid-light opacity-40 pointer-events-none" aria-hidden="true" />
+    <section id="about" className="py-12 lg:py-20 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Unified Strategic Context & Structural Focus Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 pb-10 border-b border-slate-200/80">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 mb-3 px-2.5 py-1 rounded-full bg-slate-200/60 border border-slate-300/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
+                01 / Strategic Context &amp; Structural Focus
+              </p>
+            </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex justify-center mb-6">
-          <HeaderDots dotSize="sm" theme="light" />
-        </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0A1428] tracking-[-0.03em] leading-[1.1] mb-4 font-display">
+              THREE DECADES OF INVESTMENT.<br />
+              ONE MISSING CONVERSION.
+            </h2>
 
-        {/* Strategic Thesis */}
-        <div className="max-w-4xl mx-auto mb-20 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2F6296]/10 text-xs font-bold text-[#2F6296] uppercase tracking-wider">
-            <Target className="w-3.5 h-3.5" />
-            <span>National Strategic Context</span>
+            <p className="text-sm sm:text-base text-[#4A5568] leading-relaxed font-normal">
+              {EVENT_DETAILS.threeDecadesDescription}
+            </p>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-            THREE DECADES OF INVESTMENT.{' '}
-            <span className="text-[#D61356]">ONE MISSING CONVERSION.</span>
-          </h2>
+          {/* Interactive Stack Controls & Counter */}
+          <div className="flex items-center gap-3 self-start lg:self-end shrink-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-xs text-xs font-mono text-slate-600">
+              <span className="text-[#2F6DB5] font-bold">0{activeCardIndex + 1}</span>
+              <span className="text-slate-300">/</span>
+              <span>0{total}</span>
+            </div>
 
-          <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal">
-            {EVENT_DETAILS.threeDecadesDescription}
-          </p>
+            {/* Mobile swipe gesture prompt (replaces arrows on mobile) */}
+            <div className="sm:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-xs text-[11px] font-mono text-[#2F6DB5] font-semibold select-none">
+              <span className="animate-pulse">←</span>
+              <span>Swipe cards</span>
+              <span className="animate-pulse">→</span>
+            </div>
 
-          {/* Why Now Highlight Box */}
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-md relative overflow-hidden">
-            <div className="absolute top-0 left-0 bottom-0 w-2 bg-gradient-to-b from-[#2F6296] to-[#D61356]" />
-            <div className="pl-3">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#D61356] bg-pink-50 px-2 py-0.5 rounded border border-pink-200 inline-block mb-2">
-                Why Now
-              </span>
-              <p className="text-slate-800 text-sm sm:text-base font-medium leading-relaxed">
-                {EVENT_DETAILS.whyNow}
-              </p>
+            {/* Desktop Navigation Arrows (Hidden on Mobile) */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={handlePrev}
+                aria-label="Previous priority"
+                className="w-9 h-9 rounded-full bg-white hover:bg-slate-50 active:scale-95 border border-slate-200 shadow-xs flex items-center justify-center text-[#0A1428] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2F6DB5]"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleNext}
+                aria-label="Next priority"
+                className="w-9 h-9 rounded-full bg-[#0A1428] hover:bg-[#142446] active:scale-95 text-white shadow-xs flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2F6DB5]"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
 
-        {/* The Problem We Are Solving */}
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              THE PROBLEM WE ARE SOLVING
-            </h3>
-            <p className="text-sm sm:text-base text-slate-600 mt-2">
-              Six critical bottlenecks constraining Botswana's digital economy from realizing its full potential
-            </p>
+        {/* Interactive Stacked Deck & Quick Switcher Layout with Touch Swipes on Mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Interactive Stack Container (Desktop: 7 cols) */}
+          <div className="lg:col-span-7 relative flex items-center justify-center py-4">
+            <div
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              className={`relative w-full max-w-[560px] select-none transition-all duration-300 ease-out ${
+                isExpanded
+                  ? 'h-[490px] sm:h-[450px]'
+                  : 'h-[360px] sm:h-[320px]'
+              }`}
+            >
+              {PROBLEMS_WE_ARE_SOLVING.map((prob, idx) => {
+                const diff = (idx - activeCardIndex + total) % total;
+                const isVisibleInStack = diff <= 2 || diff === total - 1;
+
+                if (!isVisibleInStack) return null;
+
+                const isFront = diff === 0;
+                const isBehind1 = diff === 1;
+                const isBehind2 = diff === 2;
+
+                const enrichment = PROBLEM_ENRICHMENTS[prob.id] || {
+                  pillarCode: `PIL-0${idx + 1}`,
+                  bottleneck: 'Institutional delay in cross-sector conversion.',
+                  solutionMandate: 'High-level mandate adopted in the Congress Communique.',
+                  targetMilestone: 'Immediate milestone review scheduled.',
+                };
+
+                let transformStyle = '';
+                let zIndex = 10;
+                let opacity = '1';
+                let scale = 'scale(1)';
+
+                if (isFront) {
+                  transformStyle = 'translate3d(0px, 0px, 0px) rotate(0deg)';
+                  zIndex = 30;
+                  opacity = '1';
+                  scale = 'scale(1)';
+                } else if (isBehind1) {
+                  transformStyle = 'translate3d(14px, -14px, -20px) rotate(2deg)';
+                  zIndex = 20;
+                  opacity = '0.9';
+                  scale = 'scale(0.97)';
+                } else if (isBehind2) {
+                  transformStyle = 'translate3d(26px, -26px, -40px) rotate(4deg)';
+                  zIndex = 10;
+                  opacity = '0.75';
+                  scale = 'scale(0.94)';
+                } else {
+                  // Just exited behind
+                  transformStyle = 'translate3d(-20px, 16px, 10px) rotate(-3deg)';
+                  zIndex = 5;
+                  opacity = '0';
+                  scale = 'scale(0.92)';
+                }
+
+                return (
+                  <div
+                    key={prob.id}
+                    onClick={() => {
+                      if (!isFront) {
+                        setActiveCardIndex(idx);
+                        setIsExpanded(false);
+                      } else {
+                        setIsExpanded((prev) => !prev);
+                      }
+                    }}
+                    style={{
+                      transform: `${transformStyle} ${scale}`,
+                      zIndex,
+                      transition: 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms ease, box-shadow 300ms ease',
+                    }}
+                    className={`absolute inset-0 rounded-2xl p-6 sm:p-7 flex flex-col justify-between cursor-pointer select-none ${
+                      isFront
+                        ? 'bg-white border-2 border-[#2F6DB5]/30 shadow-[0_20px_50px_rgba(10,20,40,0.12)]'
+                        : 'bg-[#F0F3F8] border border-slate-300/80 shadow-md pointer-events-auto'
+                    }`}
+                  >
+                    {/* Card Top Row */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100">
+                        <div className="flex items-center gap-2.5">
+                          <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#2F6DB5]/10 font-mono text-xs font-bold text-[#2F6DB5]">
+                            0{idx + 1}
+                          </span>
+                          <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                            National Priority ({enrichment.pillarCode})
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {isFront ? (
+                            <>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2F6DB5]/10 text-[#2F6DB5] text-[10px] font-semibold font-mono">
+                                <Layers className="w-3 h-3" />
+                                Active Priority
+                              </span>
+
+                              {/* Expand/Collapse Toggle on front card */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsExpanded((prev) => !prev);
+                                }}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-slate-100 hover:bg-slate-200 text-[#0A1428] border border-slate-200 transition-colors"
+                                title={isExpanded ? 'Collapse card' : 'Expand card'}
+                              >
+                                {isExpanded ? (
+                                  <>
+                                    <ChevronUp className="w-3 h-3 text-[#2F6DB5]" />
+                                    <span>Collapse</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronDown className="w-3 h-3 text-[#2F6DB5]" />
+                                    <span>Expand</span>
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-slate-400 text-xs font-mono">
+                              Click to focus
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h4 className="text-lg sm:text-xl font-bold text-[#0A1428] leading-tight tracking-tight mb-2 font-display">
+                        {prob.title}
+                      </h4>
+
+                      {/* Description */}
+                      <p className="text-xs sm:text-sm text-[#4A5568] leading-relaxed">
+                        {prob.description}
+                      </p>
+                    </div>
+
+                    {/* EXPANDED VIEW: Strategic Resolution & Target */}
+                    {isFront && isExpanded ? (
+                      <div className="my-2 py-2.5 px-3 rounded-xl bg-slate-50 border border-[#2F6DB5]/20 animate-fadeIn space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[9px] uppercase tracking-wider text-[#2F6DB5] font-semibold flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-[#2F6DB5]" />
+                            Executive Action Framework
+                          </span>
+                          <span className="font-mono text-[9px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">
+                            Target: {enrichment.targetMilestone}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-700 space-y-1">
+                          <p>
+                            <strong className="text-[#0A1428]">Current Bottleneck:</strong>{' '}
+                            {enrichment.bottleneck}
+                          </p>
+                          <p>
+                            <strong className="text-[#0A1428]">Mandate Solution:</strong>{' '}
+                            {enrichment.solutionMandate}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Compact Indicator */
+                      <div className="my-2 p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6DB5]" />
+                          <span className="text-[11px] font-medium text-slate-700">
+                            Action Deliverable 0{idx + 1}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[10px] text-slate-400">
+                          {enrichment.pillarCode}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Card Bottom Meta */}
+                    <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between mt-auto">
+                      <span className="text-[11px] text-slate-500 font-mono">
+                        {isFront
+                          ? isExpanded
+                            ? 'Tap card to collapse'
+                            : 'Tap card to expand details'
+                          : `PILLAR 0${idx + 1} OF 0${total}`}
+                      </span>
+
+                      <div className="flex items-center gap-1 text-xs font-semibold text-[#2F6DB5]">
+                        <span>{isFront ? (isExpanded ? 'Collapse' : 'Explore mandate') : 'Bring to front'}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROBLEMS_WE_ARE_SOLVING.map((prob, idx) => (
-              <div
-                key={prob.id}
-                onMouseEnter={() => setActiveTab(idx)}
-                className={`p-6 rounded-2xl bg-white border transition-all duration-300 flex flex-col justify-between ${
-                  activeTab === idx
-                    ? 'border-[#2F6296] shadow-xl ring-2 ring-[#2F6296]/10 translate-y-[-2px]'
-                    : 'border-slate-200/90 shadow-sm hover:border-slate-300 hover:shadow-md'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      {getProblemIcon(prob.id)}
-                    </div>
-                    <span className="font-mono text-xs font-bold text-slate-400">
-                      CHALLENGE 0{idx + 1}
-                    </span>
+          {/* List Navigation Column (Desktop: 5 cols) */}
+          <div className="lg:col-span-5 flex flex-col gap-2">
+            <p className="text-xs font-mono uppercase tracking-[0.18em] text-slate-500 mb-0.5 px-1">
+              All 6 Structural Pillars:
+            </p>
+            {PROBLEMS_WE_ARE_SOLVING.map((prob, idx) => {
+              const isActive = activeCardIndex === idx;
+              return (
+                <button
+                  key={prob.id}
+                  onClick={() => {
+                    setActiveCardIndex(idx);
+                    setIsExpanded(false);
+                  }}
+                  className={`w-full text-left p-3 sm:p-3.5 rounded-xl transition-all duration-200 border cursor-pointer flex items-start gap-3 ${
+                    isActive
+                      ? 'bg-white border-[#2F6DB5] shadow-xs translate-x-1.5'
+                      : 'bg-white/40 border-slate-200/70 hover:bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <span
+                    className={`font-mono text-xs font-bold shrink-0 mt-0.5 px-2 py-0.5 rounded ${
+                      isActive
+                        ? 'bg-[#2F6DB5] text-white'
+                        : 'bg-slate-200/70 text-slate-600'
+                    }`}
+                  >
+                    0{idx + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-xs sm:text-sm font-semibold truncate ${
+                        isActive ? 'text-[#0A1428]' : 'text-slate-700'
+                      }`}
+                    >
+                      {prob.title}
+                    </p>
+                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                      {prob.description}
+                    </p>
                   </div>
-
-                  <h4 className="text-base font-bold text-slate-900 mb-2 leading-snug">
-                    {prob.title}
-                  </h4>
-
-                  <p className="text-sm text-slate-600 leading-relaxed font-normal">
-                    {prob.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">Strategic Focus</span>
-                  <span className="text-[#2F6296] font-bold">Priority Agenda</span>
-                </div>
-              </div>
-            ))}
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#D81B60] shrink-0 mt-2" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

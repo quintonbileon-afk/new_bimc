@@ -1,59 +1,50 @@
 import React from 'react';
-import { EVENT_DETAILS } from '../data/bmicContent';
-import { HeaderDots } from './HeaderDots';
-import { BmicLogo } from './BmicLogo';
-import { Sparkles, ArrowRight, Calendar, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface CtaBannerProps {
   onOpenRegister: () => void;
   onDownloadIcs: () => void;
 }
 
-export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister, onDownloadIcs }) => {
+export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister }) => {
   return (
-    <section className="relative py-28 bg-[#07101F] text-white overflow-hidden border-b border-white/10">
-      {/* Background dot matrix & glow */}
-      <div className="absolute inset-0 bg-dot-grid opacity-30 pointer-events-none" aria-hidden="true" />
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-gradient-to-r from-[#2F6296]/30 via-[#853C77]/20 to-[#D61356]/30 rounded-full blur-[140px] pointer-events-none -z-10"
-        aria-hidden="true"
-      />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <div className="flex justify-center mb-6">
-          <HeaderDots dotSize="md" theme="dark" fading={true} />
+    <section className="py-[72px] lg:py-[120px] bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Eyebrow */}
+        <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full bg-slate-200/50 border border-slate-300/50">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
+            09 / National Convening · 30 October 2026
+          </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-xs font-mono font-bold text-pink-300 uppercase tracking-widest mb-6">
-          <Sparkles className="w-3.5 h-3.5 text-[#D61356]" />
-          <span>Gaborone, Botswana · 30 October 2026</span>
-        </div>
-
-        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6">
-          ONE DAY. ONE NATIONAL DIGITAL CONVERSATION.{' '}
-          <span className="gradient-text font-black">ONE ACTION AGENDA.</span>
+        {/* Solid Headline */}
+        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[#0A1428] tracking-[-0.03em] leading-[1.12] max-w-4xl mx-auto mb-6">
+          ONE DAY. ONE NATIONAL DIGITAL CONVERSATION. ONE ACTION AGENDA.
         </h2>
 
-        <p className="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed mb-10">
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg text-[#4A5568] max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
           Be in the room where Botswana's digital future moves from strategic dialogue to financed implementation.
         </p>
 
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        {/* One clear action per screen: ONE primary button + plain text link */}
+        <div className="flex flex-wrap items-center justify-center gap-6">
           <button
             onClick={onOpenRegister}
-            className="px-8 py-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#2F6296] via-[#853C77] to-[#D61356] shadow-xl shadow-[#D61356]/30 hover:shadow-[#D61356]/50 hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center gap-2"
+            className="group btn-cta-magenta px-8 py-3.5 rounded-full text-sm font-semibold text-white flex items-center gap-2.5 cursor-pointer"
           >
-            <span>Register as Delegate</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>Register Now</span>
+            <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
 
-          <button
-            onClick={onDownloadIcs}
-            className="px-7 py-4 rounded-xl text-sm font-semibold text-slate-200 glass-panel-dark border border-white/15 hover:border-white/30 hover:bg-white/[0.08] transition-all flex items-center gap-2"
+          <a
+            href="#agenda"
+            className="group text-sm font-semibold text-[#0A1428] hover:text-[#2F6DB5] transition-colors inline-flex items-center gap-1.5 py-2 px-3 rounded-full hover:bg-slate-200/40"
           >
-            <Calendar className="w-4 h-4 text-[#D61356]" />
-            <span>Save Date to Calendar (.ics)</span>
-          </button>
+            <span>View Programme</span>
+            <span className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </section>

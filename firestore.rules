@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && request.auth.token.email == 'quintonbileon@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidRegistration(data) {
+      return data.keys().hasAll(['fullName', 'email', 'passOrTier', 'status'])
+        && data.keys().hasOnly(['fullName', 'email', 'phone', 'organization', 'passOrTier', 'notes', 'status', 'adminNotes', 'createdAt', 'updatedAt'])
+        && data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 150
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.passOrTier is string && data.passOrTier.size() > 0 && data.passOrTier.size() <= 100
+        && data.status is string && (data.status in ['pending', 'contacted', 'approved', 'confirmed', 'cancelled'])
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 50))
+        && (!('organization' in data) || (data.organization is string && data.organization.size() <= 150))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000))
+        && (!('adminNotes' in data) || (data.adminNotes is string && data.adminNotes.size() <= 1000));
+    }
+
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Registrations Collection
+    match /registrations/{registrationId} {
+      // Anyone can submit a registration
+      allow create: if isValidId(registrationId)
+        && isValidRegistration(incoming())
+        && incoming().status == 'pending';
+
+      // Only administrators can read, list, update, or delete registrations (PII isolation)
+      allow get, list: if isAdmin();
+
+      allow update: if isValidId(registrationId)
+        && isAdmin()
+        && isValidRegistration(incoming());
+
+      allow delete: if isValidId(registrationId) && isAdmin();
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

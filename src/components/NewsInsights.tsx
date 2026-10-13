@@ -1,7 +1,6 @@
 import React from 'react';
 import { CONGRESS_INSIGHTS } from '../data/bmicContent';
-import { HeaderDots } from './HeaderDots';
-import { BookOpen, ArrowRight, Clock, Calendar } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 
 interface NewsInsightsProps {
   onOpenArticle: (title: string) => void;
@@ -9,58 +8,57 @@ interface NewsInsightsProps {
 
 export const NewsInsights: React.FC<NewsInsightsProps> = ({ onOpenArticle }) => {
   return (
-    <section className="py-24 bg-[#F6F8FC] text-slate-900 border-b border-slate-200 relative overflow-hidden">
-      <div className="absolute inset-0 bg-dot-grid-light opacity-30 pointer-events-none" aria-hidden="true" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex justify-center mb-6">
-          <HeaderDots dotSize="sm" theme="light" />
-        </div>
-
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-xs uppercase font-mono font-bold tracking-[0.2em] text-[#2F6296] mb-2">
-            Policy &amp; Research Briefings
-          </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
-            Congress Insights &amp; Briefings
+    <section id="insights" className="py-[72px] lg:py-[120px] bg-[#0A1428] text-white border-b border-white/[0.08]">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="max-w-3xl mb-16">
+          <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#B8C2D6]">
+              08 / Policy &amp; Research Briefings
+            </p>
+          </div>
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.03em] leading-[1.12] mb-4">
+            CONGRESS INSIGHTS &amp; BRIEFINGS
           </h2>
-          <p className="text-base text-slate-600 mt-4 leading-relaxed">
+          <p className="text-base sm:text-lg text-[#B8C2D6] leading-relaxed font-normal">
             Analytical frameworks and executive whitepapers shaping the BMIC 2026 national dialogue.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {/* Editorial Articles with Whitespace and 1px Dividers */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-12">
           {CONGRESS_INSIGHTS.map((item) => (
             <article
               key={item.id}
               onClick={() => onOpenArticle(item.title)}
-              className="bg-white rounded-3xl p-7 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer group hover:border-[#2F6296]/50"
+              className="border-t border-white/[0.08] pt-6 flex flex-col justify-between group cursor-pointer transition-colors hover:border-[#2F6DB5]"
             >
               <div>
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
-                  <span className="font-mono font-bold text-[#D61356] uppercase tracking-wider">
+                <div className="flex items-center justify-between text-xs text-[#B8C2D6] mb-4">
+                  <span className="font-mono font-semibold text-[#2F6DB5] uppercase tracking-wider text-[11px]">
                     {item.tag}
                   </span>
-                  <div className="flex items-center gap-1 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono text-[11px]">
+                    <Clock className="w-3.5 h-3.5 text-[#2F6DB5]" />
                     <span>{item.readTime}</span>
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-slate-900 group-hover:text-[#2F6296] transition-colors leading-snug mb-3">
+                <h3 className="text-lg font-bold text-white group-hover:text-[#B8C2D6] transition-colors leading-snug mb-3 tracking-tight">
                   {item.title}
                 </h3>
 
-                <p className="text-sm text-slate-600 leading-relaxed font-normal">
+                <p className="text-sm text-[#B8C2D6] leading-relaxed font-normal">
                   {item.excerpt}
                 </p>
               </div>
 
-              <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-medium">
+              <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs">
+                <span className="font-mono text-[11px] text-slate-400">
                   {item.date}
                 </span>
-                <span className="inline-flex items-center gap-1 font-bold text-[#2F6296] group-hover:translate-x-0.5 transition-transform">
+                <span className="inline-flex items-center gap-1.5 font-semibold text-white group-hover:translate-x-1 transition-transform duration-200">
                   <span>Read Briefing</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>

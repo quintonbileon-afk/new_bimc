@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { AGENDA_SESSIONS, EVENT_DETAILS } from '../data/bmicContent';
-import { HeaderDots } from './HeaderDots';
-import { Search, Printer, Calendar, Clock, ChevronDown, ChevronUp, Sparkles, Coffee, Shield, Cpu, Wifi, TrendingUp, Layers, CheckCircle } from 'lucide-react';
+import { AGENDA_SESSIONS } from '../data/bmicContent';
+import { Search, Calendar, ChevronDown, MapPin, Tag } from 'lucide-react';
 
 interface FullAgendaProps {
   onDownloadIcs: () => void;
@@ -10,34 +9,10 @@ interface FullAgendaProps {
 export const FullAgenda: React.FC<FullAgendaProps> = ({ onDownloadIcs }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'morning' | 'afternoon'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedSessions, setExpandedSessions] = useState<Record<string, boolean>>({
-    'session-03': true,
-    'session-04': true,
-    'session-10': true,
-  });
+  const [expandedSessions, setExpandedSessions] = useState<Record<string, boolean>>({});
 
   const toggleExpand = (id: string) => {
     setExpandedSessions((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const getTagColor = (tag: string) => {
-    switch (tag) {
-      case 'Keynote':
-        return 'bg-[#D61356]/20 text-pink-300 border-[#D61356]/40';
-      case 'Panel':
-        return 'bg-[#2F6296]/20 text-sky-300 border-[#2F6296]/40';
-      case 'Implementation':
-      case 'E-Commerce':
-      case 'Venture & Startups':
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
-      case 'Strategic Track':
-        return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40';
-      case 'Communique':
-      case 'Action Session':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-      default:
-        return 'bg-slate-700/30 text-slate-300 border-slate-700/50';
-    }
   };
 
   const filteredSessions = AGENDA_SESSIONS.filter((session) => {
@@ -53,165 +28,152 @@ export const FullAgenda: React.FC<FullAgendaProps> = ({ onDownloadIcs }) => {
   });
 
   return (
-    <section id="agenda" className="py-24 bg-[#07101F] text-white border-b border-white/10 relative overflow-hidden">
-      {/* Background ambient gradient */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[#2F6296]/15 rounded-full blur-[160px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex justify-center mb-6">
-          <HeaderDots dotSize="sm" theme="dark" />
-        </div>
-
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <p className="text-xs uppercase font-mono font-bold tracking-[0.2em] text-[#D61356] mb-2">
-            Congress Schedule
-          </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            High-Impact Congress Programme
-          </h2>
-          <div className="text-xs font-mono font-bold text-[#4A83BE] uppercase tracking-wider mt-3">
-            FRIDAY, 30 OCTOBER 2026 · ROYAL ARIA CONFERENCE CENTRE, GABORONE
-          </div>
-          <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-2xl mx-auto leading-relaxed">
-            {EVENT_DETAILS.coreMotto}
-          </p>
-        </div>
-
-        {/* Tab switcher, Search & Controls */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-2 rounded-2xl glass-panel-dark border border-white/10">
-            {/* Day / Period Tabs */}
-            <div className="flex items-center gap-1.5 p-1 bg-white/[0.03] rounded-xl border border-white/5">
-              {[
-                { id: 'all', label: 'Full Day (All 15 Sessions)' },
-                { id: 'morning', label: 'Morning Plenary' },
-                { id: 'afternoon', label: 'Afternoon Tracks' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-[#2F6296] to-[#D61356] text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+    <section id="agenda" className="py-12 lg:py-16 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Compact Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 mb-2.5 px-2.5 py-1 rounded-full bg-slate-200/60 border border-slate-300/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
+                03 / Programme Schedule
+              </p>
             </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0A1428] tracking-tight mb-2 font-display">
+              ONE ACTION AGENDA
+            </h2>
+            <p className="text-xs sm:text-sm text-[#4A5568] leading-relaxed">
+              Friday, 30 October 2026 · 15 structured sessions moving from policy deliberations to execution.
+            </p>
+          </div>
 
-            {/* Search and Action */}
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 sm:w-56">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Filter sessions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white/[0.05] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#2F6296]"
-                />
-              </div>
+          <div className="shrink-0">
+            <button
+              onClick={onDownloadIcs}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold text-[#0A1428] bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-xs cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#2F6DB5]" />
+              <span>Add to Calendar (.ics)</span>
+            </button>
+          </div>
+        </div>
 
-              <button
-                onClick={() => window.print()}
-                className="p-2 rounded-xl bg-white/[0.05] border border-white/10 text-slate-300 hover:text-white transition-colors"
-                title="Print Programme"
+        {/* Compact Tab Controls & Filter Strip */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200/80">
+          {/* Editorial Text Tabs with Active Indicator */}
+          <div className="flex items-center gap-6 text-xs">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`pb-1.5 transition-colors cursor-pointer relative font-medium ${
+                activeTab === 'all'
+                  ? 'text-[#0A1428] font-bold border-b-2 border-[#2F6DB5]'
+                  : 'text-[#4A5568] hover:text-[#0A1428]'
+              }`}
+            >
+              All Sessions ({AGENDA_SESSIONS.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('morning')}
+              className={`pb-1.5 transition-colors cursor-pointer relative font-medium ${
+                activeTab === 'morning'
+                  ? 'text-[#0A1428] font-bold border-b-2 border-[#2F6DB5]'
+                  : 'text-[#4A5568] hover:text-[#0A1428]'
+              }`}
+            >
+              Morning Plenary
+            </button>
+            <button
+              onClick={() => setActiveTab('afternoon')}
+              className={`pb-1.5 transition-colors cursor-pointer relative font-medium ${
+                activeTab === 'afternoon'
+                  ? 'text-[#0A1428] font-bold border-b-2 border-[#2F6DB5]'
+                  : 'text-[#4A5568] hover:text-[#0A1428]'
+              }`}
+            >
+              Afternoon Growth
+            </button>
+          </div>
+
+          {/* Minimalist Search Input */}
+          <div className="relative w-full sm:w-60">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search agenda sessions..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-full text-[#0A1428] placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5] shadow-xs"
+            />
+          </div>
+        </div>
+
+        {/* Dense, High-Efficiency Agenda Timeline */}
+        <div className="divide-y divide-slate-200/70 border-b border-slate-200/70 bg-white/40 rounded-xl overflow-hidden border border-slate-200/60">
+          {filteredSessions.map((session) => {
+            const isExpanded = expandedSessions[session.id];
+            const isBreak = session.category === 'break' || session.category === 'networking';
+
+            return (
+              <div
+                key={session.id}
+                onClick={() => toggleExpand(session.id)}
+                className={`px-4 sm:px-6 py-3.5 sm:py-4 transition-colors cursor-pointer hover:bg-white ${
+                  isBreak ? 'bg-slate-50/60' : 'bg-transparent'
+                }`}
               >
-                <Printer className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Timeline Container with Vertical Line */}
-        <div className="max-w-4xl mx-auto relative">
-          {/* Vertical Connecting Line */}
-          <div className="absolute left-[19px] sm:left-[105px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-[#2F6296] via-[#D61356] to-[#2F6296] opacity-30" />
-
-          <div className="space-y-4">
-            {filteredSessions.map((session, index) => {
-              const isExpanded = !!expandedSessions[session.id];
-              const isBreak = session.category === 'break' || session.category === 'networking';
-
-              return (
-                <div
-                  key={session.id}
-                  className={`relative flex items-start gap-4 sm:gap-6 rounded-2xl transition-all duration-200 ${
-                    isBreak
-                      ? 'bg-white/[0.02] border border-white/5 p-4 sm:p-5'
-                      : 'glass-panel-dark border border-white/10 hover:border-white/20 p-5 sm:p-6 shadow-lg'
-                  }`}
-                >
-                  {/* Timeline Node Bullet */}
-                  <div className="relative z-10 shrink-0 mt-1">
-                    <div className="w-8 h-8 rounded-full bg-[#07101F] border-2 border-[#2F6296] flex items-center justify-center shadow-lg shadow-[#2F6296]/30">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#D61356]" />
-                    </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-6">
+                  {/* Time Numeral & Location in Mono */}
+                  <div className="sm:w-36 shrink-0 flex sm:flex-col items-center sm:items-start justify-between sm:justify-center">
+                    <span className="font-mono text-xs sm:text-sm font-semibold text-[#0A1428] tabular-nums tracking-tight">
+                      {session.time}
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-mono text-[10px] text-[#2F6DB5] font-medium sm:mt-0.5">
+                      <MapPin className="w-2.5 h-2.5 shrink-0 hidden sm:inline" />
+                      {session.category === 'break' || session.category === 'networking'
+                        ? 'Networking'
+                        : session.period === 'morning'
+                        ? 'Plenary Hall'
+                        : 'Exec Chamber'}
+                    </span>
                   </div>
 
-                  {/* Time Badge (Desktop Column) */}
-                  <div className="hidden sm:block shrink-0 w-24 pt-1 font-mono text-xs font-bold text-slate-300 tabular-nums">
-                    {session.time}
-                  </div>
-
-                  {/* Session Content */}
+                  {/* Title & Tag in Single Balanced Row */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      {/* Mobile Time */}
-                      <span className="sm:hidden font-mono text-xs font-bold text-slate-300 mr-2">
-                        {session.time}
-                      </span>
-
-                      {/* Pill Badge */}
-                      <span
-                        className={`text-[11px] font-semibold tracking-wide uppercase px-2.5 py-0.5 rounded-full border ${getTagColor(
-                          session.tag
-                        )}`}
-                      >
-                        {session.tag}
-                      </span>
-
-                      {session.strategicTrack && (
-                        <span className="text-[11px] font-mono text-slate-400">
-                          {session.strategicTrack}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-start justify-between gap-4 cursor-pointer" onClick={() => toggleExpand(session.id)}>
-                      <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-xs sm:text-sm font-semibold text-[#0A1428] tracking-tight leading-snug">
                         {session.title}
                       </h3>
-                      <button
-                        className="p-1 text-slate-400 hover:text-white transition-colors"
-                        aria-label="Toggle Session Details"
-                      >
-                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
+                      <span className="font-mono text-[9px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded bg-slate-200/60 text-[#4A5568] shrink-0">
+                        {session.tag}
+                      </span>
                     </div>
 
-                    {isExpanded && (
-                      <div className="mt-3 pt-3 border-t border-white/5 text-xs sm:text-sm text-slate-300 leading-relaxed font-normal animate-fade-in">
-                        <p>{session.description}</p>
+                    <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-1 sm:line-clamp-2 mt-0.5 font-normal">
+                      {session.description}
+                    </p>
+
+                    {isExpanded && session.strategicTrack && (
+                      <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1.5 text-[11px] text-[#2F6DB5] font-medium font-mono">
+                        <Tag className="w-3 h-3" />
+                        <span>Track: {session.strategicTrack}</span>
                       </div>
                     )}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Action Agenda Banner sign-off from Page 2 */}
-        <div className="max-w-4xl mx-auto mt-16 p-6 rounded-2xl bg-gradient-to-r from-[#2F6296] via-[#102444] to-[#D61356] border border-white/20 text-center shadow-2xl">
-          <div className="font-mono text-xs font-bold tracking-widest text-pink-200 uppercase mb-1">
-            Congress Action Mandate
-          </div>
-          <div className="text-base sm:text-xl font-extrabold text-white tracking-wide">
-            {EVENT_DETAILS.actionCallout}
-          </div>
+                  {/* Expand Chevron Icon */}
+                  <div className="shrink-0 flex items-center justify-end sm:w-6">
+                    <span
+                      className={`text-slate-400 p-1 rounded hover:bg-slate-100 transition-transform duration-200 ${
+                        isExpanded ? 'rotate-180 text-[#2F6DB5]' : ''
+                      }`}
+                    >
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

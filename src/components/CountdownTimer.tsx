@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 interface CountdownTimerProps {
-  targetDate: string; // ISO date
+  targetDate: string;
+  className?: string;
 }
 
-export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate }) => {
+export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, className = '' }) => {
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
     hours: number;
@@ -32,32 +33,26 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate }) =>
     return () => clearInterval(timer);
   }, [targetDate]);
 
-  const units = [
-    { label: 'Days', value: timeLeft.days },
-    { label: 'Hours', value: timeLeft.hours },
-    { label: 'Minutes', value: timeLeft.minutes },
-    { label: 'Seconds', value: timeLeft.seconds },
-  ];
-
   return (
-    <div className="inline-flex items-center gap-2 sm:gap-3 p-2 rounded-2xl glass-panel-dark border border-white/10 shadow-2xl">
-      {units.map((unit, index) => (
-        <React.Fragment key={unit.label}>
-          <div className="flex flex-col items-center justify-center min-w-[56px] sm:min-w-[68px] py-2 px-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
-            <span className="font-mono text-xl sm:text-2xl font-extrabold text-white tracking-tight tabular-nums">
-              {String(unit.value).padStart(2, '0')}
-            </span>
-            <span className="text-[10px] sm:text-[11px] font-medium tracking-wider text-slate-400 uppercase mt-0.5">
-              {unit.label}
-            </span>
-          </div>
-          {index < units.length - 1 && (
-            <span className="text-slate-500 font-bold text-sm select-none" aria-hidden="true">
-              :
-            </span>
-          )}
-        </React.Fragment>
-      ))}
+    <div className={`w-full border-y border-white/[0.08] bg-[#0A1428]/80 backdrop-blur-sm py-3 px-4 text-center ${className}`}>
+      <div className="max-w-[1200px] mx-auto flex items-center justify-center gap-3 sm:gap-6 text-xs text-[#B8C2D6]">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D81B60] animate-pulse" />
+          Convenes In
+        </span>
+
+        <div className="font-mono text-xs sm:text-sm font-semibold text-white tabular-nums tracking-wider flex items-center gap-1">
+          <span>{timeLeft.days}<span className="text-white/40 text-[10px] ml-0.5 mr-1.5">d</span></span>
+          <span>{String(timeLeft.hours).padStart(2, '0')}<span className="text-white/40 text-[10px] ml-0.5 mr-1.5">h</span></span>
+          <span>{String(timeLeft.minutes).padStart(2, '0')}<span className="text-white/40 text-[10px] ml-0.5 mr-1.5">m</span></span>
+          <span className="text-[#D81B60]">{String(timeLeft.seconds).padStart(2, '0')}<span className="text-[#D81B60]/60 text-[10px] ml-0.5">s</span></span>
+        </div>
+
+        <span className="text-white/10 hidden sm:inline select-none">|</span>
+        <span className="text-[11px] text-[#B8C2D6] hidden md:inline font-normal">
+          Royal Aria Conference Centre · Plenary Hall
+        </span>
+      </div>
     </div>
   );
 };
