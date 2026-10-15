@@ -133,7 +133,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   // Default secretariat emergency passcode
   const SECRET_PASSCODE = 'BMIC2026';
-  const AUTHORIZED_ADMIN_EMAILS = ['quintonbileon@gmail.com', 'gsetlamelo@gmail.com'];
+  const AUTHORIZED_ADMIN_EMAILS = ['quintonbileon@gmail.com', 'gsetlamelo@gmail.com', 'eduvisionbw@gmail.com'];
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {

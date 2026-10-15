@@ -43,7 +43,7 @@ export const Speakers: React.FC = () => {
       roleBadge: 'Keynote Speaker',
       title: 'Minister of Communication and Innovation',
       organization: 'Government of Botswana',
-      imageUrl: 'https://drive.google.com/thumbnail?id=10hqNJcuEcOj0Q-XNy_NGzJUTffLtvkxZ&sz=w1000',
+      imageUrl: '/speaker1.jpg',
     },
     {
       id: 'speaker-2',
@@ -51,7 +51,7 @@ export const Speakers: React.FC = () => {
       roleBadge: 'Speaker',
       title: 'Digital Transformation Expert',
       organization: 'Chairperson of the ICT Sector Business Botswana',
-      imageUrl: 'https://drive.google.com/thumbnail?id=11Z9zwhVVBAZKsP6VEP8MMkduoQrvc8Xn&sz=w1000',
+      imageUrl: '/speaker2.jpg',
     },
     {
       id: 'speaker-3',
@@ -59,7 +59,7 @@ export const Speakers: React.FC = () => {
       roleBadge: 'Speaker',
       title: 'Chairman and CEO',
       organization: 'Future Trends Group',
-      imageUrl: 'https://drive.google.com/thumbnail?id=1wei47ZGNLmRXieBvBNphXDuKGr0bfDj0&sz=w1000',
+      imageUrl: '/speaker3.jpg',
     },
   ];
 

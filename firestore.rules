@@ -19,7 +19,11 @@ service cloud.firestore {
     }
 
     function isBootstrappedAdmin() {
-      return isSignedIn() && (request.auth.token.email == 'quintonbileon@gmail.com' || request.auth.token.email == 'gsetlamelo@gmail.com');
+      return isSignedIn() && (
+        request.auth.token.email == 'quintonbileon@gmail.com' ||
+        request.auth.token.email == 'gsetlamelo@gmail.com' ||
+        request.auth.token.email == 'eduvisionbw@gmail.com'
+      );
     }
 
     function isAdmin() {
