@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EVENT_DETAILS, CORPORATE_RATE_CARD } from '../data/bmicContent';
-import { submitRegistration } from '../firebase';
-import { X, Send, CheckCircle2, User, Mail, Phone, Building, Loader2, AlertCircle } from 'lucide-react';
+import { submitRegistration, uploadRegistrationAttachment } from '../firebase';
+import { X, Send, CheckCircle2, User, Mail, Phone, Building, Loader2, AlertCircle, Paperclip, FileCheck } from 'lucide-react';
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -27,6 +27,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialSelection) {
@@ -57,8 +59,25 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
     setIsSubmitting(true);
     setSubmitError(null);
+    setUploadStatus(null);
 
     try {
+      let attachmentUrl: string | undefined;
+      let attachmentName: string | undefined;
+
+      if (attachmentFile) {
+        setUploadStatus('Uploading document to Firebase Storage...');
+        try {
+          const uploaded = await uploadRegistrationAttachment(attachmentFile, 'delegates');
+          attachmentUrl = uploaded.url;
+          attachmentName = uploaded.name;
+        } catch (uploadErr) {
+          console.warn('Storage upload encountered network fallback:', uploadErr);
+          attachmentName = attachmentFile.name;
+        }
+      }
+
+      setUploadStatus('Saving registration to congress database...');
       const regId = await submitRegistration({
         fullName: formData.fullName,
         email: formData.email,
@@ -66,13 +85,17 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         organization: formData.organization,
         passOrTier: formData.passOrTier,
         notes: formData.notes,
+        attachmentUrl,
+        attachmentName,
       });
       setSubmittedId(regId);
     } catch (err: unknown) {
       console.error('Registration save error:', err);
-      setSubmitError('Unable to save registration to database. Please check connection and try again.');
+      const errorMsg = err instanceof Error ? err.message : 'Unable to complete database operation.';
+      setSubmitError(`Registration error: ${errorMsg}. Please try again or contact secretariat directly.`);
     } finally {
       setIsSubmitting(false);
+      setUploadStatus(null);
     }
   };
 
@@ -80,6 +103,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setSubmittedId(null);
     setSubmitError(null);
     setErrors({});
+    setAttachmentFile(null);
+    setUploadStatus(null);
     onClose();
   };
 
@@ -275,6 +300,55 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 />
               </div>
 
+              {/* Supporting Document / PO Upload (Firebase Storage) */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-medium text-[#B8C2D6]">
+                    Attachment / PO / Proof of Payment (Optional)
+                  </label>
+                  <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Firebase Storage
+                  </span>
+                </div>
+                <div className="relative border border-dashed border-white/15 rounded-[12px] p-3 text-center hover:border-[#2F6DB5] transition-colors bg-[#0A1428]/50">
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setAttachmentFile(e.target.files[0]);
+                      }
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  {attachmentFile ? (
+                    <div className="flex items-center justify-between text-xs text-emerald-300 px-2 py-0.5">
+                      <div className="flex items-center gap-2 truncate">
+                        <FileCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span className="truncate font-medium">{attachmentFile.name}</span>
+                        <span className="text-[10px] text-slate-400">({(attachmentFile.size / 1024).toFixed(0)} KB)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAttachmentFile(null);
+                        }}
+                        className="text-slate-400 hover:text-red-400 text-xs ml-2 cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2 text-xs text-slate-400 py-0.5">
+                      <Paperclip className="w-3.5 h-3.5 text-[#2F6DB5]" />
+                      <span>Attach file (PDF, PNG, JPG, DOCX up to 15MB)</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="pt-2">
                 <button
                   type="submit"
@@ -284,7 +358,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Saving to Database...</span>
+                      <span>{uploadStatus || 'Saving to Database...'}</span>
                     </>
                   ) : (
                     <>

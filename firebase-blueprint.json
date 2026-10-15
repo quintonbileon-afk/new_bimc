@@ -46,6 +46,16 @@
           "description": "Internal secretariat notes",
           "maxLength": 1000
         },
+        "attachmentUrl": {
+          "type": "string",
+          "description": "Firebase Storage download URL for registration document or proof of payment",
+          "maxLength": 1000
+        },
+        "attachmentName": {
+          "type": "string",
+          "description": "Original filename of uploaded document",
+          "maxLength": 250
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",

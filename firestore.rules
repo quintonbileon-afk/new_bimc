@@ -28,7 +28,7 @@ service cloud.firestore {
 
     function isValidRegistration(data) {
       return data.keys().hasAll(['fullName', 'email', 'passOrTier', 'status'])
-        && data.keys().hasOnly(['fullName', 'email', 'phone', 'organization', 'passOrTier', 'notes', 'status', 'adminNotes', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['fullName', 'email', 'phone', 'organization', 'passOrTier', 'notes', 'status', 'adminNotes', 'attachmentUrl', 'attachmentName', 'createdAt', 'updatedAt'])
         && data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 150
         && data.email is string && data.email.size() > 0 && data.email.size() <= 150
         && data.passOrTier is string && data.passOrTier.size() > 0 && data.passOrTier.size() <= 100
@@ -36,7 +36,9 @@ service cloud.firestore {
         && (!('phone' in data) || (data.phone is string && data.phone.size() <= 50))
         && (!('organization' in data) || (data.organization is string && data.organization.size() <= 150))
         && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000))
-        && (!('adminNotes' in data) || (data.adminNotes is string && data.adminNotes.size() <= 1000));
+        && (!('adminNotes' in data) || (data.adminNotes is string && data.adminNotes.size() <= 1000))
+        && (!('attachmentUrl' in data) || (data.attachmentUrl is string && data.attachmentUrl.size() <= 1000))
+        && (!('attachmentName' in data) || (data.attachmentName is string && data.attachmentName.size() <= 250));
     }
 
     // Default Deny

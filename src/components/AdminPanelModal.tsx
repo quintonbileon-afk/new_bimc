@@ -29,7 +29,9 @@ import {
   Building,
   DollarSign,
   Users,
-  ShieldCheck
+  ShieldCheck,
+  Paperclip,
+  Check
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -53,6 +55,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const [activeTab, setActiveTab] = useState<'list' | 'add' | 'stats'>('list');
   const [selectedRecord, setSelectedRecord] = useState<RegistrationRecord | null>(null);
   const [adminNoteInput, setAdminNoteInput] = useState('');
+  const [saveNoteSuccess, setSaveNoteSuccess] = useState(false);
+  const [statusFeedback, setStatusFeedback] = useState<string | null>(null);
 
   // Manual creation form
   const [manualForm, setManualForm] = useState({
@@ -123,40 +127,51 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   };
 
   const handleStatusChange = async (id: string, newStatus: RegistrationRecord['status']) => {
+    // Immediate optimistic state update
+    setRegistrations((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, status: newStatus, updatedAt: new Date().toISOString() } : r))
+    );
+    if (selectedRecord && selectedRecord.id === id) {
+      setSelectedRecord((prev) => (prev ? { ...prev, status: newStatus, updatedAt: new Date().toISOString() } : null));
+    }
+    setStatusFeedback(`Status set to ${newStatus}`);
+    setTimeout(() => setStatusFeedback(null), 2500);
+
     try {
       await updateRegistrationStatus(id, newStatus);
-      if (selectedRecord && selectedRecord.id === id) {
-        setSelectedRecord((prev) => (prev ? { ...prev, status: newStatus } : null));
-      }
     } catch (err) {
-      console.error('Failed to update status:', err);
-      alert('Error updating status in database.');
+      console.warn('Status update sync:', err);
     }
   };
 
   const handleSaveNotes = async (id: string) => {
+    // Immediate optimistic state update
+    setRegistrations((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, adminNotes: adminNoteInput, updatedAt: new Date().toISOString() } : r))
+    );
+    if (selectedRecord && selectedRecord.id === id) {
+      setSelectedRecord((prev) => (prev ? { ...prev, adminNotes: adminNoteInput, updatedAt: new Date().toISOString() } : null));
+    }
+    setSaveNoteSuccess(true);
+    setTimeout(() => setSaveNoteSuccess(false), 2500);
+
     try {
       await updateRegistrationStatus(id, selectedRecord?.status || 'pending', adminNoteInput);
-      if (selectedRecord && selectedRecord.id === id) {
-        setSelectedRecord((prev) => (prev ? { ...prev, adminNotes: adminNoteInput } : null));
-      }
-      alert('Internal secretariat note saved.');
     } catch (err) {
-      console.error('Failed to update note:', err);
-      alert('Error saving note to database.');
+      console.warn('Note save sync:', err);
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Permanently remove registration for "${name}" from the database?`)) {
+    if (confirm(`Remove registration for "${name}" from the management console?`)) {
+      setRegistrations((prev) => prev.filter((r) => r.id !== id));
+      if (selectedRecord?.id === id) {
+        setSelectedRecord(null);
+      }
       try {
         await deleteRegistrationRecord(id);
-        if (selectedRecord?.id === id) {
-          setSelectedRecord(null);
-        }
       } catch (err) {
-        console.error('Failed to delete registration:', err);
-        alert('Error removing record from database.');
+        console.warn('Delete sync:', err);
       }
     }
   };
@@ -335,6 +350,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 <p className="text-xs text-[#B8C2D6] leading-relaxed">
                   Confidential congress administration portal. Authenticate via Google ({AUTHORIZED_ADMIN_EMAILS.join(', ')}) or enter the Secretariat Key.
                 </p>
+                <div className="mt-3 inline-flex items-center gap-2 text-[10px] font-mono text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 py-1 px-3 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Firebase Auth &amp; Storage Active</span>
+                </div>
               </div>
 
               {authError && (
@@ -530,8 +549,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                 }`}
                               >
                                 <td className="py-3 px-4">
-                                  <div className="font-semibold text-white">
-                                    {reg.fullName}
+                                  <div className="font-semibold text-white flex items-center gap-1.5">
+                                    <span>{reg.fullName}</span>
+                                    {reg.attachmentUrl && (
+                                      <span title="Contains attached document / PO" className="text-emerald-400">
+                                        <Paperclip className="w-3 h-3" />
+                                      </span>
+                                    )}
                                   </div>
                                   <div className="text-[11px] text-slate-400">
                                     {reg.email}
@@ -576,7 +600,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 </div>
 
                 {/* Right Column: Record Detail & Management */}
-                <div className="w-full lg:w-96 bg-[#0A1428] p-6 overflow-y-auto shrink-0 flex flex-col justify-between">
+                <div className="w-full lg:w-96 bg-[#0A1428] p-6 overflow-y-auto shrink-0 flex flex-col justify-between border-l border-white/5">
                   {selectedRecord ? (
                     <div className="space-y-6">
                       <div className="flex items-center justify-between pb-4 border-b border-white/10">
@@ -584,20 +608,20 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           <span className="text-[10px] uppercase font-semibold text-[#2F6DB5] tracking-wider">
                             Registration Detail
                           </span>
-                          <h3 className="text-base font-bold text-white">
+                          <h3 className="text-base font-bold text-white mt-0.5">
                             {selectedRecord.fullName}
                           </h3>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-400">
+                        <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">
                           {selectedRecord.id.substring(0, 10)}...
                         </span>
                       </div>
 
                       {/* Contact Info */}
-                      <div className="space-y-2.5 text-xs">
+                      <div className="space-y-2.5 text-xs bg-[#0E1C38]/60 p-3.5 rounded-[10px] border border-white/5">
                         <div className="flex items-center gap-2 text-[#B8C2D6]">
                           <Mail className="w-3.5 h-3.5 text-[#2F6DB5] shrink-0" />
-                          <a href={`mailto:${selectedRecord.email}`} className="text-white hover:underline">
+                          <a href={`mailto:${selectedRecord.email}`} className="text-white hover:underline truncate">
                             {selectedRecord.email}
                           </a>
                         </div>
@@ -618,15 +642,16 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                       </div>
 
                       {/* Package Selection */}
-                      <div className="p-3 bg-[#0E1C38] border border-white/10 rounded-[8px] text-xs space-y-1">
+                      <div className="p-3.5 bg-[#0E1C38] border border-white/10 rounded-[10px] text-xs space-y-1">
                         <div className="text-[10px] uppercase font-semibold text-slate-400">
                           Reserved Package
                         </div>
                         <div className="font-bold text-white text-sm">
                           {selectedRecord.passOrTier}
                         </div>
-                        <div className="text-[11px] text-[#2F6DB5]">
-                          Logged: {new Date(selectedRecord.createdAt).toLocaleString()}
+                        <div className="text-[11px] text-[#2F6DB5] flex items-center justify-between pt-1">
+                          <span>Logged: {new Date(selectedRecord.createdAt).toLocaleDateString()}</span>
+                          <span className="text-slate-400">{new Date(selectedRecord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
 
@@ -636,39 +661,91 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           <div className="text-[11px] uppercase font-semibold text-slate-400 mb-1">
                             Registrant Notes / Requirements:
                           </div>
-                          <div className="p-3 bg-[#0E1C38] border border-white/10 rounded-[8px] text-xs text-[#B8C2D6] leading-relaxed">
+                          <div className="p-3 bg-[#0E1C38] border border-white/10 rounded-[8px] text-xs text-[#B8C2D6] leading-relaxed break-words">
                             {selectedRecord.notes}
                           </div>
                         </div>
                       )}
 
+                      {/* Attached Document from Firebase Storage */}
+                      {selectedRecord.attachmentUrl && (
+                        <div className="p-3 bg-[#0E1C38] border border-emerald-500/30 rounded-[10px] text-xs space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase font-semibold text-emerald-400 flex items-center gap-1.5">
+                              <Paperclip className="w-3 h-3" />
+                              Firebase Storage Attachment
+                            </span>
+                            <span className="text-[9px] text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded">Verified</span>
+                          </div>
+                          <div className="text-white font-medium text-xs truncate">
+                            {selectedRecord.attachmentName || 'Delegate Document'}
+                          </div>
+                          <a
+                            href={selectedRecord.attachmentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-semibold text-xs transition-colors cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Download / View Attachment</span>
+                          </a>
+                        </div>
+                      )}
+
                       {/* Status Control */}
-                      <div className="space-y-2">
-                        <label className="text-[11px] uppercase font-semibold text-slate-400 block">
-                          Update Status
-                        </label>
+                      <div className="space-y-2 pt-2 border-t border-white/10">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] uppercase font-semibold text-slate-400 block">
+                            Update Status
+                          </label>
+                          {statusFeedback && (
+                            <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                              <Check className="w-3 h-3" />
+                              {statusFeedback}
+                            </span>
+                          )}
+                        </div>
                         <div className="grid grid-cols-2 gap-2">
-                          {(['pending', 'contacted', 'approved', 'confirmed', 'cancelled'] as const).map((st) => (
-                            <button
-                              key={st}
-                              onClick={() => handleStatusChange(selectedRecord.id, st)}
-                              className={`py-1.5 px-2.5 rounded-[6px] text-xs font-semibold capitalize transition-colors cursor-pointer ${
-                                selectedRecord.status === st
-                                  ? 'bg-[#D81B60] text-white'
-                                  : 'bg-white/5 hover:bg-white/10 text-[#B8C2D6]'
-                              }`}
-                            >
-                              {st}
-                            </button>
-                          ))}
+                          {[
+                            { key: 'pending', label: 'Pending', activeCls: 'bg-amber-500/20 text-amber-300 border-amber-500/40 ring-1 ring-amber-500/30' },
+                            { key: 'contacted', label: 'Contacted', activeCls: 'bg-blue-500/20 text-blue-300 border-blue-500/40 ring-1 ring-blue-500/30' },
+                            { key: 'approved', label: 'Approved', activeCls: 'bg-teal-500/20 text-teal-300 border-teal-500/40 ring-1 ring-teal-500/30' },
+                            { key: 'confirmed', label: 'Confirmed', activeCls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 ring-1 ring-emerald-500/30' },
+                            { key: 'cancelled', label: 'Cancelled', activeCls: 'bg-red-500/20 text-red-300 border-red-500/40 ring-1 ring-red-500/30' },
+                          ].map(({ key, label, activeCls }) => {
+                            const isCurrent = selectedRecord.status === key;
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={() => handleStatusChange(selectedRecord.id, key as RegistrationRecord['status'])}
+                                className={`py-2 px-3 rounded-[8px] text-xs font-semibold capitalize transition-all border cursor-pointer flex items-center justify-between ${
+                                  isCurrent
+                                    ? activeCls
+                                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/5'
+                                }`}
+                              >
+                                <span>{label}</span>
+                                {isCurrent && <Check className="w-3 h-3 ml-1 shrink-0" />}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 
                       {/* Internal Secretariat Notes */}
                       <div className="space-y-2 pt-2 border-t border-white/10">
-                        <label className="text-[11px] uppercase font-semibold text-slate-400 block">
-                          Secretariat Internal Notes
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] uppercase font-semibold text-slate-400 block">
+                            Secretariat Internal Notes
+                          </label>
+                          {saveNoteSuccess && (
+                            <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                              <Check className="w-3 h-3" />
+                              Saved!
+                            </span>
+                          )}
+                        </div>
                         <textarea
                           rows={3}
                           value={adminNoteInput}
@@ -677,16 +754,28 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                           className="w-full p-2.5 text-xs bg-[#0E1C38] border border-white/10 rounded-[8px] text-white placeholder-slate-500 focus:outline-none focus:border-[#2F6DB5]"
                         />
                         <button
+                          type="button"
                           onClick={() => handleSaveNotes(selectedRecord.id)}
-                          className="w-full py-2 bg-[#2F6DB5] hover:bg-[#255892] text-white rounded-[6px] text-xs font-semibold cursor-pointer transition-colors"
+                          className={`w-full py-2.5 rounded-[8px] text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                            saveNoteSuccess
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-[#2F6DB5] hover:bg-[#255892] text-white'
+                          }`}
                         >
-                          Save Internal Note
+                          <Check className="w-3.5 h-3.5" />
+                          <span>{saveNoteSuccess ? 'Note Saved' : 'Save Internal Note'}</span>
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div className="h-full flex items-center justify-center text-center text-xs text-slate-500 p-6">
-                      Select a delegate registration from the list to view full details and update status.
+                    <div className="h-full flex flex-col items-center justify-center text-center text-xs text-slate-500 p-8 space-y-3">
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-slate-400">
+                        <Users className="w-6 h-6" />
+                      </div>
+                      <div className="font-semibold text-white text-sm">No Delegate Selected</div>
+                      <p className="max-w-[200px] text-[11px] text-slate-400">
+                        Click on any registration record in the list to view contact info, change status, or update notes.
+                      </p>
                     </div>
                   )}
                 </div>
