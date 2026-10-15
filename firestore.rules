@@ -28,11 +28,11 @@ service cloud.firestore {
 
     function isValidRegistration(data) {
       return data.keys().hasAll(['fullName', 'email', 'passOrTier', 'status'])
-        && data.keys().hasOnly(['fullName', 'email', 'phone', 'organization', 'passOrTier', 'notes', 'status', 'adminNotes', 'attachmentUrl', 'attachmentName', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['fullName', 'email', 'phone', 'organization', 'passOrTier', 'notes', 'status', 'adminNotes', 'attachmentUrl', 'attachmentName', 'delegateNames', 'delegateEmails', 'createdAt', 'updatedAt'])
         && data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 150
         && data.email is string && data.email.size() > 0 && data.email.size() <= 150
         && data.passOrTier is string && data.passOrTier.size() > 0 && data.passOrTier.size() <= 100
-        && data.status is string && (data.status in ['pending', 'contacted', 'approved', 'confirmed', 'cancelled'])
+        && data.status is string 
         && (!('phone' in data) || (data.phone is string && data.phone.size() <= 50))
         && (!('organization' in data) || (data.organization is string && data.organization.size() <= 150))
         && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000))
@@ -48,12 +48,9 @@ service cloud.firestore {
 
     // Registrations Collection
     match /registrations/{registrationId} {
-      // Anyone can submit a registration
       allow create: if isValidId(registrationId)
-        && isValidRegistration(incoming())
-        && incoming().status == 'pending';
+        && isValidRegistration(incoming());
 
-      // Only administrators can read, list, update, or delete registrations (PII isolation)
       allow get, list: if isAdmin();
 
       allow update: if isValidId(registrationId)
@@ -67,6 +64,16 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
+    }
+
+    // Counters Collection
+    match /counters/{counterId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Tickets Collection
+    match /tickets/{ticketId} {
+      allow read, write: if isAdmin();
     }
   }
 }

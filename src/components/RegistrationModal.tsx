@@ -23,6 +23,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     notes: '',
   });
 
+  const [delegate1Name, setDelegate1Name] = useState('');
+  const [delegate1Email, setDelegate1Email] = useState('');
+  const [delegate2Name, setDelegate2Name] = useState('');
+  const [delegate2Email, setDelegate2Email] = useState('');
+  const [delegate3Name, setDelegate3Name] = useState('');
+  const [delegate3Email, setDelegate3Email] = useState('');
+
+  const isCorporatePack = formData.passOrTier.toLowerCase().includes('corporate pack') || formData.passOrTier.toLowerCase().includes('3 delegates');
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -45,6 +54,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       errs.email = 'Email address is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errs.email = 'Please provide a valid email';
+    }
+    if (isCorporatePack) {
+      if (!delegate1Name.trim()) errs.delegate1Name = 'Delegate 1 name is required';
+      if (!delegate2Name.trim()) errs.delegate2Name = 'Delegate 2 name is required';
+      if (!delegate3Name.trim()) errs.delegate3Name = 'Delegate 3 name is required';
     }
     return errs;
   };
@@ -85,6 +99,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         organization: formData.organization,
         passOrTier: formData.passOrTier,
         notes: formData.notes,
+        delegateNames: isCorporatePack ? [delegate1Name, delegate2Name, delegate3Name] : [],
+        delegateEmails: isCorporatePack ? [delegate1Email, delegate2Email, delegate3Email] : [],
         attachmentUrl,
         attachmentName,
       });
@@ -286,6 +302,83 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </optgroup>
                 </select>
               </div>
+
+              {isCorporatePack && (
+                <div className="p-4 rounded-[12px] bg-[#0A1428] border border-white/10 space-y-3">
+                  <div className="text-xs font-bold text-[#D81B60] uppercase tracking-wide">
+                    Corporate Pack — 3 Delegate Names (Required)
+                  </div>
+                  
+                  {/* Delegate 1 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        value={delegate1Name}
+                        onChange={(e) => setDelegate1Name(e.target.value)}
+                        placeholder="Delegate 1 Full Name *"
+                        className="w-full px-3 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                      />
+                      {errors.delegate1Name && <p className="text-[10px] text-red-400 mt-0.5">{errors.delegate1Name}</p>}
+                    </div>
+                    <div>
+                      <input
+                        type="email"
+                        value={delegate1Email}
+                        onChange={(e) => setDelegate1Email(e.target.value)}
+                        placeholder="Delegate 1 Email (Optional)"
+                        className="w-full px-3 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Delegate 2 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        value={delegate2Name}
+                        onChange={(e) => setDelegate2Name(e.target.value)}
+                        placeholder="Delegate 2 Full Name *"
+                        className="w-full px-3 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                      />
+                      {errors.delegate2Name && <p className="text-[10px] text-red-400 mt-0.5">{errors.delegate2Name}</p>}
+                    </div>
+                    <div>
+                      <input
+                        type="email"
+                        value={delegate2Email}
+                        onChange={(e) => setDelegate2Email(e.target.value)}
+                        placeholder="Delegate 2 Email (Optional)"
+                        className="w-full px-3 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Delegate 3 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        value={delegate3Name}
+                        onChange={(e) => setDelegate3Name(e.target.value)}
+                        placeholder="Delegate 3 Full Name *"
+                        className="w-full px-3 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                      />
+                      {errors.delegate3Name && <p className="text-[10px] text-red-400 mt-0.5">{errors.delegate3Name}</p>}
+                    </div>
+                    <div>
+                      <input
+                        type="email"
+                        value={delegate3Email}
+                        onChange={(e) => setDelegate3Email(e.target.value)}
+                        placeholder="Delegate 3 Email (Optional)"
+                        className="w-full px-3 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-medium text-[#B8C2D6] mb-1.5">

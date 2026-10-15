@@ -107,11 +107,26 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
       ],
       action: 'Register Now',
     },
+    {
+      id: 'corporate-pack',
+      name: 'Corporate Pack (3 Delegates)',
+      price: 'P5,000',
+      priceSub: '3 Executive Passes',
+      badge: 'Team Package',
+      description: 'Includes 3 full delegate credentials with dedicated team seating and reserved company table.',
+      features: [
+        '3 Full delegate passes with priority session seating',
+        'Reserved company table during plenary and luncheons',
+        'Company branding in delegate materials',
+        'Priority registration and VIP concierge support',
+      ],
+      action: 'Register Team',
+    },
   ];
 
   return (
     <section id="sponsor" className="py-20 lg:py-28 bg-[#FFFFFF] text-[#0A1428] border-b border-slate-200">
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+      <div className="max-w-[1250px] mx-auto px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>
@@ -150,7 +165,7 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
                   : 'text-[#4A5568] hover:text-[#0A1428]'
               }`}
             >
-              <span>Delegate Passes</span>
+              <span>Delegate Passes (4)</span>
               <span className="w-2 h-2 rounded-full bg-[#D81B60]" />
             </button>
           </div>
@@ -230,19 +245,24 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
 
         {/* Tab 2: Delegate Passes & Free Pass for Exhibition Floor */}
         {activeTab === 'delegates' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-4">
             {delegatePasses.map((pass) => (
               <div
                 key={pass.id}
-                className={`rounded-[12px] p-8 flex flex-col justify-between transition-all duration-200 ${
-                  pass.id === 'free-pass'
+                className={`rounded-[12px] p-6 flex flex-col justify-between transition-all duration-200 ${
+                  pass.id === 'free-pass' || pass.id === 'corporate-pack'
                     ? 'bg-[#F7F8FA] border-2 border-[#D81B60] shadow-md relative'
                     : 'bg-white border border-slate-200 shadow-sm hover:shadow-md'
                 }`}
               >
-                {pass.id === 'free-pass' && (
+                {pass.id === 'corporate-pack' && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#D81B60] text-white text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full shadow-sm">
-                    Popular Free Access
+                    Team Package (3)
+                  </div>
+                )}
+                {pass.id === 'free-pass' && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#2F6DB5] text-white text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full shadow-sm">
+                    Complimentary
                   </div>
                 )}
 
@@ -251,13 +271,13 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
                     <span className="text-[11px] uppercase font-semibold tracking-wider text-[#2F6DB5]">
                       {pass.badge}
                     </span>
-                    <h3 className="text-xl sm:text-2xl font-bold text-[#0A1428] tracking-tight mt-1">
+                    <h3 className="text-lg font-bold text-[#0A1428] tracking-tight mt-1">
                       {pass.name}
                     </h3>
                   </div>
 
-                  <div className="mb-6 pb-6 border-b border-slate-200">
-                    <div className="text-3xl font-extrabold text-[#0A1428] tracking-tight">
+                  <div className="mb-5 pb-5 border-b border-slate-200">
+                    <div className="text-2xl font-extrabold text-[#0A1428] tracking-tight">
                       {pass.price}
                     </div>
                     <div className="text-xs text-[#4A5568] mt-1">
@@ -265,18 +285,18 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#4A5568] leading-relaxed mb-6">
+                  <p className="text-xs text-[#4A5568] leading-relaxed mb-5">
                     {pass.description}
                   </p>
 
-                  <div className="text-xs uppercase font-semibold tracking-wider text-[#4A5568] mb-4">
+                  <div className="text-xs uppercase font-semibold tracking-wider text-[#4A5568] mb-3">
                     Inclusions:
                   </div>
 
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2.5 mb-6">
                     {pass.features.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs text-[#4A5568] leading-relaxed">
-                        <Check className="w-4 h-4 text-[#D81B60] shrink-0 mt-0.5" strokeWidth={2} />
+                      <li key={idx} className="flex items-start gap-2 text-xs text-[#4A5568] leading-relaxed">
+                        <Check className="w-3.5 h-3.5 text-[#D81B60] shrink-0 mt-0.5" strokeWidth={2} />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -287,15 +307,15 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
                   <button
                     type="button"
                     onClick={() => onOpenRegister(pass.name)}
-                    className={`w-full py-3.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${
-                      pass.id === 'free-pass'
+                    className={`w-full py-3 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${
+                      pass.id === 'free-pass' || pass.id === 'corporate-pack'
                         ? 'bg-[#D81B60] hover:bg-[#C2185B] text-white shadow-md'
                         : 'bg-[#0A1428] hover:bg-slate-800 text-white'
                     }`}
                   >
                     {pass.action}
                   </button>
-                  <p className="text-[11px] text-center text-[#4A5568] mt-2.5">
+                  <p className="text-[11px] text-center text-[#4A5568] mt-2">
                     Instant registration confirmation
                   </p>
                 </div>

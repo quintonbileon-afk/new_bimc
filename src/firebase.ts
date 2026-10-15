@@ -10,7 +10,10 @@ import {
   onSnapshot,
   query,
   orderBy,
-  getDocFromServer
+  getDocFromServer,
+  getDocs,
+  where,
+  runTransaction
 } from 'firebase/firestore';
 import {
   getStorage,
@@ -102,12 +105,28 @@ export interface RegistrationRecord {
   organization?: string;
   passOrTier: string;
   notes?: string;
-  status: 'pending' | 'contacted' | 'approved' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'contacted' | 'approved' | 'confirmed' | 'cancelled' | 'Payment verified' | 'Rejected';
   adminNotes?: string;
   attachmentUrl?: string;
   attachmentName?: string;
+  delegateNames?: string[];
+  delegateEmails?: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TicketRecord {
+  id: string;
+  passId: string;
+  token: string;
+  bookingId: string;
+  delegateName: string;
+  organizationName: string;
+  tier: string;
+  delegateEmail?: string;
+  status: 'Valid' | 'Checked in' | 'Cancelled';
+  createdAt: string;
+  emailSent?: boolean;
 }
 
 const LOCAL_STORAGE_KEY = 'bmic_2026_registrations_cache';
@@ -133,10 +152,6 @@ export function saveLocalBackup(record: RegistrationRecord) {
 
 /**
  * Submit a delegate or corporate booking.
- * CRITICAL FIRESTORE SCHEMA COMPLIANCE:
- * The live Firestore rules enforce data.keys().hasOnly(...) containing EXACTLY:
- * ['fullName', 'email', 'phone', 'organization', 'passOrTier', 'notes', 'status', 'adminNotes', 'createdAt', 'updatedAt']
- * The document 'id' is represented by the document key itself.
  */
 export async function submitRegistration(
   registration: Omit<RegistrationRecord, 'id' | 'status' | 'createdAt' | 'updatedAt'>
@@ -145,7 +160,6 @@ export async function submitRegistration(
   const now = new Date().toISOString();
   const path = `registrations/${regId}`;
 
-  // If an attachment exists, encode it into notes so it complies with the live hasOnly rule
   let formattedNotes = registration.notes?.trim() || '';
   if (registration.attachmentUrl) {
     const attachTag = `[Attachment: ${registration.attachmentName || 'document'}] ${registration.attachmentUrl}`;
@@ -158,8 +172,7 @@ export async function submitRegistration(
     formattedNotes = formattedNotes.substring(0, 950);
   }
 
-  // Exactly the 10 allowed keys accepted by the live database rules:
-  const firestoreData: Record<string, string> = {
+  const firestoreData: Record<string, any> = {
     fullName: registration.fullName.trim().substring(0, 150),
     email: registration.email.trim().toLowerCase().substring(0, 150),
     phone: (registration.phone?.trim() || '').substring(0, 50),
@@ -168,6 +181,8 @@ export async function submitRegistration(
     notes: formattedNotes,
     status: 'pending',
     adminNotes: '',
+    delegateNames: registration.delegateNames || [],
+    delegateEmails: registration.delegateEmails || [],
     createdAt: now,
     updatedAt: now,
   };
@@ -184,6 +199,8 @@ export async function submitRegistration(
     adminNotes: '',
     attachmentUrl: registration.attachmentUrl,
     attachmentName: registration.attachmentName,
+    delegateNames: firestoreData.delegateNames,
+    delegateEmails: firestoreData.delegateEmails,
     createdAt: now,
     updatedAt: now,
   };
@@ -194,7 +211,6 @@ export async function submitRegistration(
     return regId;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, path);
-    // Persist to local backup so delegate booking is never lost
     saveLocalBackup(clientRecord);
     return regId;
   }
@@ -214,7 +230,6 @@ export function subscribeToRegistrations(
         let attachmentUrl = d.attachmentUrl;
         let attachmentName = d.attachmentName;
 
-        // Parse attachment from notes if embedded
         if (!attachmentUrl && typeof d.notes === 'string') {
           const match = d.notes.match(/\[Attachment:\s*(.*?)\]\s*(https?:\/\/[^\s\n]+)/);
           if (match) {
@@ -235,12 +250,13 @@ export function subscribeToRegistrations(
           adminNotes: d.adminNotes || '',
           attachmentUrl,
           attachmentName,
+          delegateNames: d.delegateNames || [],
+          delegateEmails: d.delegateEmails || [],
           createdAt: d.createdAt || new Date().toISOString(),
           updatedAt: d.updatedAt || new Date().toISOString(),
         });
       });
 
-      // Merge local backups (if any offline entries exist)
       const local = getLocalBackups();
       const existingIds = new Set(records.map(r => r.id));
       for (const loc of local) {
@@ -253,7 +269,6 @@ export function subscribeToRegistrations(
     },
     (err) => {
       handleFirestoreError(err, OperationType.LIST, 'registrations');
-      // If list listener is restricted, provide local cached records
       onData(getLocalBackups());
       onError(err);
     }
@@ -274,7 +289,6 @@ export async function updateRegistrationStatus(
     updates.adminNotes = adminNotes;
   }
 
-  // Update in local cache
   try {
     const local = getLocalBackups();
     const idx = local.findIndex(r => r.id === id);
@@ -295,6 +309,23 @@ export async function updateRegistrationStatus(
   }
 }
 
+export async function updateBookingDelegateNames(
+  bookingId: string,
+  delegateNames: string[],
+  delegateEmails: string[]
+) {
+  const path = `registrations/${bookingId}`;
+  try {
+    await updateDoc(doc(db, 'registrations', bookingId), {
+      delegateNames,
+      delegateEmails,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, path);
+  }
+}
+
 export async function deleteRegistrationRecord(id: string) {
   const path = `registrations/${id}`;
   try {
@@ -309,6 +340,132 @@ export async function deleteRegistrationRecord(id: string) {
     await deleteDoc(doc(db, 'registrations', id));
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+// Ticket functions
+export async function getTicketsForBooking(bookingId: string): Promise<TicketRecord[]> {
+  try {
+    const q = query(collection(db, 'tickets'), where('bookingId', '==', bookingId));
+    const snapshot = await getDocs(q);
+    const tickets: TicketRecord[] = [];
+    snapshot.forEach(docSnap => {
+      const d = docSnap.data();
+      tickets.push({
+        id: docSnap.id,
+        passId: d.passId,
+        token: d.token,
+        bookingId: d.bookingId,
+        delegateName: d.delegateName,
+        organizationName: d.organizationName,
+        tier: d.tier,
+        delegateEmail: d.delegateEmail,
+        status: d.status || 'Valid',
+        createdAt: d.createdAt,
+        emailSent: d.emailSent || false,
+      });
+    });
+    return tickets;
+  } catch (err) {
+    console.error('Error fetching tickets for booking:', err);
+    return [];
+  }
+}
+
+export async function generateTicketsForBooking(
+  booking: RegistrationRecord,
+  delegateDetails: { name: string; email?: string }[]
+): Promise<TicketRecord[]> {
+  const existing = await getTicketsForBooking(booking.id);
+  if (existing.length > 0) {
+    return existing;
+  }
+
+  const tierLower = booking.passOrTier.toLowerCase();
+  let tierCode = 'STD';
+  let tierDisplayName = booking.passOrTier;
+
+  if (tierLower.includes('free pass') || tierLower.includes('exhibition floor')) {
+    tierCode = 'EXPO';
+    tierDisplayName = 'Free Pass';
+  } else if (tierLower.includes('student') || tierLower.includes('developer')) {
+    tierCode = 'DEV';
+    tierDisplayName = 'Student / Developer';
+  } else if (tierLower.includes('standard')) {
+    tierCode = 'STD';
+    tierDisplayName = 'Standard Delegate';
+  } else if (tierLower.includes('corporate delegate')) {
+    tierCode = 'CORP';
+    tierDisplayName = 'Corporate Delegate';
+  } else if (tierLower.includes('corporate pack') || tierLower.includes('3 delegates') || tierLower.includes('team')) {
+    tierCode = 'TEAM';
+    tierDisplayName = 'Corporate Pack';
+  } else if (tierLower.includes('gold') || tierLower.includes('silver')) {
+    tierCode = 'CORP';
+    tierDisplayName = booking.passOrTier;
+  } else if (tierLower.includes('exhibitor')) {
+    tierCode = 'EXPO';
+    tierDisplayName = 'Exhibitor';
+  }
+
+  const createdTickets: TicketRecord[] = [];
+  const counterRef = doc(db, 'counters', 'ticket_counter');
+
+  for (const del of delegateDetails) {
+    let seqNum = Math.floor(1000 + Math.random() * 90000);
+    try {
+      seqNum = await runTransaction(db, async (transaction) => {
+        const counterDoc = await transaction.get(counterRef);
+        let nextVal = 1000;
+        if (counterDoc.exists()) {
+          nextVal = (counterDoc.data().currentValue || 1000) + 1;
+        }
+        transaction.set(counterRef, { currentValue: nextVal }, { merge: true });
+        return nextVal;
+      });
+    } catch (e) {
+      console.warn('Counter transaction failed, using random sequence', e);
+    }
+
+    const fiveDigit = String(seqNum).padStart(5, '0');
+    const passId = `BMIC-2026-${tierCode}-${fiveDigit}`;
+    const token = 'tok_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+    const ticketId = 'tkt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+    const now = new Date().toISOString();
+
+    const ticketData = {
+      passId,
+      token,
+      bookingId: booking.id,
+      delegateName: del.name.trim(),
+      organizationName: booking.organization || '',
+      tier: tierDisplayName,
+      delegateEmail: del.email?.trim() || booking.email,
+      status: 'Valid' as const,
+      createdAt: now,
+      emailSent: false,
+    };
+
+    try {
+      await setDoc(doc(db, 'tickets', ticketId), ticketData);
+      createdTickets.push({
+        id: ticketId,
+        ...ticketData,
+      });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.CREATE, `tickets/${ticketId}`);
+    }
+  }
+
+  await updateRegistrationStatus(booking.id, 'Payment verified');
+  return createdTickets;
+}
+
+export async function updateTicketStatus(ticketId: string, status: 'Valid' | 'Checked in' | 'Cancelled') {
+  try {
+    await updateDoc(doc(db, 'tickets', ticketId), { status });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, `tickets/${ticketId}`);
   }
 }
 

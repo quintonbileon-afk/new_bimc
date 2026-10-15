@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   RegistrationRecord,
+  TicketRecord,
   subscribeToRegistrations,
   updateRegistrationStatus,
   deleteRegistrationRecord,
   submitRegistration,
+  getTicketsForBooking,
+  generateTicketsForBooking,
+  updateTicketStatus,
+  updateBookingDelegateNames,
   auth,
   googleProvider,
   signInWithPopup,
   signOut
 } from '../firebase';
+import { TicketCard } from './TicketCard';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import {
   X,
@@ -31,7 +37,8 @@ import {
   Users,
   ShieldCheck,
   Paperclip,
-  Check
+  Check,
+  Ticket
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -57,6 +64,61 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const [adminNoteInput, setAdminNoteInput] = useState('');
   const [saveNoteSuccess, setSaveNoteSuccess] = useState(false);
   const [statusFeedback, setStatusFeedback] = useState<string | null>(null);
+
+  const [bookingTickets, setBookingTickets] = useState<TicketRecord[]>([]);
+  const [isGeneratingTickets, setIsGeneratingTickets] = useState(false);
+  const [editDelNames, setEditDelNames] = useState<string[]>(['', '', '']);
+
+  useEffect(() => {
+    if (selectedRecord) {
+      getTicketsForBooking(selectedRecord.id).then((tks) => setBookingTickets(tks));
+      const names = selectedRecord.delegateNames && selectedRecord.delegateNames.length > 0
+        ? selectedRecord.delegateNames
+        : [selectedRecord.fullName, '', ''];
+      setEditDelNames([names[0] || '', names[1] || '', names[2] || '']);
+    } else {
+      setBookingTickets([]);
+    }
+  }, [selectedRecord]);
+
+  const handleGenerateTickets = async () => {
+    if (!selectedRecord) return;
+    setIsGeneratingTickets(true);
+    try {
+      const isCorpPack = selectedRecord.passOrTier.toLowerCase().includes('corporate pack') || selectedRecord.passOrTier.toLowerCase().includes('3 delegates');
+
+      let delegateDetails: { name: string; email?: string }[] = [];
+      if (isCorpPack) {
+        delegateDetails = [
+          { name: editDelNames[0] || selectedRecord.fullName, email: selectedRecord.email },
+          { name: editDelNames[1] || 'Delegate 2', email: selectedRecord.email },
+          { name: editDelNames[2] || 'Delegate 3', email: selectedRecord.email },
+        ];
+        await updateBookingDelegateNames(
+          selectedRecord.id,
+          [editDelNames[0] || selectedRecord.fullName, editDelNames[1] || 'Delegate 2', editDelNames[2] || 'Delegate 3'],
+          [selectedRecord.email, selectedRecord.email, selectedRecord.email]
+        );
+      } else {
+        delegateDetails = [{ name: selectedRecord.fullName, email: selectedRecord.email }];
+      }
+
+      const tks = await generateTicketsForBooking(selectedRecord, delegateDetails);
+      setBookingTickets(tks);
+      setSelectedRecord((prev) => prev ? { ...prev, status: 'Payment verified' } : null);
+      alert(`Successfully generated ${tks.length} ticket(s) for booking!`);
+    } catch (err) {
+      console.error('Ticket generation error:', err);
+      alert('Error generating tickets.');
+    } finally {
+      setIsGeneratingTickets(false);
+    }
+  };
+
+  const handleCheckInTicket = async (ticketId: string, status: 'Valid' | 'Checked in' | 'Cancelled') => {
+    await updateTicketStatus(ticketId, status);
+    setBookingTickets((prev) => prev.map((t) => t.id === ticketId ? { ...t, status } : t));
+  };
 
   // Manual creation form
   const [manualForm, setManualForm] = useState({
@@ -692,6 +754,99 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         </div>
                       )}
 
+                      {/* Ticket System Section */}
+                      <div className="space-y-3 pt-3 border-t border-white/10">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] uppercase font-bold text-[#FF6B9A] tracking-wider flex items-center gap-1.5">
+                            <Ticket className="w-3.5 h-3.5" />
+                            Congress Passes &amp; Tickets
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {bookingTickets.length} Issued
+                          </span>
+                        </div>
+
+                        {bookingTickets.length > 0 ? (
+                          <div className="space-y-3">
+                            <div className="text-[11px] text-emerald-400 font-medium">
+                              Tickets generated and active in system:
+                            </div>
+                            {bookingTickets.map((tkt) => (
+                              <div key={tkt.id} className="p-3 bg-[#0E1C38] border border-white/10 rounded-[10px] space-y-2 text-xs">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-bold text-white">{tkt.delegateName}</span>
+                                  <span className="font-mono text-[10px] text-[#6AA5EE]">{tkt.passId}</span>
+                                </div>
+                                <div className="text-[11px] text-slate-400">Tier: {tkt.tier}</div>
+                                <div className="flex items-center gap-2 pt-1">
+                                  <button
+                                    onClick={() => setSelectedRecord({ ...selectedRecord, _viewTicket: tkt } as any)}
+                                    className="flex-1 py-1.5 bg-[#2F6DB5] hover:bg-[#255892] text-white rounded font-semibold text-[11px] text-center cursor-pointer"
+                                  >
+                                    View Pass Card
+                                  </button>
+                                  <span className={`px-2 py-1 rounded text-[10px] font-bold ${
+                                    tkt.status === 'Checked in' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-blue-500/20 text-blue-300'
+                                  }`}>
+                                    {tkt.status}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {selectedRecord.passOrTier.toLowerCase().includes('corporate pack') || selectedRecord.passOrTier.toLowerCase().includes('3 delegates') ? (
+                              <div className="space-y-2 bg-[#0E1C38] p-3 rounded-[10px] border border-white/10">
+                                <div className="text-[11px] text-slate-300 font-medium">Edit 3 Delegate Names before generating:</div>
+                                <input
+                                  type="text"
+                                  value={editDelNames[0]}
+                                  onChange={(e) => setEditDelNames([e.target.value, editDelNames[1], editDelNames[2]])}
+                                  placeholder="Delegate 1 Name"
+                                  className="w-full px-2.5 py-1.5 text-xs bg-[#0A1428] border border-white/10 rounded text-white"
+                                />
+                                <input
+                                  type="text"
+                                  value={editDelNames[1]}
+                                  onChange={(e) => setEditDelNames([editDelNames[0], e.target.value, editDelNames[2]])}
+                                  placeholder="Delegate 2 Name"
+                                  className="w-full px-2.5 py-1.5 text-xs bg-[#0A1428] border border-white/10 rounded text-white"
+                                />
+                                <input
+                                  type="text"
+                                  value={editDelNames[2]}
+                                  onChange={(e) => setEditDelNames([editDelNames[0], editDelNames[1], e.target.value])}
+                                  placeholder="Delegate 3 Name"
+                                  className="w-full px-2.5 py-1.5 text-xs bg-[#0A1428] border border-white/10 rounded text-white"
+                                />
+                              </div>
+                            ) : null}
+
+                            <button
+                              type="button"
+                              onClick={handleGenerateTickets}
+                              disabled={isGeneratingTickets}
+                              className="w-full py-3 bg-[#D81B60] hover:bg-[#c2185b] text-white rounded-full text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+                            >
+                              {isGeneratingTickets ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Ticket className="w-4 h-4" />
+                              )}
+                              <span>
+                                {selectedRecord.passOrTier.toLowerCase().includes('free pass') || selectedRecord.passOrTier.toLowerCase().includes('exhibition floor')
+                                  ? 'Approve and generate ticket'
+                                  : 'Verify payment and generate ticket(s)'}
+                              </span>
+                            </button>
+                            <div className="text-[10px] text-slate-400 text-center">
+                              Generates Pass ID and scannable QR ticket(s) in database.
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Status Control */}
                       <div className="space-y-2 pt-2 border-t border-white/10">
                         <div className="flex items-center justify-between">
@@ -965,6 +1120,33 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Ticket View Modal */}
+        {(selectedRecord as any)?._viewTicket && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-[#0A1428]/95 backdrop-blur-md animate-fade-in">
+            <div className="relative w-full max-w-3xl bg-[#0E1C38] rounded-[16px] p-6 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+                <h3 className="text-base font-bold text-white">Congress Pass &amp; Ticket View</h3>
+                <button
+                  onClick={() => setSelectedRecord({ ...selectedRecord, _viewTicket: undefined } as any)}
+                  className="p-1 rounded-full text-slate-400 hover:text-white cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <TicketCard
+                ticket={(selectedRecord as any)._viewTicket}
+                onStatusChange={async (id, status) => {
+                  await handleCheckInTicket(id, status);
+                  setSelectedRecord({
+                    ...selectedRecord,
+                    _viewTicket: { ...(selectedRecord as any)._viewTicket, status }
+                  } as any);
+                }}
+              />
+            </div>
           </div>
         )}
       </div>

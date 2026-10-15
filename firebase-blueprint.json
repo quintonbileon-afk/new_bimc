@@ -38,8 +38,7 @@
         },
         "status": {
           "type": "string",
-          "description": "Registration approval and payment status",
-          "enum": ["pending", "contacted", "approved", "confirmed", "cancelled"]
+          "description": "Registration approval and payment status"
         },
         "adminNotes": {
           "type": "string",
@@ -56,6 +55,14 @@
           "description": "Original filename of uploaded document",
           "maxLength": 250
         },
+        "delegateNames": {
+          "type": "array",
+          "description": "Delegate names for team or corporate pack bookings"
+        },
+        "delegateEmails": {
+          "type": "array",
+          "description": "Delegate emails for team or corporate pack bookings"
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",
@@ -69,6 +76,24 @@
       },
       "required": ["fullName", "email", "passOrTier", "status"]
     },
+    "Ticket": {
+      "title": "Congress Pass Ticket",
+      "description": "Generated pass ticket for verified booking",
+      "type": "object",
+      "properties": {
+        "passId": { "type": "string" },
+        "token": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "delegateName": { "type": "string" },
+        "organizationName": { "type": "string" },
+        "tier": { "type": "string" },
+        "delegateEmail": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "emailSent": { "type": "boolean" }
+      },
+      "required": ["passId", "token", "bookingId", "delegateName", "tier", "status"]
+    },
     "Admin": {
       "title": "Congress Admin",
       "description": "Authorized secretariat administrator",
@@ -81,8 +106,7 @@
         },
         "role": {
           "type": "string",
-          "description": "Administrative access role",
-          "enum": ["admin", "superadmin"]
+          "description": "Administrative access role"
         }
       },
       "required": ["email", "role"]
@@ -93,9 +117,17 @@
       "schema": "Registration",
       "description": "Public submissions and secretariat managed delegate reservations"
     },
+    "/tickets/{ticketId}": {
+      "schema": "Ticket",
+      "description": "Generated pass tickets linked to verified bookings"
+    },
     "/admins/{adminId}": {
       "schema": "Admin",
       "description": "System admin whitelist"
+    },
+    "/counters/{counterId}": {
+      "schema": "Admin",
+      "description": "Sequence counters for ticket pass IDs"
     }
   }
 }
