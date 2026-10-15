@@ -12,20 +12,92 @@ import { FullAgenda } from './components/FullAgenda';
 import { Deliverables } from './components/Deliverables';
 import { SponsorsMarquee } from './components/SponsorsMarquee';
 import { VenueTravel } from './components/VenueTravel';
-import { TicketsPasses } from './components/TicketsPasses';
+import { TicketsPasses, PassesTabType } from './components/TicketsPasses';
 import { NewsInsights } from './components/NewsInsights';
 import { CtaBanner } from './components/CtaBanner';
 import { Footer } from './components/Footer';
-import { RegistrationModal } from './components/RegistrationModal';
+import { FreePassModal } from './components/FreePassModal';
+import { DelegateRegistrationModal } from './components/DelegateRegistrationModal';
+import { ExhibitionBookingModal } from './components/ExhibitionBookingModal';
+import { SponsorshipInquiryModal } from './components/SponsorshipInquiryModal';
 import { ArticleModal } from './components/ArticleModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
+import { ProgrammePage } from './components/ProgrammePage';
 import { generateIcsFile } from './utils/calendar';
 import { Check } from 'lucide-react';
 
 export default function App() {
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  // Separate modal states for each distinct registration pathway
+  const [isFreePassOpen, setIsFreePassOpen] = useState(false);
+  const [isDelegateOpen, setIsDelegateOpen] = useState(false);
+  const [delegateTier, setDelegateTier] = useState<string | undefined>(undefined);
+
+  const [isExhibitionOpen, setIsExhibitionOpen] = useState(false);
+  const [exhibitionStand, setExhibitionStand] = useState<string | undefined>(undefined);
+
+  const [isSponsorshipOpen, setIsSponsorshipOpen] = useState(false);
+  const [sponsorshipPackage, setSponsorshipPackage] = useState<string | undefined>(undefined);
+
+  // Active track selection within the Passes & Packages section
+  const [activePassesTab, setActivePassesTab] = useState<PassesTabType>('delegates');
+
+  const [currentPage, setCurrentPage] = useState<'home' | 'programme'>(() => {
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    if (path.includes('programme') || hash.includes('programme')) {
+      return 'programme';
+    }
+    return 'home';
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('programme') || hash.includes('programme')) {
+        setCurrentPage('programme');
+      } else {
+        setCurrentPage('home');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
+  }, []);
+
+  const handleNavigateProgramme = () => {
+    setCurrentPage('programme');
+    try {
+      window.history.pushState(null, '', '/programme');
+    } catch {
+      window.location.hash = '#/programme';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateHome = (targetAnchor?: string) => {
+    setCurrentPage('home');
+    try {
+      window.history.pushState(null, '', targetAnchor || '/');
+    } catch {
+      window.location.hash = targetAnchor || '#';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (targetAnchor) {
+      setTimeout(() => {
+        const id = targetAnchor.replace('#', '');
+        const el = document.getElementById(id) || document.getElementById('passes');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  };
+
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [selectedPass, setSelectedPass] = useState<string | undefined>(undefined);
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
   const [calendarToast, setCalendarToast] = useState(false);
 
@@ -55,14 +127,48 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleOpenRegister = (tierOrPass?: string) => {
-    setSelectedPass(tierOrPass);
-    setIsRegisterOpen(true);
+  // Dedicated opening handlers
+  const handleOpenFreePass = () => {
+    setIsFreePassOpen(true);
   };
 
-  const handleCloseRegister = () => {
-    setIsRegisterOpen(false);
-    setSelectedPass(undefined);
+  const handleOpenDelegate = (tier?: string) => {
+    setDelegateTier(tier);
+    setIsDelegateOpen(true);
+  };
+
+  const handleOpenExhibition = (stand?: string) => {
+    setExhibitionStand(stand);
+    setIsExhibitionOpen(true);
+  };
+
+  const handleOpenSponsorship = (pkg?: string) => {
+    setSponsorshipPackage(pkg);
+    setIsSponsorshipOpen(true);
+  };
+
+  // Smart dispatcher for generic buttons (Navbar, Hero, CTA banners)
+  const handleSmartRegister = (tierOrPass?: string) => {
+    if (!tierOrPass) {
+      handleOpenDelegate();
+      return;
+    }
+    const lower = tierOrPass.toLowerCase();
+    if (lower.includes('free') || lower.includes('expo floor')) {
+      handleOpenFreePass();
+    } else if (lower.includes('exhibit') || lower.includes('stand') || lower.includes('booth')) {
+      handleOpenExhibition(tierOrPass);
+    } else if (
+      lower.includes('sponsor') ||
+      lower.includes('headline') ||
+      lower.includes('track') ||
+      lower.includes('accord') ||
+      lower.includes('partner')
+    ) {
+      handleOpenSponsorship(tierOrPass);
+    } else {
+      handleOpenDelegate(tierOrPass);
+    }
   };
 
   const handleDownloadIcs = () => {
@@ -77,14 +183,48 @@ export default function App() {
     <div className="min-h-screen bg-[#0A1428] text-[#B8C2D6] flex flex-col font-sans selection:bg-[#D81B60] selection:text-white">
       {/* 1. Sticky Glass Navbar */}
       <Navbar
-        onOpenRegister={handleOpenRegister}
+        currentPage={currentPage}
+        onNavigateProgramme={handleNavigateProgramme}
+        onNavigateHome={handleNavigateHome}
+        onOpenRegister={handleSmartRegister}
         onDownloadIcs={handleDownloadIcs}
+        onSelectNavTab={(tab) => {
+          setActivePassesTab(tab);
+          const targetId =
+            tab === 'delegates'
+              ? 'tickets'
+              : tab === 'exhibition'
+              ? 'exhibitions'
+              : tab === 'partnerships'
+              ? 'sponsorship'
+              : 'rate-card';
+          const el = document.getElementById(targetId) || document.getElementById('passes');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
       />
+
+      {currentPage === 'programme' ? (
+        <ProgrammePage
+          onNavigateHome={handleNavigateHome}
+          onOpenRegister={handleSmartRegister}
+          onOpenFreePass={handleOpenFreePass}
+          onDownloadIcs={handleDownloadIcs}
+          onSelectNavTab={(tab) => {
+            setActivePassesTab(tab);
+            handleNavigateHome(
+              tab === 'delegates' ? '#tickets' : tab === 'exhibition' ? '#exhibitions' : '#sponsorship'
+            );
+          }}
+        />
+      ) : (
 
       <main className="flex-1">
         {/* 2. Dark Immersive Hero with Subtle Radial Glow & Slim Countdown */}
         <Hero
-          onOpenRegister={() => handleOpenRegister()}
+          onOpenRegister={() => handleSmartRegister()}
+          onOpenFreePass={handleOpenFreePass}
           onDownloadIcs={handleDownloadIcs}
         />
 
@@ -104,7 +244,7 @@ export default function App() {
 
         {/* 7. Sponsors & Partner Domains (Light Section with Large Numerals 01-06) */}
         <SponsorsMarquee
-          onOpenRegister={handleOpenRegister}
+          onOpenRegister={handleSmartRegister}
         />
 
         {/* 8. Venue & Travel Destination (Dark Section with 1px Dividers) */}
@@ -112,9 +252,15 @@ export default function App() {
           onDownloadIcs={handleDownloadIcs}
         />
 
-        {/* 9. Tickets & Corporate Rate Card (Light Section with Large Price Numerals) */}
+        {/* 9. Tickets & Corporate Rate Card (Separate pathways + prominent Free Pass) */}
         <TicketsPasses
-          onSelectPass={handleOpenRegister}
+          activeTab={activePassesTab}
+          onTabChange={setActivePassesTab}
+          onOpenFreePass={handleOpenFreePass}
+          onOpenDelegatePass={handleOpenDelegate}
+          onOpenExhibitionStand={handleOpenExhibition}
+          onOpenSponsorship={handleOpenSponsorship}
+          onSelectPass={handleSmartRegister}
         />
 
         {/* 10. News & Insights (Dark Section with 1px Dividers) */}
@@ -124,27 +270,62 @@ export default function App() {
 
         {/* 11. Final Action Banner (Light Section with 1 Magenta CTA) */}
         <CtaBanner
-          onOpenRegister={() => handleOpenRegister()}
+          onOpenRegister={() => handleSmartRegister()}
           onDownloadIcs={handleDownloadIcs}
         />
       </main>
+      )}
 
       {/* 12. Institutional Footer with Discrete Admin Trigger */}
       <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
 
-      {/* Modals */}
-      <RegistrationModal
-        isOpen={isRegisterOpen}
-        onClose={handleCloseRegister}
-        initialSelection={selectedPass}
+      {/* =========================================================================
+          SEPARATE DEDICATED MODALS (NOT A SINGLE MONOLITHIC FORM)
+          ========================================================================= */}
+      
+      {/* 1. Dedicated Free Exhibition Floor Pass Modal (Instant Confirmation & Ticket) */}
+      <FreePassModal
+        isOpen={isFreePassOpen}
+        onClose={() => setIsFreePassOpen(false)}
       />
 
+      {/* 2. Dedicated Delegate Registration Modal (4 Delegate Tiers + Team 3-Pack) */}
+      <DelegateRegistrationModal
+        isOpen={isDelegateOpen}
+        onClose={() => {
+          setIsDelegateOpen(false);
+          setDelegateTier(undefined);
+        }}
+        initialTier={delegateTier}
+      />
+
+      {/* 3. Dedicated Exhibition Stand Booking Modal (3m x 3m Shell Scheme + 2 Badges) */}
+      <ExhibitionBookingModal
+        isOpen={isExhibitionOpen}
+        onClose={() => {
+          setIsExhibitionOpen(false);
+          setExhibitionStand(undefined);
+        }}
+        initialStand={exhibitionStand}
+      />
+
+      {/* 4. Dedicated Sponsorship & Track Accords Inquiry Modal */}
+      <SponsorshipInquiryModal
+        isOpen={isSponsorshipOpen}
+        onClose={() => {
+          setIsSponsorshipOpen(false);
+          setSponsorshipPackage(undefined);
+        }}
+        initialPackage={sponsorshipPackage}
+      />
+
+      {/* Article Detail Modal */}
       <ArticleModal
         articleTitle={selectedArticle}
         onClose={() => setSelectedArticle(null)}
       />
 
-      {/* Silent Secretariat Administration Console */}
+      {/* Secretariat Administration Console */}
       <AdminPanelModal
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}

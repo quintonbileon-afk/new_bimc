@@ -90,10 +90,10 @@ export const BmicLogo: React.FC<BmicLogoProps> = ({
   const lightBlueColor = '#82B4EE';
 
   const markSizes = {
-    sm: 'w-7 h-9',
-    md: 'w-10 h-13',
-    lg: 'w-14 h-18',
-    xl: 'w-20 h-26',
+    sm: 'w-7 h-[36px]',
+    md: 'w-10 h-[52px]',
+    lg: 'w-14 h-[72px]',
+    xl: 'w-20 h-[104px]',
   };
 
   const textSizes = {

@@ -28,7 +28,8 @@ export const FullAgenda: React.FC<FullAgendaProps> = ({ onDownloadIcs }) => {
   });
 
   return (
-    <section id="agenda" className="py-12 lg:py-16 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
+    <section id="agenda" className="py-12 lg:py-16 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative">
+      <div id="programme" className="absolute -top-24 pointer-events-none" />
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Compact Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">

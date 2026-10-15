@@ -218,8 +218,14 @@ export async function submitRegistration(
 
 export function subscribeToRegistrations(
   onData: (registrations: RegistrationRecord[]) => void,
-  onError: (error: unknown) => void
+  onError?: (error: unknown) => void
 ) {
+  // If not signed in to Firebase Auth, serve local cache and avoid firing unauthorized queries
+  if (!auth.currentUser) {
+    onData(getLocalBackups());
+    return () => {};
+  }
+
   const q = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
   return onSnapshot(
     q,
@@ -270,7 +276,7 @@ export function subscribeToRegistrations(
     (err) => {
       handleFirestoreError(err, OperationType.LIST, 'registrations');
       onData(getLocalBackups());
-      onError(err);
+      if (onError) onError(err);
     }
   );
 }
@@ -302,6 +308,10 @@ export async function updateRegistrationStatus(
     console.warn('Local cache update failed:', e);
   }
 
+  if (!auth.currentUser) {
+    return;
+  }
+
   try {
     await updateDoc(doc(db, 'registrations', id), updates);
   } catch (error) {
@@ -315,6 +325,23 @@ export async function updateBookingDelegateNames(
   delegateEmails: string[]
 ) {
   const path = `registrations/${bookingId}`;
+  try {
+    const local = getLocalBackups();
+    const idx = local.findIndex(r => r.id === bookingId);
+    if (idx !== -1) {
+      local[idx].delegateNames = delegateNames;
+      local[idx].delegateEmails = delegateEmails;
+      local[idx].updatedAt = new Date().toISOString();
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local));
+    }
+  } catch (e) {
+    console.warn('Local cache update failed:', e);
+  }
+
+  if (!auth.currentUser) {
+    return;
+  }
+
   try {
     await updateDoc(doc(db, 'registrations', bookingId), {
       delegateNames,
@@ -336,6 +363,10 @@ export async function deleteRegistrationRecord(id: string) {
     console.warn('Local cache delete failed:', e);
   }
 
+  if (!auth.currentUser) {
+    return;
+  }
+
   try {
     await deleteDoc(doc(db, 'registrations', id));
   } catch (error) {
@@ -345,6 +376,9 @@ export async function deleteRegistrationRecord(id: string) {
 
 // Ticket functions
 export async function getTicketsForBooking(bookingId: string): Promise<TicketRecord[]> {
+  if (!auth.currentUser) {
+    return [];
+  }
   try {
     const q = query(collection(db, 'tickets'), where('bookingId', '==', bookingId));
     const snapshot = await getDocs(q);

@@ -1,68 +1,203 @@
 import React from 'react';
 import { EVENT_DETAILS } from '../data/bmicContent';
 import { CountdownTimer } from './CountdownTimer';
-import { ArrowRight } from 'lucide-react';
+import { NAV_ROUTES } from '../config/routes';
 
 interface HeroProps {
   onOpenRegister: () => void;
+  onOpenFreePass?: () => void;
   onDownloadIcs?: () => void;
+  onSelectNavTab?: (tab: 'delegates' | 'exhibition' | 'partnerships') => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenRegister }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSelectNavTab }) => {
   return (
-    <section className="relative bg-[#0A1428] text-white pt-36 pb-0 overflow-hidden bg-dot-grid">
-      {/* Subtle navy depth glow */}
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[520px] bg-[#2F6DB5]/10 rounded-full blur-[160px] pointer-events-none"
-        aria-hidden="true"
-      />
+    <section className="hero bmic-hero relative overflow-hidden">
+      <div className="wrap bmic-wrap">
+        <div className="hero-grid">
+          {/* Left Column */}
+          <div>
+            <h1>
+              Botswana Mobile &amp; Internet <em>Congress</em> 2026
+            </h1>
+            <p className="tag bmic-tag">
+              Transforming Botswana into the Digital Valley of SADC.
+            </p>
+            <p className="sum bmic-sum">
+              Moving Botswana from policy and infrastructure to commercial execution and regional scale.
+            </p>
+            <div className="cta bmic-cta">
+              <a
+                className="btn bmic-btn cursor-pointer"
+                href={NAV_ROUTES.register}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenRegister();
+                }}
+              >
+                Register Now &rarr;
+              </a>
+              <button
+                type="button"
+                className="link bmic-link cursor-pointer bg-transparent border-0 text-left"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onOpenFreePass) {
+                    onOpenFreePass();
+                  } else {
+                    const el = document.getElementById('tickets') || document.getElementById('passes');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Get Free Exhibition Pass &rarr;
+              </button>
+            </div>
+            <div className="bmic-pill mt-6">30 OCTOBER 2026 &middot; GABORONE, BOTSWANA</div>
+            <div className="mt-4 pt-4 border-t border-[#26365a]/60">
+              <CountdownTimer targetDate={EVENT_DETAILS.isoDate} />
+            </div>
+          </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center pb-20">
-        {/* Eyebrow Line (Mono for tiny label) */}
-        <div className="inline-flex items-center gap-2 mb-6 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#B8C2D6]">
-            30 OCTOBER 2026 · GABORONE, BOTSWANA
-          </p>
-        </div>
+          {/* Right Column: Two Entry Cards */}
+          <div className="cards bmic-cards">
+            {/* Card 1: Attend (Hot gradient) */}
+            <div className="card bmic-card hot relative overflow-hidden group">
+              <div className="absolute inset-0 bmic-dot-texture-hot pointer-events-none" />
+              <div className="absolute right-4 top-4 text-7xl sm:text-8xl font-black font-mono select-none pointer-events-none text-white/[0.04] tracking-tighter">
+                01
+              </div>
+              <div className="relative z-10 flex flex-col h-full justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <span className="px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-white/15 text-white border border-white/20">
+                      Attend
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-[#b6c2dc] font-mono tracking-wide">
+                      Attendees, Venue &amp; Tickets
+                    </span>
+                  </div>
+                  <h2>Attend</h2>
+                  <ul className="bmic-card-rows mt-4">
+                    <li>
+                      <a
+                        href="#attendees"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectNavTab?.('delegates');
+                          const el = document.getElementById('attendees') || document.getElementById('passes');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      >
+                        <span>Attendees</span>
+                        <span className="bmic-row-arrow">&rarr;</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="#venue"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const el = document.getElementById('venue') || document.getElementById('venue-section');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      >
+                        <span>Venue</span>
+                        <span className="bmic-row-arrow">&rarr;</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href={NAV_ROUTES.tickets}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectNavTab?.('delegates');
+                          const el = document.getElementById('tickets') || document.getElementById('passes');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      >
+                        <span>Tickets</span>
+                        <span className="bmic-row-arrow">&rarr;</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  className="w-full py-3.5 px-6 rounded-full bg-white text-[#d81b60] font-bold text-base hover:bg-slate-100 transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2 mt-4"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onOpenRegister();
+                  }}
+                >
+                  Register Now &rarr;
+                </button>
+              </div>
+            </div>
 
-        {/* Larger H1: Single solid color + one accent word, tight tracking */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[84px] font-bold text-white tracking-[-0.03em] leading-[1.04] mb-7 max-w-5xl mx-auto">
-          BOTSWANA MOBILE &amp;<br className="hidden sm:inline" /> INTERNET <span className="text-[#D81B60]">CONGRESS</span> 2026
-        </h1>
-
-        {/* Tagline */}
-        <p className="text-lg sm:text-2xl font-medium text-white max-w-2xl mx-auto mb-3 tracking-tight">
-          Transforming Botswana into the Digital Valley of SADC.
-        </p>
-
-        {/* Sub-line (hidden on mobile, concise without repeated stats) */}
-        <p className="hidden sm:block text-sm text-[#B8C2D6] max-w-xl mx-auto mb-10 leading-relaxed font-normal">
-          {EVENT_DETAILS.coreMotto}
-        </p>
-
-        {/* Primary CTA button + plain text link with nudging arrow */}
-        <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
-          <button
-            onClick={onOpenRegister}
-            className="group btn-cta-magenta px-8 py-3.5 rounded-full text-sm font-semibold text-white flex items-center gap-2.5 cursor-pointer"
-          >
-            <span>Register Now</span>
-            <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </button>
-
-          <a
-            href="#agenda"
-            className="group text-sm font-semibold text-white hover:text-[#B8C2D6] transition-colors inline-flex items-center gap-1.5 py-2 px-3 rounded-full hover:bg-white/[0.04]"
-          >
-            <span>View Programme</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">→</span>
-          </a>
-        </div>
-
-        {/* Countdown Timer inside upper container */}
-        <div className="mt-6">
-          <CountdownTimer targetDate={EVENT_DETAILS.isoDate} />
+            {/* Card 2: Exhibit/Sponsor */}
+            <div className="card bmic-card card-exhibit relative overflow-hidden group">
+              <div className="absolute inset-0 bmic-dot-texture pointer-events-none" />
+              <div className="absolute right-4 top-4 text-7xl sm:text-8xl font-black font-mono select-none pointer-events-none text-white/[0.04] tracking-tighter">
+                02
+              </div>
+              <div className="relative z-10 flex flex-col h-full justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <span className="px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-[#d81b60]/25 text-[#ff6b9a] border border-[#d81b60]/40">
+                      Exhibit / Sponsor
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-[#b6c2dc] font-mono tracking-wide">
+                      Exhibitions &amp; Sponsorship
+                    </span>
+                  </div>
+                  <h2>Exhibit/Sponsor</h2>
+                  <ul className="bmic-card-rows mt-4">
+                    <li>
+                      <a
+                        href={NAV_ROUTES.exhibitions}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectNavTab?.('exhibition');
+                          const el = document.getElementById('exhibitions') || document.getElementById('passes');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      >
+                        <span>Exhibitions</span>
+                        <span className="bmic-row-arrow">&rarr;</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href={NAV_ROUTES.sponsorship}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectNavTab?.('partnerships');
+                          const el = document.getElementById('sponsorship') || document.getElementById('partners');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      >
+                        <span>Sponsorship</span>
+                        <span className="bmic-row-arrow">&rarr;</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  className="w-full py-3.5 px-6 rounded-full border border-[#26365a] bg-transparent text-white font-bold text-base hover:border-[#5aa9e6] hover:text-[#5aa9e6] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-4"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onSelectNavTab?.('exhibition');
+                    const el = document.getElementById('exhibitions') || document.getElementById('passes');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Exhibitions &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

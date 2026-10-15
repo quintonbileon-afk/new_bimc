@@ -10,6 +10,7 @@ import {
   generateTicketsForBooking,
   updateTicketStatus,
   updateBookingDelegateNames,
+  getLocalBackups,
   auth,
   googleProvider,
   signInWithPopup,
@@ -151,6 +152,13 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   useEffect(() => {
     if (!isOpen || !isAuthorized) return;
 
+    if (!currentUser) {
+      // Local passcode mode: load cached registrations without attempting unauthenticated Firestore reads
+      setRegistrations(getLocalBackups());
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     const unsubscribeSnapshot = subscribeToRegistrations(
       (data) => {
@@ -158,13 +166,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         setIsLoading(false);
       },
       (err) => {
-        console.error('Subscription error in admin:', err);
+        console.warn('Subscription fallback in admin, using local storage cache:', err);
+        setRegistrations(getLocalBackups());
         setIsLoading(false);
       }
     );
 
     return () => unsubscribeSnapshot();
-  }, [isOpen, isAuthorized]);
+  }, [isOpen, isAuthorized, currentUser]);
 
   if (!isOpen) return null;
 
@@ -353,9 +362,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 <span className="text-[11px] text-[#2F6DB5] font-semibold uppercase tracking-wider">
                   Secretariat Console
                 </span>
-                <span className="px-2 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold">
-                  Live Firestore Sync
-                </span>
+                {currentUser ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold">
+                    Live Firestore Sync
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-semibold">
+                    Local Passcode Mode
+                  </span>
+                )}
               </div>
               <h2 className="text-lg font-bold text-white tracking-tight">
                 BMIC 2026 Registration Management
@@ -479,6 +494,23 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         ) : (
           /* Main Admin Workspace */
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            {!currentUser && (
+              <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-amber-200 shrink-0">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>
+                    Secretariat Passcode Mode active. Viewing local registrations. Sign in with Google (<strong>eduvisionbw@gmail.com</strong>) for live multi-device Cloud Firestore sync.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  className="px-3 py-1 bg-white text-[#0A1428] font-bold rounded-full text-[11px] hover:bg-slate-200 transition-colors whitespace-nowrap cursor-pointer shadow-sm"
+                >
+                  Sign in with Google
+                </button>
+              </div>
+            )}
             {/* Top Toolbar: Tabs + Summary Stats */}
             <div className="p-4 sm:p-6 border-b border-white/10 bg-[#0A1428]/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0">
               {/* Tab Navigation */}

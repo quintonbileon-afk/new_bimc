@@ -1,136 +1,323 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BmicLogo } from './BmicLogo';
-import { Menu, X } from 'lucide-react';
+import { NAV_ROUTES } from '../config/routes';
 
 interface NavbarProps {
   onOpenRegister: (tier?: string) => void;
   onDownloadIcs?: () => void;
+  onSelectNavTab?: (tab: 'delegates' | 'exhibition' | 'partnerships' | 'rate-card-table') => void;
+  currentPage?: 'home' | 'programme';
+  onNavigateHome?: (targetAnchor?: string) => void;
+  onNavigateProgramme?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenRegister }) => {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+export const Navbar: React.FC<NavbarProps> = ({
+  onOpenRegister,
+  onSelectNavTab,
+  currentPage = 'home',
+  onNavigateHome,
+  onNavigateProgramme,
+}) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [attendOpen, setAttendOpen] = useState(false);
+  const [ticketsOpen, setTicketsOpen] = useState(false);
+  const [sponsorOpen, setSponsorOpen] = useState(false);
 
+  const navRef = useRef<HTMLElement>(null);
+  const attendRef = useRef<HTMLLIElement>(null);
+  const ticketsRef = useRef<HTMLLIElement>(null);
+  const sponsorRef = useRef<HTMLLIElement>(null);
+
+  // Close dropdowns on click outside
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (attendRef.current && !attendRef.current.contains(target)) {
+        setAttendOpen(false);
+        setTicketsOpen(false);
+      }
+      if (sponsorRef.current && !sponsorRef.current.contains(target)) {
+        setSponsorOpen(false);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // Close dropdowns on Escape key
   useEffect(() => {
-    if (mobileMenuOpen) {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setAttendOpen(false);
+        setTicketsOpen(false);
+        setSponsorOpen(false);
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Lock body scroll on mobile when menu is open
+  useEffect(() => {
+    if (mobileOpen) {
       document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     }
-  }, [mobileMenuOpen]);
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
 
-  // Max 5 links
-  const navLinks = [
-    { label: 'Theme', href: '#about' },
-    { label: 'Programme', href: '#agenda' },
-    { label: 'Attendees', href: '#speakers' },
-    { label: 'Venue', href: '#venue' },
-    { label: 'Rate Card', href: '#passes' },
-  ];
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+
+    setMobileOpen(false);
+    setAttendOpen(false);
+    setTicketsOpen(false);
+    setSponsorOpen(false);
+
+    // If programme link is clicked
+    if (href === NAV_ROUTES.programme) {
+      if (onNavigateProgramme) {
+        onNavigateProgramme();
+      } else {
+        window.location.href = '/programme';
+      }
+      return;
+    }
+
+    // If currently on programme page, navigate back to home with the target anchor
+    if (currentPage === 'programme' && onNavigateHome) {
+      if (href === NAV_ROUTES.tickets && onSelectNavTab) {
+        onSelectNavTab('delegates');
+      } else if (href === NAV_ROUTES.exhibitions && onSelectNavTab) {
+        onSelectNavTab('exhibition');
+      } else if (href === NAV_ROUTES.sponsorship && onSelectNavTab) {
+        onSelectNavTab('partnerships');
+      }
+      onNavigateHome(href);
+      return;
+    }
+
+    // On home page: activate tab if ticket/exhibition/sponsor
+    if (href === NAV_ROUTES.tickets && onSelectNavTab) {
+      onSelectNavTab('delegates');
+    } else if (href === NAV_ROUTES.exhibitions && onSelectNavTab) {
+      onSelectNavTab('exhibition');
+    } else if (href === NAV_ROUTES.sponsorship && onSelectNavTab) {
+      onSelectNavTab('partnerships');
+    }
+
+    const targetId = href.replace('#', '');
+    const el =
+      document.getElementById(targetId) ||
+      (href === NAV_ROUTES.tickets || href === NAV_ROUTES.exhibitions || href === NAV_ROUTES.sponsorship
+        ? document.getElementById('passes')
+        : null);
+
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      try {
+        window.history.pushState(null, '', href);
+      } catch {
+        window.location.hash = href;
+      }
+    }
+  };
 
   return (
-    <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? 'py-3.5 bg-[#0A1428]/90 backdrop-blur-md border-b border-white/[0.08] shadow-lg'
-            : 'py-5 bg-transparent border-b border-transparent'
-        }`}
-      >
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a
-              href="#"
-              className="flex items-center outline-none focus-visible:ring-2 focus-visible:ring-[#2F6DB5] rounded-lg"
-              aria-label="BMIC 2026 Home"
-            >
-              <BmicLogo size="sm" theme="dark" />
-            </a>
+    <header className="bmic-bar bar">
+      <div className="bmic-wrap wrap">
+        {/* Logo */}
+        <a
+          className="logo flex items-center cursor-pointer"
+          href="/"
+          aria-label="Botswana Mobile &amp; Internet Congress"
+          onClick={(e) => {
+            e.preventDefault();
+            if (onNavigateHome) {
+              onNavigateHome();
+            } else {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+        >
+          <BmicLogo size="sm" />
+        </a>
 
-            {/* Desktop Navigation Links (Max 5) */}
-            <nav className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-xs font-medium text-[#B8C2D6] hover:text-white transition-colors py-1"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-
-            {/* One Magenta CTA Button */}
-            <div className="hidden md:flex items-center">
-              <button
-                onClick={() => onOpenRegister()}
-                className="btn-cta-magenta px-5 py-2.5 rounded-full text-xs font-semibold text-white cursor-pointer"
-              >
-                Register
-              </button>
-            </div>
-
-            {/* Mobile Hamburger Button */}
-            <div className="flex items-center gap-3 md:hidden">
-              <button
-                onClick={() => onOpenRegister()}
-                className="btn-cta-magenta px-4 py-2 text-xs font-semibold text-white rounded-full"
-              >
-                Register
-              </button>
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-[#B8C2D6] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6DB5] rounded-lg"
-                aria-label="Toggle Navigation Menu"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#0A1428] flex flex-col justify-between pt-24 pb-8 px-6 md:hidden animate-fade-in">
-          <div className="flex flex-col space-y-4">
-            <div className="text-[11px] uppercase tracking-wider text-slate-400 mb-2 font-medium">
-              Navigation
-            </div>
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-semibold text-white hover:text-[#D81B60] transition-colors py-2 border-b border-white/5"
-              >
-                {link.label}
+        {/* Navigation */}
+        <nav
+          id="nav"
+          ref={navRef}
+          className={`bmic-nav ${mobileOpen ? 'open' : ''}`}
+          aria-label="Main"
+        >
+          <ul className="bmic-menu menu">
+            <li>
+              <a href={NAV_ROUTES.theme} onClick={(e) => handleLinkClick(e, NAV_ROUTES.theme)}>
+                Theme
               </a>
-            ))}
-          </div>
+            </li>
+            <li>
+              <a
+                href={NAV_ROUTES.programme}
+                className={currentPage === 'programme' ? 'text-[#f0467f] font-bold' : ''}
+                onClick={(e) => handleLinkClick(e, NAV_ROUTES.programme)}
+              >
+                Programme
+              </a>
+            </li>
 
-          <div className="pt-6 border-t border-white/10">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenRegister();
-              }}
-              className="w-full py-3.5 px-4 text-sm font-semibold text-white bg-[#D81B60] rounded-full text-center"
+            {/* Attend Dropdown */}
+            <li
+              ref={attendRef}
+              className={`has-sub ${attendOpen ? 'open' : ''}`}
             >
-              Register for BMIC 2026
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+              <button
+                type="button"
+                aria-expanded={attendOpen}
+                aria-haspopup="true"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setAttendOpen(!attendOpen);
+                  setSponsorOpen(false);
+                }}
+              >
+                Attend <span className="bmic-caret caret" aria-hidden="true" />
+              </button>
+              <ul className="bmic-sub sub">
+                <li>
+                  <a href={NAV_ROUTES.attendees} onClick={(e) => handleLinkClick(e, NAV_ROUTES.attendees)}>
+                    Attendees
+                  </a>
+                </li>
+                <li>
+                  <a href={NAV_ROUTES.venue} onClick={(e) => handleLinkClick(e, NAV_ROUTES.venue)}>
+                    Venue
+                  </a>
+                </li>
+
+                {/* Sub2: Tickets flyout */}
+                <li
+                  ref={ticketsRef}
+                  className={`sub2 bmic-sub2 ${ticketsOpen ? 'open' : ''}`}
+                >
+                  <button
+                    type="button"
+                    aria-expanded={ticketsOpen}
+                    aria-haspopup="true"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTicketsOpen(!ticketsOpen);
+                    }}
+                  >
+                    Tickets
+                  </button>
+                  <ul className="bmic-sub sub">
+                    <li>
+                      <a href={NAV_ROUTES.tickets} onClick={(e) => handleLinkClick(e, NAV_ROUTES.tickets)}>
+                        Tickets
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href={NAV_ROUTES.register}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setMobileOpen(false);
+                          setAttendOpen(false);
+                          setTicketsOpen(false);
+                          setSponsorOpen(false);
+                          onOpenRegister();
+                        }}
+                      >
+                        Register
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+
+            {/* Exhibit/Sponsor Dropdown */}
+            <li
+              ref={sponsorRef}
+              className={`has-sub ${sponsorOpen ? 'open' : ''}`}
+            >
+              <button
+                type="button"
+                aria-expanded={sponsorOpen}
+                aria-haspopup="true"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSponsorOpen(!sponsorOpen);
+                  setAttendOpen(false);
+                  setTicketsOpen(false);
+                }}
+              >
+                Exhibit/Sponsor <span className="bmic-caret caret" aria-hidden="true" />
+              </button>
+              <ul className="bmic-sub sub">
+                <li>
+                  <a href={NAV_ROUTES.exhibitions} onClick={(e) => handleLinkClick(e, NAV_ROUTES.exhibitions)}>
+                    Exhibitions
+                  </a>
+                </li>
+                <li>
+                  <a href={NAV_ROUTES.sponsorship} onClick={(e) => handleLinkClick(e, NAV_ROUTES.sponsorship)}>
+                    Sponsorship
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            {/* Mobile-only Back to Main Page when on Programme */}
+            {currentPage === 'programme' && (
+              <li className="lg:hidden mt-2 pt-2 border-t border-[#26365a]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    onNavigateHome?.();
+                  }}
+                  className="w-full text-left font-bold text-[#5aa9e6] flex items-center gap-2 py-3 px-1"
+                >
+                  &larr; Back to Main Page
+                </button>
+              </li>
+            )}
+          </ul>
+        </nav>
+
+        {/* Right CTA Button (Hidden on Mobile) */}
+        <a
+          className="bmic-btn btn sm"
+          href={NAV_ROUTES.register}
+          onClick={(e) => {
+            e.preventDefault();
+            onOpenRegister();
+          }}
+        >
+          Register
+        </a>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          className="bmic-burger burger"
+          id="burger"
+          type="button"
+          aria-label="Menu"
+          aria-expanded={mobileOpen}
+          aria-controls="nav"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+    </header>
   );
 };
