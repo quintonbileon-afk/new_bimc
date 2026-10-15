@@ -8,25 +8,27 @@ interface HeroProps {
   onOpenFreePass?: () => void;
   onDownloadIcs?: () => void;
   onSelectNavTab?: (tab: 'delegates' | 'exhibition' | 'partnerships') => void;
+  onNavigateProgramme?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSelectNavTab }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNavigateProgramme }) => {
   return (
     <section className="hero bmic-hero relative overflow-hidden">
       <div className="wrap bmic-wrap">
         <div className="hero-grid">
           {/* Left Column */}
           <div>
-            <h1>
+            <div className="bmic-pill mb-4">30 OCTOBER 2026 &middot; GABORONE, BOTSWANA</div>
+            <h1 className="m-0">
               Botswana Mobile &amp; Internet <em>Congress</em> 2026
             </h1>
-            <p className="tag bmic-tag">
+            <p className="tag bmic-tag mt-4 mb-2">
               Transforming Botswana into the Digital Valley of SADC.
             </p>
-            <p className="sum bmic-sum">
+            <p className="sum bmic-sum mb-6">
               Moving Botswana from policy and infrastructure to commercial execution and regional scale.
             </p>
-            <div className="cta bmic-cta">
+            <div className="cta bmic-cta flex items-center gap-4 flex-wrap mb-6">
               <a
                 className="btn bmic-btn cursor-pointer"
                 href={NAV_ROUTES.register}
@@ -42,43 +44,35 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSe
                 className="link bmic-link cursor-pointer bg-transparent border-0 text-left"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (onOpenFreePass) {
-                    onOpenFreePass();
+                  if (onNavigateProgramme) {
+                    onNavigateProgramme();
                   } else {
-                    const el = document.getElementById('tickets') || document.getElementById('passes');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    window.location.href = '#programme';
                   }
                 }}
               >
-                Get Free Exhibition Pass &rarr;
+                View Programme &rarr;
               </button>
             </div>
-            <div className="bmic-pill mt-6">30 OCTOBER 2026 &middot; GABORONE, BOTSWANA</div>
-            <div className="mt-4 pt-4 border-t border-[#26365a]/60">
+            <div className="text-left">
               <CountdownTimer targetDate={EVENT_DETAILS.isoDate} />
             </div>
           </div>
 
           {/* Right Column: Two Entry Cards */}
           <div className="cards bmic-cards">
-            {/* Card 1: Attend (Hot gradient) */}
+            {/* Card 1: Attend (Navy gradient) */}
             <div className="card bmic-card hot relative overflow-hidden group">
               <div className="absolute inset-0 bmic-dot-texture-hot pointer-events-none" />
-              <div className="absolute right-4 top-4 text-7xl sm:text-8xl font-black font-mono select-none pointer-events-none text-white/[0.04] tracking-tighter">
-                01
-              </div>
               <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
-                  <div className="flex items-center gap-3 mb-3 flex-wrap">
-                    <span className="px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-white/15 text-white border border-white/20">
-                      Attend
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-[#b6c2dc] font-mono tracking-wide">
-                      Attendees, Venue &amp; Tickets
+                  <div className="flex items-center justify-between mb-4">
+                    <h2>Attend</h2>
+                    <span className="w-8 h-8 rounded-full bg-white/[0.14] flex items-center justify-center text-white text-sm font-bold">
+                      &rarr;
                     </span>
                   </div>
-                  <h2>Attend</h2>
-                  <ul className="bmic-card-rows mt-4">
+                  <ul className="bmic-card-rows">
                     <li>
                       <a
                         href="#attendees"
@@ -124,7 +118,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSe
                 </div>
                 <button
                   type="button"
-                  className="w-full py-3.5 px-6 rounded-full bg-white text-[#d81b60] font-bold text-base hover:bg-slate-100 transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2 mt-4"
+                  className="w-full py-3.5 px-6 rounded-full border-[1.5px] border-white/40 bg-white/[0.12] text-white font-bold text-base hover:bg-white/[0.2] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-[20px]"
                   onClick={(e) => {
                     e.preventDefault();
                     onOpenRegister();
@@ -135,24 +129,18 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSe
               </div>
             </div>
 
-            {/* Card 2: Exhibit/Sponsor */}
+            {/* Card 2: Exhibit/Sponsor (Maroon gradient) */}
             <div className="card bmic-card card-exhibit relative overflow-hidden group">
               <div className="absolute inset-0 bmic-dot-texture pointer-events-none" />
-              <div className="absolute right-4 top-4 text-7xl sm:text-8xl font-black font-mono select-none pointer-events-none text-white/[0.04] tracking-tighter">
-                02
-              </div>
               <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
-                  <div className="flex items-center gap-3 mb-3 flex-wrap">
-                    <span className="px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-[#d81b60]/25 text-[#ff6b9a] border border-[#d81b60]/40">
-                      Exhibit / Sponsor
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-[#b6c2dc] font-mono tracking-wide">
-                      Exhibitions &amp; Sponsorship
+                  <div className="flex items-center justify-between mb-4">
+                    <h2>Exhibit/Sponsor</h2>
+                    <span className="w-8 h-8 rounded-full bg-white/[0.14] flex items-center justify-center text-white text-sm font-bold">
+                      &rarr;
                     </span>
                   </div>
-                  <h2>Exhibit/Sponsor</h2>
-                  <ul className="bmic-card-rows mt-4">
+                  <ul className="bmic-card-rows">
                     <li>
                       <a
                         href={NAV_ROUTES.exhibitions}
@@ -185,7 +173,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSe
                 </div>
                 <button
                   type="button"
-                  className="w-full py-3.5 px-6 rounded-full border border-[#26365a] bg-transparent text-white font-bold text-base hover:border-[#5aa9e6] hover:text-[#5aa9e6] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-4"
+                  className="w-full py-3.5 px-6 rounded-full border border-white/20 bg-transparent text-white font-bold text-base hover:border-[#5aa9e6] hover:text-[#5aa9e6] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-[20px]"
                   onClick={(e) => {
                     e.preventDefault();
                     onSelectNavTab?.('exhibition');

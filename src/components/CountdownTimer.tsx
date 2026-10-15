@@ -45,7 +45,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, clas
   const secondsProgress = Math.min(100, Math.max(0, (timeLeft.seconds / 60) * 100));
 
   return (
-    <div className={`w-full py-2 px-2 flex flex-col items-center justify-center ${className}`}>
+    <div className={`w-full py-1 flex flex-col items-start justify-start ${className}`}>
       {/* Small uppercase label */}
       <div className="flex items-center gap-2 mb-2">
         <span className="w-1.5 h-1.5 rounded-full bg-[#D81B60]" />
@@ -55,7 +55,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, clas
       </div>
 
       {/* Row of four tiles with thin colon separators */}
-      <div className="flex flex-row flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 mb-1">
+      <div className="flex flex-row flex-nowrap items-center justify-start gap-1.5 sm:gap-2.5 mb-1">
         {/* Days Tile */}
         <div className="w-[56px] sm:w-[72px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-2 text-center relative overflow-hidden shadow-md flex flex-col items-center justify-center">
           <div className="text-[22px] sm:text-[30px] font-bold font-mono text-white tabular-nums leading-none mb-0.5">
