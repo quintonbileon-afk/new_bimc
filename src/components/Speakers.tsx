@@ -233,74 +233,70 @@ export const Speakers: React.FC = () => {
           </p>
         </div>
 
-        {/* 2-Column Editorial Structure with Refined Interactive Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-16">
+        {/* 2-Column Editorial Structure with Premium Glassmorphism Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
           {/* Column 1: Institutional Leadership */}
-          <div className="rounded-2xl p-5 sm:p-6 bg-[#0D1C3C]/60 border border-white/[0.08] backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-56 h-56 bg-[#2F6DB5]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative rounded-3xl p-8 sm:p-10 bg-[#0D1C3C]/70 backdrop-blur-xl border border-transparent bg-gradient-to-br from-[#2F6DB5]/40 via-white/[0.08] to-cyan-500/10 shadow-[0_20px_50px_rgba(47,109,181,0.2)] flex flex-col justify-between overflow-hidden group transition-all duration-300 hover:shadow-[0_25px_60px_rgba(47,109,181,0.35)] hover:-translate-y-1">
+            {/* Soft radial glow background */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#2F6DB5]/20 rounded-full blur-[80px] pointer-events-none group-hover:bg-[#2F6DB5]/30 transition-all duration-500" />
+            
+            {/* Oversized Watermark Number */}
+            <div className="absolute right-4 top-2 text-[100px] sm:text-[120px] font-black font-mono leading-none bg-gradient-to-b from-[#2F6DB5]/25 via-[#2F6DB5]/10 to-transparent bg-clip-text text-transparent select-none pointer-events-none">
+              01
+            </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-                <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-2xl sm:text-3xl font-bold text-[#2F6DB5] tabular-nums">
-                    01
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="px-3.5 py-1.5 rounded-full bg-[#2F6DB5]/20 border border-[#2F6DB5]/40 backdrop-blur-md">
+                  <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#60A5FA] font-bold">
+                    Institutional Leadership
                   </span>
-                  <div>
-                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-300 block">
-                      Institutional Leadership
-                    </span>
-                    <span className="text-[11px] text-white/40">Sovereign &amp; Telecom Core</span>
-                  </div>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[9px] font-mono text-[#B8C2D6]">
-                  5 Pillars
-                </span>
+                <span className="font-mono text-xs text-slate-400">Sovereign &amp; Telecom Core</span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-1.5 font-display">
-                Decision-Makers &amp; Regulators
+              <h3 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4 font-display leading-[1.1]">
+                Decision-Makers <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">&amp; Regulators</span>
               </h3>
 
-              <p className="text-xs sm:text-sm text-[#B8C2D6] leading-relaxed mb-4 font-normal">
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-8 font-normal">
                 Government ministries, regulators, telecom operators, ISPs, financial institutions, and policy leaders shaping regulation and sovereign investment.
               </p>
 
               <div>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-semibold">
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <p className="font-mono text-xs uppercase tracking-wider text-blue-300 font-semibold">
                     Represented Institutions
                   </p>
-                  <span className="font-mono text-[9px] text-[#2F6DB5] font-medium">Policy &amp; Capital</span>
+                  <span className="font-mono text-xs text-blue-400 font-bold">Policy &amp; Capital</span>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-3">
                   {decisionMakers.map((item, idx) => {
                     const IconComponent = item.icon;
                     return (
                       <div
                         key={item.name}
-                        className="group/item relative overflow-hidden px-3 py-2.5 rounded-xl bg-[#0A1428]/80 hover:bg-[#112140] border border-white/[0.06] hover:border-[#2F6DB5]/60 hover:shadow-[0_6px_20px_-6px_rgba(47,109,181,0.35)] transition-all duration-200 flex items-center gap-3 cursor-default hover:-translate-y-0.5 hover:translate-x-0.5"
+                        className="group/item relative overflow-hidden p-4 rounded-2xl bg-[#0A1428]/90 hover:bg-[#112347] border border-white/10 hover:border-blue-400/60 shadow-sm hover:shadow-[0_8px_30px_rgba(47,109,181,0.4)] transition-all duration-300 flex items-center gap-4 cursor-default -translate-y-0 hover:-translate-y-1"
                       >
-                        <div className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-r bg-[#2F6DB5] opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                        {/* Glowing left accent line */}
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-400 opacity-0 group-hover/item:opacity-100 transition-opacity" />
 
-                        <div className="w-7 h-7 rounded-lg bg-[#2F6DB5]/15 border border-[#2F6DB5]/30 flex items-center justify-center shrink-0 text-[#60A5FA] group-hover/item:bg-[#2F6DB5] group-hover/item:text-white group-hover/item:scale-105 group-hover/item:shadow-[0_0_12px_rgba(47,109,181,0.5)] transition-all">
-                          <IconComponent className="w-3.5 h-3.5" />
+                        {/* 48px Glowing Icon Badge */}
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2F6DB5]/30 to-blue-600/20 border border-[#2F6DB5]/50 flex items-center justify-center shrink-0 text-blue-300 group-hover/item:bg-blue-600 group-hover/item:text-white group-hover/item:scale-110 group-hover/item:shadow-[0_0_20px_rgba(47,109,181,0.6)] transition-all duration-300">
+                          <IconComponent className="w-6 h-6" strokeWidth={1.75} />
                         </div>
+
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="text-xs sm:text-[13px] font-semibold text-white tracking-tight truncate group-hover/item:text-white transition-colors">
-                              {item.name}
-                            </h4>
-                            <span className="font-mono text-[9px] text-slate-400 group-hover/item:text-[#60A5FA] shrink-0 font-medium transition-colors">
-                              0{idx + 1}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-[#B8C2D6]/80 leading-normal line-clamp-1 mt-0.5 group-hover/item:text-slate-200 transition-colors">
+                          <h4 className="text-base font-bold text-white tracking-tight truncate group-hover/item:text-blue-200 transition-colors mb-1">
+                            {item.name}
+                          </h4>
+                          <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-normal">
                             {item.description}
                           </p>
                         </div>
 
-                        <ArrowRight className="w-3.5 h-3.5 text-[#60A5FA] opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-blue-400 opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 shrink-0" />
                       </div>
                     );
                   })}
@@ -308,80 +304,71 @@ export const Speakers: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 mt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
-              <span className="font-mono text-[10px] text-[#B8C2D6] truncate mr-2">
-                Mandate: Spectrum allocation, policy harmonization &amp; infrastructure
-              </span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6DB5] shrink-0" />
-            </div>
+     
           </div>
 
           {/* Column 2: Ecosystem Builders */}
-          <div className="rounded-2xl p-5 sm:p-6 bg-[#0D1C3C]/60 border border-white/[0.08] backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-56 h-56 bg-[#D81B60]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative rounded-3xl p-8 sm:p-10 bg-[#0D1C3C]/70 backdrop-blur-xl border border-transparent bg-gradient-to-br from-[#D81B60]/40 via-white/[0.08] to-orange-500/10 shadow-[0_20px_50px_rgba(216,27,96,0.2)] flex flex-col justify-between overflow-hidden group transition-all duration-300 hover:shadow-[0_25px_60px_rgba(216,27,96,0.35)] hover:-translate-y-1">
+            {/* Soft radial glow background */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#D81B60]/20 rounded-full blur-[80px] pointer-events-none group-hover:bg-[#D81B60]/30 transition-all duration-500" />
+            
+            {/* Oversized Watermark Number */}
+            <div className="absolute right-4 top-2 text-[100px] sm:text-[120px] font-black font-mono leading-none bg-gradient-to-b from-[#D81B60]/25 via-[#D81B60]/10 to-transparent bg-clip-text text-transparent select-none pointer-events-none">
+              02
+            </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-                <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-2xl sm:text-3xl font-bold text-[#D81B60] tabular-nums">
-                    02
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="px-3.5 py-1.5 rounded-full bg-[#D81B60]/20 border border-[#D81B60]/40 backdrop-blur-md">
+                  <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#F472B6] font-bold">
+                    Ecosystem Builders
                   </span>
-                  <div>
-                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-300 block">
-                      Ecosystem Builders
-                    </span>
-                    <span className="text-[11px] text-white/40">Commercial Execution &amp; Scale</span>
-                  </div>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[9px] font-mono text-[#B8C2D6]">
-                  5 Segments
-                </span>
+                <span className="font-mono text-xs text-slate-400">Commercial Execution &amp; Scale</span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-1.5 font-display">
-                Builders, Founders &amp; Creators
+              <h3 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4 font-display leading-[1.1]">
+                Builders, Founders <span className="bg-gradient-to-r from-pink-400 to-orange-300 bg-clip-text text-transparent">&amp; Creators</span>
               </h3>
 
-              <p className="text-xs sm:text-sm text-[#B8C2D6] leading-relaxed mb-4 font-normal">
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-8 font-normal">
                 Early-stage founders, software engineers, content creators, accelerators, researchers, and venture investors driving scalable technology products and digital commerce.
               </p>
 
               <div>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-semibold">
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <p className="font-mono text-xs uppercase tracking-wider text-pink-300 font-semibold">
                     Participating Groups
                   </p>
-                  <span className="font-mono text-[9px] text-[#D81B60] font-medium">Innovation &amp; Scale</span>
+                  <span className="font-mono text-xs text-pink-400 font-bold">Innovation &amp; Scale</span>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-3">
                   {builders.map((item, idx) => {
                     const IconComponent = item.icon;
                     return (
                       <div
                         key={item.name}
-                        className="group/item relative overflow-hidden px-3 py-2.5 rounded-xl bg-[#0A1428]/80 hover:bg-[#1E1128] border border-white/[0.06] hover:border-[#D81B60]/60 hover:shadow-[0_6px_20px_-6px_rgba(216,27,96,0.35)] transition-all duration-200 flex items-center gap-3 cursor-default hover:-translate-y-0.5 hover:translate-x-0.5"
+                        className="group/item relative overflow-hidden p-4 rounded-2xl bg-[#0A1428]/90 hover:bg-[#251229] border border-white/10 hover:border-pink-400/60 shadow-sm hover:shadow-[0_8px_30px_rgba(216,27,96,0.4)] transition-all duration-300 flex items-center gap-4 cursor-default -translate-y-0 hover:-translate-y-1"
                       >
-                        <div className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-r bg-[#D81B60] opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                        {/* Glowing left accent line */}
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-500 to-orange-400 opacity-0 group-hover/item:opacity-100 transition-opacity" />
 
-                        <div className="w-7 h-7 rounded-lg bg-[#D81B60]/15 border border-[#D81B60]/30 flex items-center justify-center shrink-0 text-[#F472B6] group-hover/item:bg-[#D81B60] group-hover/item:text-white group-hover/item:scale-105 group-hover/item:shadow-[0_0_12px_rgba(216,27,96,0.5)] transition-all">
-                          <IconComponent className="w-3.5 h-3.5" />
+                        {/* 48px Glowing Icon Badge */}
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D81B60]/30 to-pink-600/20 border border-[#D81B60]/50 flex items-center justify-center shrink-0 text-pink-300 group-hover/item:bg-pink-600 group-hover/item:text-white group-hover/item:scale-110 group-hover/item:shadow-[0_0_20px_rgba(216,27,96,0.6)] transition-all duration-300">
+                          <IconComponent className="w-6 h-6" strokeWidth={1.75} />
                         </div>
+
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="text-xs sm:text-[13px] font-semibold text-white tracking-tight truncate group-hover/item:text-white transition-colors">
-                              {item.name}
-                            </h4>
-                            <span className="font-mono text-[9px] text-slate-400 group-hover/item:text-[#F472B6] shrink-0 font-medium transition-colors">
-                              0{idx + 1}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-[#B8C2D6]/80 leading-normal line-clamp-1 mt-0.5 group-hover/item:text-slate-200 transition-colors">
+                          <h4 className="text-base font-bold text-white tracking-tight truncate group-hover/item:text-pink-200 transition-colors mb-1">
+                            {item.name}
+                          </h4>
+                          <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-normal">
                             {item.description}
                           </p>
                         </div>
 
-                        <ArrowRight className="w-3.5 h-3.5 text-[#F472B6] opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-pink-400 opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 shrink-0" />
                       </div>
                     );
                   })}
@@ -389,12 +376,7 @@ export const Speakers: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 mt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
-              <span className="font-mono text-[10px] text-[#B8C2D6] truncate mr-2">
-                Mandate: Commercialization, product development &amp; tech venture creation
-              </span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#D81B60] shrink-0" />
-            </div>
+        
           </div>
         </div>
 

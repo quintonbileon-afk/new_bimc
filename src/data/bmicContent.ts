@@ -460,7 +460,7 @@ export const DELEGATE_PASS_TIERS: DelegatePassTier[] = [
     price: 'P2,500',
     priceNote: 'Most selected by industry professionals',
     description: 'Individual corporate access for executives and professionals.',
-    badge: 'Popular Choice',
+    badge: 'Popular',
     isPopular: true,
     features: [
       'Individual corporate access for executives',
@@ -558,6 +558,7 @@ export const CORPORATE_RATE_CARD = {
       priceRaw: 2500,
       currency: 'BWP',
       isPopular: true,
+      badge: 'Popular',
       features: ['Executive access', 'All sessions', 'Executive networking', 'Full luncheon'],
     },
     {

@@ -42,7 +42,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister }) => {
         </p>
 
         {/* Primary CTA button + plain text link with nudging arrow */}
-        <div className="flex flex-wrap items-center justify-center gap-6 mb-14">
+        <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
           <button
             onClick={onOpenRegister}
             className="group btn-cta-magenta px-8 py-3.5 rounded-full text-sm font-semibold text-white flex items-center gap-2.5 cursor-pointer"
@@ -60,32 +60,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister }) => {
           </a>
         </div>
 
-        {/* Single thin stat strip: compact, refined with mono accents */}
-        <div className="pt-6 border-t border-white/[0.08] flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-[#B8C2D6]">
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-sm font-bold text-white">250+</span>
-            <span className="text-slate-400">Delegates</span>
-          </div>
-          <span className="text-white/10 select-none hidden sm:inline">•</span>
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-sm font-bold text-white">8</span>
-            <span className="text-slate-400">Sessions</span>
-          </div>
-          <span className="text-white/10 select-none hidden sm:inline">•</span>
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-sm font-bold text-white">1</span>
-            <span className="text-slate-400">Day</span>
-          </div>
-          <span className="text-white/10 select-none hidden sm:inline">•</span>
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-sm font-bold text-white">6</span>
-            <span className="text-slate-400">Deliverables</span>
-          </div>
+        {/* Countdown Timer inside upper container */}
+        <div className="mt-6">
+          <CountdownTimer targetDate={EVENT_DETAILS.isoDate} />
         </div>
       </div>
-
-      {/* Slim one-line countdown bar */}
-      <CountdownTimer targetDate={EVENT_DETAILS.isoDate} />
     </section>
   );
 };
