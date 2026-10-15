@@ -19,7 +19,7 @@ service cloud.firestore {
     }
 
     function isBootstrappedAdmin() {
-      return isSignedIn() && request.auth.token.email == 'quintonbileon@gmail.com';
+      return isSignedIn() && (request.auth.token.email == 'quintonbileon@gmail.com' || request.auth.token.email == 'gsetlamelo@gmail.com');
     }
 
     function isAdmin() {

@@ -67,7 +67,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   // Default secretariat emergency passcode
   const SECRET_PASSCODE = 'BMIC2026';
-  const AUTHORIZED_ADMIN_EMAIL = 'quintonbileon@gmail.com';
+  const AUTHORIZED_ADMIN_EMAILS = ['quintonbileon@gmail.com', 'gsetlamelo@gmail.com'];
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -79,7 +79,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   const isAuthorized =
     isUnlockedWithPassphrase ||
-    (currentUser && (currentUser.email === AUTHORIZED_ADMIN_EMAIL || currentUser.email?.endsWith('@continentalmedia.co.bw')));
+    (currentUser && (AUTHORIZED_ADMIN_EMAILS.includes(currentUser.email || '') || currentUser.email?.endsWith('@continentalmedia.co.bw')));
 
   // Subscribe to real-time registrations when modal is open and authorized
   useEffect(() => {
@@ -333,7 +333,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   Secretariat Access Gate
                 </h3>
                 <p className="text-xs text-[#B8C2D6] leading-relaxed">
-                  Confidential congress administration portal. Authenticate via Google ({AUTHORIZED_ADMIN_EMAIL}) or enter the Secretariat Key.
+                  Confidential congress administration portal. Authenticate via Google ({AUTHORIZED_ADMIN_EMAILS.join(', ')}) or enter the Secretariat Key.
                 </p>
               </div>
 
