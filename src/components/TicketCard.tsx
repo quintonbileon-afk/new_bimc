@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { TicketRecord } from '../firebase';
 import { BmicLogo } from './BmicLogo';
-import { Download, CheckCircle, ShieldCheck, Printer } from 'lucide-react';
+import { Download, CheckCircle, ShieldCheck, Printer, Mail, Loader2 } from 'lucide-react';
 
 interface TicketCardProps {
   ticket: TicketRecord;
@@ -62,6 +62,38 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
   };
 
   const bookingRefShort = ticket.bookingId ? ticket.bookingId.replace('reg_', '').toUpperCase() : 'BMIC2026';
+
+  const [isEmailing, setIsEmailing] = useState(false);
+  const [emailSentSuccess, setEmailSentSuccess] = useState(false);
+
+  const handleEmailPass = async () => {
+    setIsEmailing(true);
+    setEmailSentSuccess(false);
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          passId: ticket.passId,
+          tier: ticket.tier,
+          delegateName: ticket.delegateName,
+          delegateEmail: ticket.delegateEmail || '',
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setEmailSentSuccess(true);
+        setTimeout(() => setEmailSentSuccess(false), 4000);
+      } else {
+        alert(data.error || 'Failed to send pass email.');
+      }
+    } catch (err) {
+      console.error('Email pass error:', err);
+      alert('Network error while sending pass email.');
+    } finally {
+      setIsEmailing(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-3 w-full my-4">
@@ -186,15 +218,28 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
           <span>Download Pass (PNG)</span>
         </button>
 
-        {onStatusChange && ticket.status !== 'Checked in' && (
-          <button
-            onClick={() => onStatusChange(ticket.id, 'Checked in')}
-            className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
-          >
-            <CheckCircle className="w-3.5 h-3.5" />
-            <span>Simulate Scan / Check-in</span>
-          </button>
-        )}
+        <button
+          onClick={handleEmailPass}
+          disabled={isEmailing}
+          className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+        >
+          {isEmailing ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Sending Pass...</span>
+            </>
+          ) : emailSentSuccess ? (
+            <>
+              <CheckCircle className="w-3.5 h-3.5 text-white" />
+              <span>Pass Emailed!</span>
+            </>
+          ) : (
+            <>
+              <Mail className="w-3.5 h-3.5" />
+              <span>Email Pass</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

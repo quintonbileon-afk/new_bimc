@@ -18,26 +18,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { fullName, email, registrationType, passOrTier, referenceId, organization, phone, notes, honeypot } = req.body || {};
+    const { fullName, email, registrationType, passOrTier, referenceId, organization, phone, passId, tier, delegateName, token, honeypot } = req.body || {};
 
     // Honeypot check
     if (honeypot) {
       return res.status(200).json({ success: true });
     }
 
-    if (!fullName || typeof fullName !== 'string' || !email || typeof email !== 'string') {
-      return res.status(400).json({ error: 'Missing required fields: fullName and email' });
+    const targetEmail = email || req.body.delegateEmail;
+    const targetName = fullName || delegateName;
+
+    if (!targetName || typeof targetName !== 'string' || !targetEmail || typeof targetEmail !== 'string') {
+      return res.status(400).json({ error: 'Missing required fields: fullName/delegateName and email' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(targetEmail)) {
       return res.status(400).json({ error: 'Invalid email address format' });
     }
 
-    const cleanName = escapeHtml(fullName.trim().substring(0, 200));
-    const cleanEmail = email.trim().toLowerCase().substring(0, 200);
-    const passType = escapeHtml((registrationType || passOrTier || 'General Delegate Pass').trim().substring(0, 150));
-    const refId = escapeHtml((referenceId || 'BMIC-2026-REF').trim().substring(0, 100));
+    const cleanName = escapeHtml(targetName.trim().substring(0, 200));
+    const cleanEmail = targetEmail.trim().toLowerCase().substring(0, 200);
 
     const apiKey = process.env.RESEND_API_KEY;
     const emailFrom = process.env.EMAIL_FROM || 'BMIC 2026 Secretariat <info@bmic.co.bw>';
@@ -48,7 +49,100 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const resend = new Resend(apiKey);
-    const subject = `BMIC 2026 Registration Received – Ref ${refId}`;
+
+    let subject = '';
+    let textContent = '';
+    let htmlContent = '';
+
+    if (passId) {
+      const cleanPassId = escapeHtml(passId.trim());
+      const cleanTier = escapeHtml((tier || passOrTier || 'General Pass').trim());
+      subject = `BMIC 2026 Official Congress Pass – ${cleanPassId}`;
+      
+      textContent = `
+Official Congress Pass - BMIC 2026
+------------------------------------------------
+Dear ${cleanName},
+
+Your official pass for the Botswana Mobile Innovation Congress (BMIC 2026) has been issued.
+
+Pass ID: ${cleanPassId}
+Pass Tier: ${cleanTier}
+Venue: Royal Aria Conference Centre, Plenary Hall
+Date: 30 October 2026
+
+Please present this Pass ID or your QR code at the registration desk upon arrival.
+
+Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
+      `.trim();
+
+      htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>BMIC 2026 Official Congress Pass</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #050B14; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #050B14; padding: 24px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #0A1428; border: 1px solid rgba(47, 109, 181, 0.3); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background-color: #070D18; padding: 32px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <h1 style="margin: 0 0 8px 0; font-size: 20px; font-weight: bold; color: #ffffff; letter-spacing: -0.5px;">Botswana Mobile Innovation Congress</h1>
+              <p style="margin: 0; font-size: 11px; font-family: monospace; color: #6AA5EE; text-transform: uppercase; letter-spacing: 1px;">Official Congress Pass Credentials</p>
+            </td>
+          </tr>
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 36px 32px;">
+              <h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: bold; color: #ffffff;">Your Pass is Ready</h2>
+              <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #B8C2D6;">
+                Dear <strong style="color: #ffffff;">${cleanName}</strong>,
+              </p>
+              <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #B8C2D6;">
+                Your official scannable pass credentials for <strong style="color: #6AA5EE;">${cleanTier}</strong> have been generated and issued by the Secretariat.
+              </p>
+
+              <!-- Pass Box -->
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0E1C38; border: 1px solid rgba(47,109,181,0.4); border-radius: 12px; margin-bottom: 28px;">
+                <tr>
+                  <td style="padding: 24px;">
+                    <span style="font-size: 10px; font-family: monospace; text-transform: uppercase; color: #6AA5EE; display: block; margin-bottom: 4px;">Assigned Pass ID</span>
+                    <span style="font-size: 22px; font-family: monospace; font-weight: bold; color: #ffffff; letter-spacing: 1.5px; display: block; margin-bottom: 16px;">${cleanPassId}</span>
+                    
+                    <span style="font-size: 10px; font-family: monospace; text-transform: uppercase; color: #8A99AD; display: block; margin-bottom: 2px;">Venue &amp; Date</span>
+                    <span style="font-size: 13px; color: #ffffff; display: block;">Royal Aria Conference Centre, Plenary Hall · 30 October 2026</span>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #B8C2D6;">
+                Please present this Pass ID or your digital QR code credential at the registration desk upon arrival to gain immediate entry.
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background-color: #070D18; padding: 24px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 12px; color: #8A99AD;">
+              <p style="margin: 0 0 6px 0;">Botswana Mobile Innovation Congress 2026</p>
+              <p style="margin: 0;">For inquiries contact: <a href="mailto:info@bmic.co.bw" style="color: #6AA5EE; text-decoration: none;">info@bmic.co.bw</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `.trim();
+    } else {
+      const passType = escapeHtml((registrationType || passOrTier || 'General Delegate Pass').trim().substring(0, 150));
+      const refId = escapeHtml((referenceId || 'BMIC-2026-REF').trim().substring(0, 100));
+      subject = `BMIC 2026 Registration Received – Ref ${refId}`;
+
 
     const textContent = `
 Reservation Received - BMIC 2026
@@ -126,6 +220,7 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
 </body>
 </html>
     `.trim();
+    }
 
     const result = await resend.emails.send({
       from: emailFrom,
