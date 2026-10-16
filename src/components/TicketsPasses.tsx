@@ -114,8 +114,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
   return (
     <section
       id="passes"
-      style={{ height: '1572px' }}
-      className="h-[1572px] py-10 lg:py-16 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative overflow-hidden"
+      className="py-12 sm:py-16 lg:py-24 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative overflow-hidden"
     >
       {/* Scroll Anchors for Navbar direct jumps */}
       <div id="tickets" className="relative -top-28 pointer-events-none" />
