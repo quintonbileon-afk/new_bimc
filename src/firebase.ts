@@ -357,11 +357,28 @@ export function subscribeToRegistrations(
         });
       });
 
-      // Merge local records that aren't in Firestore yet
+      // Merge local records that aren't in Firestore yet and sync them up
       const currentLocal = getLocalRegistrations();
       for (const loc of currentLocal) {
         if (!seenIds.has(loc.id)) {
           records.push(loc);
+          // Auto-sync up to Firestore in background
+          setDoc(doc(db, 'registrations', loc.id), {
+            fullName: loc.fullName,
+            email: loc.email,
+            phone: loc.phone || '',
+            organization: loc.organization || '',
+            passOrTier: loc.passOrTier,
+            notes: loc.notes || '',
+            status: loc.status || 'pending',
+            adminNotes: loc.adminNotes || '',
+            attachmentUrl: loc.attachmentUrl || null,
+            attachmentName: loc.attachmentName || null,
+            delegateNames: loc.delegateNames || [],
+            delegateEmails: loc.delegateEmails || [],
+            createdAt: loc.createdAt,
+            updatedAt: loc.updatedAt,
+          }).catch(err => console.warn('Background sync push error:', err));
         }
       }
 
@@ -412,6 +429,22 @@ export async function fetchAllRegistrations(): Promise<RegistrationRecord[]> {
     for (const loc of currentLocal) {
       if (!seenIds.has(loc.id)) {
         records.push(loc);
+        setDoc(doc(db, 'registrations', loc.id), {
+          fullName: loc.fullName,
+          email: loc.email,
+          phone: loc.phone || '',
+          organization: loc.organization || '',
+          passOrTier: loc.passOrTier,
+          notes: loc.notes || '',
+          status: loc.status || 'pending',
+          adminNotes: loc.adminNotes || '',
+          attachmentUrl: loc.attachmentUrl || null,
+          attachmentName: loc.attachmentName || null,
+          delegateNames: loc.delegateNames || [],
+          delegateEmails: loc.delegateEmails || [],
+          createdAt: loc.createdAt,
+          updatedAt: loc.updatedAt,
+        }).catch(err => console.warn('Background sync push error:', err));
       }
     }
 
