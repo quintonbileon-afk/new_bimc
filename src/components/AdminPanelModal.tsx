@@ -46,7 +46,8 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Copy
+  Copy,
+  FileCheck
 } from 'lucide-react';
 
 interface AdminPanelModalProps {

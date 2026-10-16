@@ -196,6 +196,7 @@ export const DelegateRegistrationModal: React.FC<DelegateRegistrationModalProps>
       organization: '',
       jobTitle: '',
       dietaryNotes: '',
+      referenceNumber: '',
     });
     setDelegate1Name('');
     setDelegate1Email('');

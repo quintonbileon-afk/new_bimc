@@ -58,8 +58,6 @@ Dear ${fullName},
 Thank you for registering for the Botswana Mobile Innovation Congress (BMIC 2026).
 Your reservation for "${passType}" has been successfully logged with the Secretariat.
 
-Reference ID: ${refId}
-Reference Number: ${req.body.referenceNumber || 'N/A'}
 Organization: ${organization || 'N/A'}
 Phone: ${phone || 'N/A'}
 
@@ -67,8 +65,6 @@ Payment Methods:
 - E-Wallet/Pay2Cell: +26771843386
 - Orange Money: +26772846420
 - Mascom MyZaka: +26771843386
-
-An official VAT invoice and proforma will be sent to your email address, and scannable congress pass credentials will be issued once payment is confirmed or the purchase order is verified.
 
 Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
     `.trim();
@@ -103,16 +99,6 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
                 Thank you for your registration. Your booking for <strong style="color: #6AA5EE;">${passType}</strong> has been successfully logged with the Secretariat.
               </p>
 
-              <!-- Reference Box -->
-              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0E1C38; border: 1px solid rgba(47,109,181,0.4); border-radius: 12px; margin-bottom: 28px;">
-                <tr>
-                  <td style="padding: 20px;">
-                    <span style="font-size: 10px; font-family: monospace; text-transform: uppercase; color: #6AA5EE; display: block; margin-bottom: 4px;">Secretariat Reference ID</span>
-                    <span style="font-size: 18px; font-family: monospace; font-weight: bold; color: #ffffff; letter-spacing: 1px;">${refId}</span>
-                  </td>
-                </tr>
-              </table>
-
               <!-- Payment Methods -->
               <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">Payment Methods</h3>
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0E1C38; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 28px;">
@@ -124,11 +110,6 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
                   </td>
                 </tr>
               </table>
-
-
-              <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #B8C2D6;">
-                An official VAT invoice and proforma will be sent to your email address, and scannable congress pass credentials will be issued once payment is confirmed or the purchase order is verified.
-              </p>
             </td>
           </tr>
           <!-- Footer -->
