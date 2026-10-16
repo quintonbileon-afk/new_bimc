@@ -78,6 +78,8 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
           tier: ticket.tier,
           delegateName: ticket.delegateName,
           delegateEmail: ticket.delegateEmail || '',
+          organizationName: ticket.organizationName || '',
+          bookingId: ticket.bookingId || '',
         }),
       });
       const data = await res.json();
