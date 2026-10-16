@@ -176,7 +176,7 @@ export const SponsorsMarquee: React.FC<SponsorsMarqueeProps> = ({ onOpenRegister
   }, [total]);
 
   return (
-    <section id="partners" className="py-12 lg:py-16 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
+    <section id="partners" className="py-10 lg:py-14 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header with Refined Spacing and Deck Controls */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -184,15 +184,12 @@ export const SponsorsMarquee: React.FC<SponsorsMarqueeProps> = ({ onOpenRegister
             <div className="inline-flex items-center gap-2 mb-2 px-2.5 py-1 rounded-full bg-slate-200/60 border border-slate-300/60">
               <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
-                05 / Ecosystem Alignment
+                04 / Ecosystem Alignment
               </p>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0A1428] tracking-tight font-display">
               PARTNERSHIP &amp; EXHIBITION SECTORS
             </h2>
-            <p className="text-xs sm:text-sm text-[#4A5568] max-w-xl font-normal leading-relaxed mt-1">
-              Six key ecosystem pillars invited to partner, sponsor, and exhibit at the Botswana Mobile Internet Congress 2026.
-            </p>
           </div>
 
           {/* Navigation Controls (Swipes indicator on mobile, Arrows on desktop) */}
@@ -235,7 +232,7 @@ export const SponsorsMarquee: React.FC<SponsorsMarqueeProps> = ({ onOpenRegister
         </div>
 
         {/* Cascading & Stacked Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
           {/* Left Column: Cascading Sector Navigation Strip (5 cols) */}
           <div className="lg:col-span-5 space-y-2">
             <div className="flex items-center justify-between mb-1 px-1">
@@ -523,7 +520,7 @@ export const SponsorsMarquee: React.FC<SponsorsMarqueeProps> = ({ onOpenRegister
         </div>
 
         {/* Secretariat Notice with Streamlined Layout & Whitespace */}
-        <div className="border-t border-slate-200/80 pt-10">
+        <div className="border-t border-slate-200/80 pt-6">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
             <div className="max-w-2xl space-y-2">
               <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[#2F6DB5]">

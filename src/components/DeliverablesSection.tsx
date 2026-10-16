@@ -36,22 +36,8 @@ export const DeliverablesSection: React.FC = () => {
 
   return (
     <section id="deliverables" className="py-20 lg:py-28 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200">
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-        {/* Header */}
-        <div className="max-w-2xl mb-16">
-          <div className="mb-4">
-            <span className="text-xs uppercase font-semibold tracking-[0.14em] text-[#2F6DB5]">
-              Actionable Mandates
-            </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A1428] tracking-[-0.03em] leading-[1.12]">
-            What the Congress Will Deliver
-          </h2>
-          <p className="text-base sm:text-lg text-[#4A5568] mt-4 font-normal leading-relaxed">
-            Six binding, practical outcomes engineered to transition Botswana from high-level dialogue to financed execution.
-          </p>
-        </div>
 
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
         {/* 2x3 Grid with Large Numerals (Official Outcome Document Feel) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12 pt-4">
           {deliverables.map((item) => (

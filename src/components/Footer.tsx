@@ -24,8 +24,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
 
   return (
     <footer className="bg-[#0A1428] text-[#B8C2D6] border-t border-white/[0.08] relative">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-white/[0.08]">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-white/[0.08]">
           {/* Column 1: Brand & Logo */}
           <div className="lg:col-span-4 space-y-4">
             <BmicLogo theme="dark" size="sm" />

@@ -1,20 +1,22 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { NAV_ROUTES } from '../config/routes';
 
 interface CtaBannerProps {
   onOpenRegister: () => void;
   onDownloadIcs: () => void;
+  onNavigateProgramme?: () => void;
 }
 
-export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister }) => {
+export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister, onNavigateProgramme }) => {
   return (
-    <section className="py-[72px] lg:py-[120px] bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
+    <section className="py-10 lg:py-14 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Eyebrow */}
         <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full bg-slate-200/50 border border-slate-300/50">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
-            09 / National Convening · 30 October 2026
+            08 / National Convening · 30 October 2026
           </p>
         </div>
 
@@ -23,10 +25,7 @@ export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister }) => {
           ONE DAY. ONE NATIONAL DIGITAL CONVERSATION. ONE ACTION AGENDA.
         </h2>
 
-        {/* Subtitle */}
-        <p className="text-base sm:text-lg text-[#4A5568] max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
-          Be in the room where Botswana's digital future moves from strategic dialogue to financed implementation.
-        </p>
+      
 
         {/* One clear action per screen: ONE primary button + plain text link */}
         <div className="flex flex-wrap items-center justify-center gap-6">
@@ -39,8 +38,16 @@ export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister }) => {
           </button>
 
           <a
-            href="#agenda"
-            className="group text-sm font-semibold text-[#0A1428] hover:text-[#2F6DB5] transition-colors inline-flex items-center gap-1.5 py-2 px-3 rounded-full hover:bg-slate-200/40"
+            href={NAV_ROUTES.programme}
+            onClick={(e) => {
+              e.preventDefault();
+              if (onNavigateProgramme) {
+                onNavigateProgramme();
+              } else {
+                window.location.href = '/programme';
+              }
+            }}
+            className="group text-sm font-semibold text-[#0A1428] hover:text-[#2F6DB5] transition-colors inline-flex items-center gap-1.5 py-2 px-3 rounded-full hover:bg-slate-200/40 cursor-pointer"
           >
             <span>View Programme</span>
             <span className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">→</span>

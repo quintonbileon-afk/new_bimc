@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AGENDA_SESSIONS, EVENT_DETAILS } from '../data/bmicContent';
-import { BmicLogo } from './BmicLogo';
 import { NAV_ROUTES } from '../config/routes';
 import {
   ArrowLeft,
@@ -33,7 +32,6 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
   onSelectNavTab,
 }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'morning' | 'afternoon'>('all');
-  const [selectedTrack, setSelectedTrack] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedSessions, setExpandedSessions] = useState<Record<string, boolean>>({});
   const [copiedShare, setCopiedShare] = useState(false);
@@ -50,13 +48,6 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
     }
   };
 
-  const tracks = [
-    { id: 'all', label: 'All Tracks' },
-    { id: 'National Direction', label: 'National Direction' },
-    { id: 'Midday Exchange', label: 'Midday Exchange' },
-    { id: 'Execution & Growth', label: 'Execution & Growth' },
-  ];
-
   const filteredSessions = AGENDA_SESSIONS.filter((session) => {
     const matchesSearch =
       session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -67,7 +58,6 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
     if (!matchesSearch) return false;
     if (activeTab === 'morning' && session.period !== 'morning') return false;
     if (activeTab === 'afternoon' && session.period !== 'afternoon') return false;
-    if (selectedTrack !== 'all' && !session.strategicTrack?.includes(selectedTrack)) return false;
 
     return true;
   });
@@ -77,7 +67,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
 
 
       {/* 2. Page Hero Banner */}
-      <section className="relative pt-10 pb-14 lg:pt-14 lg:pb-16 bg-radial-[900px_420px_at_20%_0] from-[#5aa9e6]/10 to-transparent border-b border-[#26365a]">
+      <section className="relative pt-8 pb-10 lg:pt-10 lg:pb-12 bg-radial-[900px_420px_at_20%_0] from-[#5aa9e6]/10 to-transparent border-b border-[#26365a]">
         <div className="bmic-wrap wrap">
 
           <div className="max-w-4xl">
@@ -119,29 +109,10 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
         </div>
       </section>
 
-      {/* 3. Key Metrics Strip */}
-      <section className="bg-[#101f3f] border-b border-[#26365a] py-6">
-        <div className="bmic-wrap wrap grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-          <div>
-            <div className="font-mono text-2xl sm:text-3xl font-extrabold text-white">15</div>
-            <div className="text-xs text-[#b6c2dc] uppercase tracking-wider font-semibold mt-1">Sessions</div>
-          </div>
-          <div>
-            <div className="font-mono text-2xl sm:text-3xl font-extrabold text-[#5aa9e6]">08:00 - 18:30</div>
-            <div className="text-xs text-[#b6c2dc] uppercase tracking-wider font-semibold mt-1">Full Day Schedule</div>
-          </div>
-          <div>
-            <div className="font-mono text-2xl sm:text-3xl font-extrabold text-[#d81b60]">04</div>
-            <div className="text-xs text-[#b6c2dc] uppercase tracking-wider font-semibold mt-1">Strategic Tracks</div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 4. Filter & Search Controls */}
-      <section className="py-8 bg-[#0b1630]">
+      {/* Filter & Search Controls */}
+      <section className="py-6 bg-[#0b1630]">
         <div className="bmic-wrap wrap">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 pb-6 border-b border-[#26365a]">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
             {/* Period Segment Tabs */}
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -188,26 +159,6 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
               />
             </div>
           </div>
-
-          {/* Track Filter Pills */}
-          <div className="flex flex-wrap items-center gap-2 pt-4">
-            <span className="text-xs text-[#b6c2dc] mr-1 font-semibold uppercase tracking-wider font-mono">
-              Filter Track:
-            </span>
-            {tracks.map((track) => (
-              <button
-                key={track.id}
-                onClick={() => setSelectedTrack(track.id)}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-                  selectedTrack === track.id
-                    ? 'bg-[#5aa9e6] text-[#0b1630] font-bold'
-                    : 'bg-white/[0.04] text-[#b6c2dc] hover:text-white border border-white/[0.08]'
-                }`}
-              >
-                {track.label}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -223,7 +174,6 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                 onClick={() => {
                   setSearchQuery('');
                   setActiveTab('all');
-                  setSelectedTrack('all');
                 }}
                 className="px-4 py-2 bg-[#d81b60] text-white rounded-full text-xs font-semibold cursor-pointer"
               >
@@ -231,34 +181,34 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
               </button>
             </div>
           ) : (
-            <div className="space-y-3.5">
-              {filteredSessions.map((session, index) => {
+            <div className="space-y-2">
+              {filteredSessions.map((session) => {
                 const isExpanded = !!expandedSessions[session.id];
                 const isBreak = session.category === 'break' || session.category === 'networking';
 
                 return (
                   <div
                     key={session.id}
-                    className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    className={`rounded-xl border transition-all duration-200 overflow-hidden ${
                       isBreak
                         ? 'bg-[#0e1a38]/80 border-[#26365a]/80'
                         : isExpanded
-                        ? 'bg-[#12244a] border-[#5aa9e6]/50 shadow-lg'
+                        ? 'bg-[#12244a] border-[#5aa9e6]/50 shadow-md'
                         : 'bg-[#101f3f] border-[#26365a] hover:border-[#5aa9e6]/30'
                     }`}
                   >
                     <div
                       onClick={() => toggleExpand(session.id)}
-                      className="p-5 sm:p-6 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      className="py-2.5 px-3.5 sm:py-3 sm:px-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4"
                     >
                       {/* Left: Time & Location */}
-                      <div className="sm:w-48 shrink-0 flex sm:flex-col items-center sm:items-start justify-between">
-                        <span className="font-mono text-sm sm:text-base font-bold text-white tabular-nums tracking-tight">
+                      <div className="sm:w-36 shrink-0 flex sm:flex-col items-center sm:items-start justify-between">
+                        <span className="font-mono text-xs sm:text-sm font-bold text-white tabular-nums tracking-tight">
                           {session.time}
                         </span>
-                        <div className="inline-flex items-center gap-1.5 text-xs text-[#5aa9e6] font-medium font-mono mt-1">
-                          <MapPin className="w-3 h-3 shrink-0" />
-                          <span>
+                        <div className="inline-flex items-center gap-1 text-[11px] text-[#5aa9e6] font-medium font-mono sm:mt-0.5">
+                          <MapPin className="w-2.5 h-2.5 shrink-0" />
+                          <span className="truncate">
                             {session.category === 'break' || session.category === 'networking'
                               ? 'Networking Foyer'
                               : session.period === 'morning'
@@ -268,17 +218,14 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                         </div>
                       </div>
 
-                      {/* Middle: Title, Tags & Description */}
+                      {/* Middle: Title, Tag & Description */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <span className="font-mono text-[10px] text-white/50 uppercase font-semibold">
-                            #{String(index + 1).padStart(2, '0')}
-                          </span>
-                          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-xs sm:text-sm font-bold text-white tracking-tight leading-snug">
                             {session.title}
-                          </h2>
+                          </h3>
                           <span
-                            className={`font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                            className={`font-mono text-[9px] uppercase font-bold px-1.5 py-0.2 rounded-full ${
                               session.category === 'keynote'
                                 ? 'bg-[#d81b60]/20 text-[#f0467f] border border-[#d81b60]/40'
                                 : session.category === 'panel'
@@ -290,38 +237,30 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                           </span>
                         </div>
 
-                        <p className="text-xs sm:text-sm text-[#b6c2dc] leading-relaxed">
+                        <p className="text-xs text-[#b6c2dc] mt-0.5 leading-relaxed">
                           {session.description}
                         </p>
-
-                        {/* Collapsed/Expanded hint */}
-                        {session.strategicTrack && (
-                          <div className="mt-2 flex items-center gap-2 text-xs text-[#5aa9e6]/90 font-mono">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#5aa9e6]" />
-                            <span>Track: {session.strategicTrack}</span>
-                          </div>
-                        )}
                       </div>
 
                       {/* Right: Expand Indicator */}
-                      <div className="shrink-0 flex items-center justify-end sm:w-10">
+                      <div className="shrink-0 flex items-center justify-end sm:w-6">
                         <span
-                          className={`p-1.5 rounded-full bg-white/[0.04] text-[#b6c2dc] hover:text-white transition-transform duration-200 ${
+                          className={`p-1 rounded-full bg-white/[0.04] text-[#b6c2dc] hover:text-white transition-transform duration-200 ${
                             isExpanded ? 'rotate-180 text-[#5aa9e6] bg-[#5aa9e6]/10' : ''
                           }`}
                         >
-                          <ChevronDown className="w-4 h-4" />
+                          <ChevronDown className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </div>
 
                     {/* Expanded Content Details */}
                     {isExpanded && (
-                      <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-[#26365a] bg-black/20 text-xs sm:text-sm text-[#b6c2dc] space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="p-4 rounded-xl bg-[#0b1630] border border-[#26365a]">
-                            <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono mb-1.5 flex items-center gap-1.5">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      <div className="px-3.5 sm:px-4 pb-3.5 pt-2 border-t border-[#26365a] bg-black/20 text-xs text-[#b6c2dc] space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="p-3 rounded-lg bg-[#0b1630] border border-[#26365a]">
+                            <h4 className="text-[11px] font-bold text-white uppercase tracking-wider font-mono mb-1 flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                               Strategic Deliverable
                             </h4>
                             <p className="text-xs text-[#b6c2dc] leading-relaxed">
@@ -329,9 +268,9 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                             </p>
                           </div>
 
-                          <div className="p-4 rounded-xl bg-[#0b1630] border border-[#26365a]">
-                            <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono mb-1.5 flex items-center gap-1.5">
-                              <Users className="w-3.5 h-3.5 text-[#5aa9e6]" />
+                          <div className="p-3 rounded-lg bg-[#0b1630] border border-[#26365a]">
+                            <h4 className="text-[11px] font-bold text-white uppercase tracking-wider font-mono mb-1 flex items-center gap-1.5">
+                              <Users className="w-3 h-3 text-[#5aa9e6]" />
                               Target Stakeholders
                             </h4>
                             <p className="text-xs text-[#b6c2dc] leading-relaxed">
@@ -340,9 +279,9 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                          <div className="flex items-center gap-2 text-xs text-[#b6c2dc]">
-                            <Clock className="w-3.5 h-3.5 text-[#5aa9e6]" />
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                          <div className="flex items-center gap-1.5 text-xs text-[#b6c2dc]">
+                            <Clock className="w-3 h-3 text-[#5aa9e6]" />
                             <span>Duration: 45 - 60 minutes · Q&amp;A included</span>
                           </div>
 
@@ -351,9 +290,9 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                               e.stopPropagation();
                               onDownloadIcs();
                             }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white bg-[#5aa9e6]/20 border border-[#5aa9e6]/40 hover:bg-[#5aa9e6]/30 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#5aa9e6]/20 border border-[#5aa9e6]/40 hover:bg-[#5aa9e6]/30 transition-colors cursor-pointer"
                           >
-                            <Calendar className="w-3.5 h-3.5 text-[#5aa9e6]" />
+                            <Calendar className="w-3 h-3 text-[#5aa9e6]" />
                             <span>Add Session to Calendar</span>
                           </button>
                         </div>
@@ -368,7 +307,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
       </section>
 
       {/* 6. Bottom Conversion / Return CTA Banner */}
-      <section className="py-14 bg-gradient-to-b from-[#101f3f] to-[#0b1630] border-t border-[#26365a]">
+      <section className="py-10 bg-gradient-to-b from-[#101f3f] to-[#0b1630] border-t border-[#26365a]">
         <div className="bmic-wrap wrap text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full bg-[#d81b60]/10 border border-[#d81b60]/30 text-[#f0467f] text-xs font-bold font-mono">
             SECURE YOUR CONGRESS ACCESS
@@ -406,39 +345,6 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
           </div>
         </div>
       </section>
-
-      {/* 7. Footer for Programme Page */}
-      <footer className="py-10 bg-[#070e20] border-t border-[#26365a] text-xs text-[#b6c2dc]">
-        <div className="bmic-wrap wrap flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <BmicLogo size="sm" />
-            <span>&copy; 2026 Botswana Mobile &amp; Internet Congress. All rights reserved.</span>
-          </div>
-
-          <div className="flex items-center gap-5">
-            <button
-              onClick={() => onNavigateHome()}
-              className="text-[#5aa9e6] hover:underline cursor-pointer bg-transparent border-0"
-            >
-              Return to Main Page
-            </button>
-            <span className="text-[#26365a]">|</span>
-            <button
-              onClick={() => onNavigateHome(NAV_ROUTES.tickets)}
-              className="text-[#b6c2dc] hover:text-white cursor-pointer bg-transparent border-0"
-            >
-              Passes &amp; Rates
-            </button>
-            <span className="text-[#26365a]">|</span>
-            <button
-              onClick={() => onNavigateHome(NAV_ROUTES.venue)}
-              className="text-[#b6c2dc] hover:text-white cursor-pointer bg-transparent border-0"
-            >
-              Venue Details
-            </button>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

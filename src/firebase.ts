@@ -353,6 +353,38 @@ export async function updateBookingDelegateNames(
   }
 }
 
+export async function updateRegistrationRecord(
+  id: string,
+  updates: Partial<Omit<RegistrationRecord, 'id'>>
+) {
+  const path = `registrations/${id}`;
+  const payload = {
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+
+  try {
+    const local = getLocalBackups();
+    const idx = local.findIndex(r => r.id === id);
+    if (idx !== -1) {
+      local[idx] = { ...local[idx], ...payload };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local));
+    }
+  } catch (e) {
+    console.warn('Local cache update failed:', e);
+  }
+
+  if (!auth.currentUser) {
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, 'registrations', id), payload);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, path);
+  }
+}
+
 export async function deleteRegistrationRecord(id: string) {
   const path = `registrations/${id}`;
   try {

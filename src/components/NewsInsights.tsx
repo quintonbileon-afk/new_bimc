@@ -14,9 +14,6 @@ export const NewsInsights: React.FC<NewsInsightsProps> = ({ onOpenArticle }) => 
         <div className="max-w-3xl mb-16">
           <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#B8C2D6]">
-              08 / Policy &amp; Research Briefings
-            </p>
           </div>
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.03em] leading-[1.12] mb-4">
             CONGRESS INSIGHTS &amp; BRIEFINGS

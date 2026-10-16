@@ -40,33 +40,6 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({ onOpenRegister
   return (
     <section id="partners" className="py-20 lg:py-28 bg-[#FFFFFF] text-[#0A1428] border-b border-slate-200">
       <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-slate-200">
-          <div>
-            <div className="mb-4">
-              <span className="text-xs uppercase font-semibold tracking-[0.14em] text-[#2F6DB5]">
-                Institutional Alignment
-              </span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A1428] tracking-[-0.03em] leading-[1.12]">
-              Partners &amp; Supporters
-            </h2>
-            <p className="text-base text-[#4A5568] mt-3 max-w-xl font-normal leading-relaxed">
-              Convened under sovereign public-private stewardship, uniting regulators, operators, capital allocators, and industry associations.
-            </p>
-          </div>
-
-          <div className="self-start md:self-auto">
-            <button
-              type="button"
-              onClick={() => onOpenRegister('Strategic Partnership')}
-              className="inline-flex items-center gap-2 text-xs uppercase font-semibold tracking-wider text-[#2F6DB5] hover:text-[#0A1428] transition-colors"
-            >
-              <span>Request Partnership Deck</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
 
         {/* Tier 1: Host & Convenors */}
         <div className="mb-14">

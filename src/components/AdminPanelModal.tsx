@@ -4,6 +4,7 @@ import {
   TicketRecord,
   subscribeToRegistrations,
   updateRegistrationStatus,
+  updateRegistrationRecord,
   deleteRegistrationRecord,
   submitRegistration,
   getTicketsForBooking,
@@ -39,7 +40,8 @@ import {
   ShieldCheck,
   Paperclip,
   Check,
-  Ticket
+  Ticket,
+  Edit3
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -119,6 +121,92 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const handleCheckInTicket = async (ticketId: string, status: 'Valid' | 'Checked in' | 'Cancelled') => {
     await updateTicketStatus(ticketId, status);
     setBookingTickets((prev) => prev.map((t) => t.id === ticketId ? { ...t, status } : t));
+  };
+
+  // Record Editing State
+  const [editingRecord, setEditingRecord] = useState<RegistrationRecord | null>(null);
+  const [editForm, setEditForm] = useState<{
+    fullName: string;
+    email: string;
+    phone: string;
+    organization: string;
+    passOrTier: string;
+    status: RegistrationRecord['status'];
+    notes: string;
+    delegateNames: string[];
+  }>({
+    fullName: '',
+    email: '',
+    phone: '',
+    organization: '',
+    passOrTier: '',
+    status: 'pending',
+    notes: '',
+    delegateNames: ['', '', ''],
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const handleOpenEdit = (reg: RegistrationRecord) => {
+    const delNames = reg.delegateNames && reg.delegateNames.length > 0
+      ? reg.delegateNames
+      : [reg.fullName, '', ''];
+    setEditingRecord(reg);
+    setEditForm({
+      fullName: reg.fullName || '',
+      email: reg.email || '',
+      phone: reg.phone || '',
+      organization: reg.organization || '',
+      passOrTier: reg.passOrTier || 'Standard Delegate Pass',
+      status: reg.status,
+      notes: reg.notes || '',
+      delegateNames: [delNames[0] || '', delNames[1] || '', delNames[2] || ''],
+    });
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord) return;
+    if (!editForm.fullName.trim() || !editForm.email.trim()) {
+      alert('Please provide full name and email address.');
+      return;
+    }
+    setIsSavingEdit(true);
+    try {
+      const isCorpPack = editForm.passOrTier.toLowerCase().includes('corporate pack') || editForm.passOrTier.toLowerCase().includes('3 delegates');
+      const updates: Partial<Omit<RegistrationRecord, 'id'>> = {
+        fullName: editForm.fullName.trim(),
+        email: editForm.email.trim(),
+        phone: editForm.phone.trim() || undefined,
+        organization: editForm.organization.trim() || undefined,
+        passOrTier: editForm.passOrTier,
+        status: editForm.status,
+        notes: editForm.notes.trim() || undefined,
+      };
+
+      if (isCorpPack) {
+        updates.delegateNames = [
+          editForm.delegateNames[0]?.trim() || editForm.fullName.trim(),
+          editForm.delegateNames[1]?.trim() || 'Delegate 2',
+          editForm.delegateNames[2]?.trim() || 'Delegate 3',
+        ];
+        updates.delegateEmails = [editForm.email.trim(), editForm.email.trim(), editForm.email.trim()];
+      }
+
+      await updateRegistrationRecord(editingRecord.id, updates);
+
+      setRegistrations((prev) =>
+        prev.map((r) => (r.id === editingRecord.id ? { ...r, ...updates, updatedAt: new Date().toISOString() } : r))
+      );
+      if (selectedRecord?.id === editingRecord.id) {
+        setSelectedRecord((prev) => prev ? { ...prev, ...updates, updatedAt: new Date().toISOString() } : null);
+      }
+      setEditingRecord(null);
+    } catch (err) {
+      console.error('Error saving record edit:', err);
+      alert('Failed to update registration record.');
+    } finally {
+      setIsSavingEdit(false);
+    }
   };
 
   // Manual creation form
@@ -673,16 +761,47 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                 </td>
 
                                 <td className="py-3 px-3 text-right whitespace-nowrap">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDelete(reg.id, reg.fullName);
-                                    }}
-                                    className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors"
-                                    title="Delete record"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+                                  <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                    <select
+                                      value={reg.status}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange(reg.id, e.target.value as RegistrationRecord['status']);
+                                      }}
+                                      className="text-[11px] font-semibold py-1 px-2 rounded-[6px] bg-[#0E1C38] border border-white/15 text-[#B8C2D6] focus:text-white focus:outline-none focus:border-[#2F6DB5] cursor-pointer"
+                                      title="Update Status"
+                                    >
+                                      <option value="pending" className="bg-[#0A1428] text-amber-300">Pending</option>
+                                      <option value="contacted" className="bg-[#0A1428] text-blue-300">Contacted</option>
+                                      <option value="approved" className="bg-[#0A1428] text-teal-300">Approved</option>
+                                      <option value="confirmed" className="bg-[#0A1428] text-emerald-300">Confirmed</option>
+                                      <option value="Payment verified" className="bg-[#0A1428] text-emerald-400">Payment verified</option>
+                                      <option value="Rejected" className="bg-[#0A1428] text-red-400">Rejected</option>
+                                      <option value="cancelled" className="bg-[#0A1428] text-red-400">Cancelled</option>
+                                    </select>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleOpenEdit(reg);
+                                      }}
+                                      className="p-1.5 rounded-[6px] text-slate-300 hover:text-white hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+                                      title="Edit delegate details"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5 text-[#2F6DB5]" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(reg.id, reg.fullName);
+                                      }}
+                                      className="p-1.5 rounded-[6px] text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+                                      title="Delete record"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             );

@@ -106,27 +106,20 @@ export const AboutTheme: React.FC = () => {
   }, [total]);
 
   return (
-    <section id="about" className="py-12 lg:py-20 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative">
+    <section id="about" className="py-10 lg:py-14 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative">
       <div id="theme" className="absolute -top-24 pointer-events-none" />
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Strategic Context & Text */}
           <div className="lg:col-span-5 flex flex-col justify-center">
-            <div className="inline-flex items-center gap-2 mb-3 px-2.5 py-1 rounded-full bg-slate-200/60 border border-slate-300/60 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
-                01 / Strategic Context &amp; Structural Focus
-              </p>
-            </div>
+
 
             <h2 className="text-3xl sm:text-4xl font-bold text-[#0A1428] tracking-[-0.03em] leading-[1.1] mb-4 font-display">
               THREE DECADES OF INVESTMENT.<br />
               ONE MISSING CONVERSION.
             </h2>
 
-            <p className="text-sm sm:text-base text-[#4A5568] leading-relaxed font-normal mb-6">
-              {EVENT_DETAILS.threeDecadesDescription}
-            </p>
+
 
             <div className="hidden lg:flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
               <div className="w-10 h-10 rounded-lg bg-[#2F6DB5]/10 flex items-center justify-center text-[#2F6DB5] font-mono font-bold shrink-0">

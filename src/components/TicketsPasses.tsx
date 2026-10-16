@@ -88,13 +88,13 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
       ...DELEGATE_PASS_TIERS.find((p) => p.id === 'student-developer') || DELEGATE_PASS_TIERS[3],
       code: 'DEV-01',
       category: 'Builders & Tech Talent',
-      badge: 'Student / Dev',
+      badge: undefined,
     },
     {
       ...DELEGATE_PASS_TIERS.find((p) => p.id === 'standard-delegate') || DELEGATE_PASS_TIERS[0],
       code: 'STD-02',
       category: 'Professional Access',
-      badge: 'Single Delegate',
+      badge: undefined,
     },
     {
       ...DELEGATE_PASS_TIERS.find((p) => p.id === 'corporate-delegate') || DELEGATE_PASS_TIERS[1],
@@ -107,12 +107,16 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
       ...DELEGATE_PASS_TIERS.find((p) => p.id === 'corporate-pack') || DELEGATE_PASS_TIERS[2],
       code: 'TEAM-04',
       category: 'Enterprise 3-Pack',
-      badge: 'Save BWP 2,500',
+      badge: undefined,
     },
   ];
 
   return (
-    <section id="passes" className="py-16 lg:py-24 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative overflow-hidden">
+    <section
+      id="passes"
+      style={{ height: '1572px' }}
+      className="h-[1572px] py-10 lg:py-16 bg-[#F7F8FA] text-[#0A1428] border-b border-slate-200/80 relative overflow-hidden"
+    >
       {/* Scroll Anchors for Navbar direct jumps */}
       <div id="tickets" className="relative -top-28 pointer-events-none" />
       <div id="exhibitions" className="relative -top-28 pointer-events-none" />
@@ -126,20 +130,18 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
       {/* TARGET CONTAINER (section#passes > div:nth-of-type(3)) */}
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Child 1: Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-6 sm:mb-8">
           <div>
             <div className="inline-flex items-center gap-2 mb-3 px-3.5 py-1.5 rounded-full bg-slate-200/60 border border-slate-300/60">
               <span className="w-2 h-2 rounded-full bg-[#2F6DB5]" />
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
-                07 / Registration &amp; Participation Tracks
+                06 / Registration &amp; Participation Tracks
               </p>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A1428] tracking-tight font-display">
               CONGRESS PASSES &amp; PACKAGES
             </h2>
-            <p className="text-sm sm:text-base text-[#4A5568] max-w-2xl font-normal leading-relaxed mt-2">
-              Separate registration pathways for individual delegates, corporate delegations, commercial exhibitors, and strategic sponsors.
-            </p>
+          
           </div>
         </div>
 
@@ -168,7 +170,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                     Free Exhibition Floor Pass
                   </h3>
                   <p className="text-sm sm:text-base text-[#4A5568] mt-2 max-w-3xl leading-relaxed">
-                    Explore 50+ cutting-edge technology exhibits, witness live startup demonstrations, and connect across the main networking floor at the Royal Aria Conference Centre at no cost.
+                    Explore  exhibits, witness live startup demonstrations, and connect across the main networking floor at the Royal Aria Conference Centre at no cost.
                   </p>
                 </div>
 
@@ -218,9 +220,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                 Dedicated Registration Pathways
               </h3>
             </div>
-            <p className="text-xs sm:text-sm text-[#4A5568] max-w-md font-normal leading-relaxed">
-              Three distinct tracks with separated booking processes, plus the master fee schedule.
-            </p>
+           
           </div>
 
           {/* Child 2: THE TARGET ELEMENT (div:nth-of-type(3) > div:nth-of-type(2))
@@ -389,22 +389,9 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
             ========================================================================= */}
         {currentTab === 'delegates' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h4 className="font-bold text-[#0A1428] text-base font-display">
-                  Individual &amp; Corporate Delegate Passes
-                </h4>
-                <p className="text-xs text-[#4A5568] mt-0.5">
-                  Full plenary seating, ministerial keynote sessions, executive networking lunch, and digital congress documentation.
-                </p>
-              </div>
-              <div className="font-mono text-xs text-[#2F6DB5] font-semibold bg-[#2F6DB5]/10 px-3 py-1.5 rounded-xl border border-[#2F6DB5]/20 shrink-0">
-                4 Delegate Tiers Available
-              </div>
-            </div>
 
             {/* 4-CARD DELEGATE PASSES GRID - Styled in crisp light theme */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch mb-6">
               {paidPasses.map((pass) => {
                 const isPopular = pass.isPopular;
 
@@ -419,7 +406,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                   >
                     {/* Top Lanyard Detail & Pass Code Bar */}
                     <div className={`pt-4 pb-2.5 px-5 flex items-center justify-between border-b ${
-                      isPopular ? 'border-slate-100 bg-[#D81B60]/[0.03]' : 'border-slate-100 bg-slate-50/80'
+                      isPopular ? 'border-pink-100 bg-[#D81B60]/[0.04]' : 'border-slate-100 bg-slate-50/80'
                     }`}>
                       <div className="flex items-center gap-1.5">
                         <Wifi className="w-3.5 h-3.5 rotate-90 text-[#2F6DB5]" />
@@ -429,24 +416,27 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                       </div>
 
                       {/* Lanyard punch hole aesthetic */}
-                      <div className="w-12 h-1.5 rounded-full bg-slate-200 group-hover:bg-[#2F6DB5] transition-colors" />
+                      <div className={`w-12 h-1.5 rounded-full transition-colors ${
+                        isPopular ? 'bg-[#D81B60]/30 group-hover:bg-[#D81B60]' : 'bg-slate-200 group-hover:bg-[#2F6DB5]'
+                      }`} />
                     </div>
 
                     {/* Badge Main Body */}
                     <div className="p-6 flex-1 flex flex-col justify-between">
                       <div>
                         {/* Category & Badge */}
-                        <div className="flex items-center justify-between gap-1.5 mb-3">
-                          <span className="font-mono text-[10.5px] uppercase tracking-wider font-bold text-[#2F6DB5]">
+                        <div className="flex items-center justify-between gap-1.5 mb-3.5">
+                          <span className="font-mono text-[10.5px] uppercase tracking-wider font-bold text-[#2F6DB5] bg-[#2F6DB5]/10 px-2.5 py-1 rounded-md border border-[#2F6DB5]/20">
                             {pass.category}
                           </span>
-                          {pass.badge && (
-                            <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                              isPopular
-                                ? 'bg-[#D81B60] text-white shadow-xs'
-                                : 'bg-[#2F6DB5]/10 text-[#2F6DB5] border border-[#2F6DB5]/20'
-                            }`}>
-                              {pass.badge}
+                          {pass.badge ? (
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#D81B60] text-white shadow-xs flex items-center gap-1">
+                              <Sparkles className="w-2.5 h-2.5" />
+                              <span>{pass.badge}</span>
+                            </span>
+                          ) : (
+                            <span className="font-mono text-[10px] font-medium text-slate-400">
+                              {pass.priceNote?.split('·')[0]?.trim() || 'Access Tier'}
                             </span>
                           )}
                         </div>
@@ -461,8 +451,10 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                         </p>
 
                         {/* Price Frame */}
-                        <div className={`py-4 px-4.5 rounded-2xl border mb-6 ${
-                          isPopular ? 'bg-slate-50 border-slate-200' : 'bg-slate-50/80 border-slate-200'
+                        <div className={`py-4 px-4.5 rounded-2xl border mb-6 transition-colors ${
+                          isPopular
+                            ? 'bg-gradient-to-br from-pink-50/70 via-white to-rose-50/40 border-[#D81B60]/30'
+                            : 'bg-gradient-to-b from-slate-50 to-slate-100/50 border-slate-200/90'
                         }`}>
                           <div className="flex items-baseline gap-1.5">
                             <span className="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums font-display text-[#0A1428]">
@@ -834,18 +826,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
           </div>
         )}
 
-        {/* Child 4: Contact Strip */}
-        <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4A5568]">
-          <div>
-            Direct corporate reservations &amp; delegation enquiries: <strong className="text-[#0A1428] font-mono">{EVENT_DETAILS.enquiriesPhone}</strong>
-          </div>
-          <a
-            href={`mailto:${EVENT_DETAILS.contactEmail}?subject=BMIC%202026%20Rate%20Card%20Inquiry`}
-            className="font-mono text-xs font-semibold text-[#2F6DB5] hover:underline"
-          >
-            {EVENT_DETAILS.contactEmail}
-          </a>
-        </div>
+   
       </div>
     </section>
   );

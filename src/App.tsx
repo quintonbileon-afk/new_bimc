@@ -8,12 +8,10 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { AboutTheme } from './components/AboutTheme';
 import { Speakers } from './components/Speakers';
-import { FullAgenda } from './components/FullAgenda';
 import { Deliverables } from './components/Deliverables';
 import { SponsorsMarquee } from './components/SponsorsMarquee';
 import { VenueTravel } from './components/VenueTravel';
 import { TicketsPasses, PassesTabType } from './components/TicketsPasses';
-import { NewsInsights } from './components/NewsInsights';
 import { CtaBanner } from './components/CtaBanner';
 import { Footer } from './components/Footer';
 import { FreePassModal } from './components/FreePassModal';
@@ -232,28 +230,18 @@ export default function App() {
         {/* 3. About / Theme Section (Light Section with 1px Dividers) */}
         <AboutTheme />
 
-        {/* 4. Delegation & Attendees (Dark Section with Large Numerals 01, 02) */}
+        {/* 4. Delegation & Attendees (Dark Section) */}
         <Speakers />
 
-        {/* 5. Programme Schedule (Light Section with 1px Dividers & Clean Tabs) */}
-        <FullAgenda
-          onDownloadIcs={handleDownloadIcs}
-        />
-
-        {/* 6. Deliverables & Measurable Outcomes (Dark Section with Large Numerals 01-06) */}
-        <Deliverables />
-
-        {/* 7. Sponsors & Partner Domains (Light Section with Large Numerals 01-06) */}
+        {/* 5. Sponsors & Partner Domains (Light Section) */}
         <SponsorsMarquee
           onOpenRegister={handleSmartRegister}
         />
 
-        {/* 8. Venue & Travel Destination (Dark Section with 1px Dividers) */}
-        <VenueTravel
-          onDownloadIcs={handleDownloadIcs}
-        />
+        {/* 6. Deliverables & Measurable Outcomes (Dark Section) */}
+        <Deliverables />
 
-        {/* 9. Tickets & Corporate Rate Card (Separate pathways + prominent Free Pass) */}
+        {/* 7. Tickets & Corporate Rate Card (Light Section) */}
         <TicketsPasses
           activeTab={activePassesTab}
           onTabChange={setActivePassesTab}
@@ -264,15 +252,16 @@ export default function App() {
           onSelectPass={handleSmartRegister}
         />
 
-        {/* 10. News & Insights (Dark Section with 1px Dividers) */}
-        <NewsInsights
-          onOpenArticle={(title) => setSelectedArticle(title)}
+        {/* 8. Venue & Travel Destination (Dark Section) */}
+        <VenueTravel
+          onDownloadIcs={handleDownloadIcs}
         />
 
-        {/* 11. Final Action Banner (Light Section with 1 Magenta CTA) */}
+        {/* 9. Final Action Banner (Light Section with 1 Magenta CTA) */}
         <CtaBanner
           onOpenRegister={() => handleSmartRegister()}
           onDownloadIcs={handleDownloadIcs}
+          onNavigateProgramme={handleNavigateProgramme}
         />
       </main>
       )}

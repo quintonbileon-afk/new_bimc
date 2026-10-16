@@ -8,25 +8,22 @@ interface VenueTravelProps {
 
 export const VenueTravel: React.FC<VenueTravelProps> = ({ onDownloadIcs }) => {
   return (
-    <section id="venue" className="py-12 lg:py-16 bg-[#0A1428] text-white border-b border-white/[0.08] relative overflow-hidden">
+    <section id="venue" className="py-10 lg:py-14 bg-[#0A1428] text-white border-b border-white/[0.08] relative overflow-hidden">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-96 h-96 bg-[#2F6DB5]/[0.06] rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="max-w-xl mb-8">
+        <div className="max-w-xl mb-6">
           <div className="inline-flex items-center gap-2 mb-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#B8C2D6]">
-              06 / Host Destination &amp; Schedule
+              07 / Host Destination &amp; Schedule
             </p>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-display">
             LOCATION &amp; EVENT DETAILS
           </h2>
-          <p className="text-xs sm:text-sm text-[#B8C2D6] leading-relaxed mt-1">
-            Core venue coordinates and official scheduling details for delegates and stakeholders.
-          </p>
         </div>
 
         {/* 2-Column Streamlined Cards: Location & Event Details Only */}
@@ -77,21 +74,7 @@ export const VenueTravel: React.FC<VenueTravelProps> = ({ onDownloadIcs }) => {
               </div>
             </div>
 
-            {/* Action */}
-            <div className="pt-5 mt-5 border-t border-white/[0.06] flex items-center justify-between">
-              <span className="font-mono text-[10px] text-slate-400">
-                GPS: -24.6672, 25.9614
-              </span>
-              <a
-                href="https://maps.google.com/?q=Royal+Aria+Conference+Centre+Gaborone+Botswana"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-[#2F6DB5] text-white hover:text-white border border-white/[0.1] hover:border-[#2F6DB5] text-xs font-semibold transition-all cursor-pointer"
-              >
-                <span>Open in Google Maps</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
+     
           </div>
 
           {/* Card 2: The Event Details */}
@@ -140,19 +123,7 @@ export const VenueTravel: React.FC<VenueTravelProps> = ({ onDownloadIcs }) => {
               </div>
             </div>
 
-            {/* Action */}
-            <div className="pt-5 mt-5 border-t border-white/[0.06] flex items-center justify-between">
-              <span className="font-mono text-[10px] text-slate-400">
-                Format: In-Person Summit
-              </span>
-              <button
-                onClick={onDownloadIcs}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-[#D13B84] text-white hover:text-white border border-white/[0.1] hover:border-[#D13B84] text-xs font-semibold transition-all cursor-pointer"
-              >
-                <span>Save to Calendar (.ics)</span>
-                <CalendarPlus className="w-3.5 h-3.5" />
-              </button>
-            </div>
+     
           </div>
         </div>
       </div>

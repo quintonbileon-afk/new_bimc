@@ -13,7 +13,10 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNavigateProgramme }) => {
   return (
-    <section className="hero bmic-hero relative overflow-hidden">
+    <section
+      className="hero bmic-hero relative overflow-hidden pt-[60px]"
+      style={{ height: '850.26px', paddingTop: '60px' }}
+    >
       <div className="wrap bmic-wrap">
         <div className="hero-grid">
           {/* Left Column */}
@@ -22,11 +25,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNa
             <h1 className="m-0">
               Botswana Mobile &amp; Internet <em>Congress</em> 2026
             </h1>
-            <p className="tag bmic-tag mt-4 mb-2">
+             <p className="tag bmic-tag mt-4 mb-2">
               Transforming Botswana into the Digital Valley of SADC.
-            </p>
-            <p className="sum bmic-sum mb-6">
-              Moving Botswana from policy and infrastructure to commercial execution and regional scale.
             </p>
             <div className="cta bmic-cta flex items-center gap-4 flex-wrap mb-6">
               <a
@@ -78,8 +78,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNa
                         href="#attendees"
                         onClick={(e) => {
                           e.preventDefault();
-                          onSelectNavTab?.('delegates');
-                          const el = document.getElementById('attendees') || document.getElementById('passes');
+                          const el = document.getElementById('attendees');
                           if (el) el.scrollIntoView({ behavior: 'smooth' });
                         }}
                       >

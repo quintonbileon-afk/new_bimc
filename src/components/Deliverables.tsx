@@ -166,7 +166,7 @@ export const Deliverables: React.FC = () => {
   }, [total]);
 
   return (
-    <section id="deliverables" className="py-12 lg:py-16 bg-[#0A1428] text-white border-b border-white/[0.08] relative overflow-hidden">
+    <section id="deliverables" className="py-10 lg:py-14 bg-[#0A1428] text-white border-b border-white/[0.08] relative overflow-hidden">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-[#2F6DB5]/[0.08] rounded-full blur-[140px] pointer-events-none" />
 
@@ -178,15 +178,12 @@ export const Deliverables: React.FC = () => {
             <div className="inline-flex items-center gap-2 mb-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#B8C2D6]">
-                04 / Actionable Outcomes
+                05 / Actionable Outcomes
               </p>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-display">
               WHAT THE CONGRESS WILL DELIVER
             </h2>
-            <p className="text-xs sm:text-sm text-[#B8C2D6] max-w-md font-normal leading-relaxed mt-1">
-              Six concrete mandates transitioning Botswana from high-level deliberations into funded national execution.
-            </p>
           </div>
 
           {/* Deck Controls (Swipes indicator on Mobile, Arrows on Desktop) */}
