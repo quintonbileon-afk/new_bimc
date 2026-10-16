@@ -50,7 +50,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || fallbackConfig.appId,
 };
 
-const firestoreDatabaseId = import.meta.env.VITE_FIREBASE_DATABASE_ID || fallbackConfig.firestoreDatabaseId;
+const firestoreDatabaseId = import.meta.env.VITE_FIREBASE_DATABASE_ID ||
+  (firebaseConfig.projectId === fallbackConfig.projectId ? fallbackConfig.firestoreDatabaseId : undefined);
 
 // Single, idempotent Firebase App initialization
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();

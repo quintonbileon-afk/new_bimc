@@ -65,6 +65,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedPackage, setSelectedPackage] = useState<string>('all');
@@ -245,14 +246,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
     if (!isOpen || !isUnlocked) return;
 
     setIsLoading(true);
+    setLoadError(null);
     const unsubscribeSnapshot = subscribeToRegistrations(
       (data) => {
         setRegistrations(data);
         setIsLoading(false);
+        setLoadError(null);
       },
       (err) => {
         console.error('Firestore live subscription error:', err);
         setIsLoading(false);
+        const msg = err instanceof Error ? err.message : 'Database permission check';
+        setLoadError(msg);
       }
     );
 
@@ -758,6 +763,23 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
                   {/* Registrations Table Container */}
                   <div className="flex-1 overflow-y-auto">
+                    {loadError && (
+                      <div className="m-4 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>Firestore Notice: {loadError}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsLoading(true);
+                            setLoadError(null);
+                          }}
+                          className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-semibold transition-colors cursor-pointer"
+                        >
+                          Retry Sync
+                        </button>
+                      </div>
+                    )}
                     {isLoading ? (
                       <div className="p-16 text-center text-xs text-[#B8C2D6]">
                         <RefreshCw className="w-7 h-7 animate-spin mx-auto mb-3 text-[#6AA5EE]" />
