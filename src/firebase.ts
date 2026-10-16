@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import {
   getFirestore,
   doc,
@@ -27,10 +26,8 @@ import firebaseConfig from '../firebase-applet-config.json';
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 
-// CRITICAL: Must use firestoreDatabaseId
+// CRITICAL: Must use firestoreDatabaseId for multi-database Firestore configurations
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
 
 // Initialize Firebase Storage
 export const storage = getStorage(
@@ -54,13 +51,6 @@ export interface FirestoreErrorInfo {
   authInfo: {
     userId?: string | null;
     email?: string | null;
-    emailVerified?: boolean | null;
-    isAnonymous?: boolean | null;
-    tenantId?: string | null;
-    providerInfo?: {
-      providerId?: string | null;
-      email?: string | null;
-    }[];
   };
 }
 
@@ -68,15 +58,8 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData?.map(provider => ({
-        providerId: provider.providerId,
-        email: provider.email,
-      })) || []
+      userId: null,
+      email: null,
     },
     operationType,
     path
@@ -84,7 +67,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   console.error('Firestore Error:', JSON.stringify(errInfo));
 }
 
-// Quick connection test per guidelines
+// Initial connection test per guidelines
 export async function testFirestoreConnection() {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
@@ -129,29 +112,9 @@ export interface TicketRecord {
   emailSent?: boolean;
 }
 
-const LOCAL_STORAGE_KEY = 'bmic_2026_registrations_cache';
-
-export function getLocalBackups(): RegistrationRecord[] {
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function saveLocalBackup(record: RegistrationRecord) {
-  try {
-    const current = getLocalBackups();
-    const updated = [record, ...current.filter(r => r.id !== record.id)];
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-  } catch (e) {
-    console.warn('Could not save local backup:', e);
-  }
-}
-
 /**
- * Submit a delegate or corporate booking.
+ * Submit a delegate, sponsor, exhibitor or free pass booking directly to Firebase Firestore.
+ * Data is immediately universally available across all devices.
  */
 export async function submitRegistration(
   registration: Omit<RegistrationRecord, 'id' | 'status' | 'createdAt' | 'updatedAt'>
@@ -187,46 +150,32 @@ export async function submitRegistration(
     updatedAt: now,
   };
 
-  const clientRecord: RegistrationRecord = {
-    id: regId,
-    fullName: firestoreData.fullName,
-    email: firestoreData.email,
-    phone: firestoreData.phone,
-    organization: firestoreData.organization,
-    passOrTier: firestoreData.passOrTier,
-    notes: firestoreData.notes,
-    status: 'pending',
-    adminNotes: '',
-    attachmentUrl: registration.attachmentUrl,
-    attachmentName: registration.attachmentName,
-    delegateNames: firestoreData.delegateNames,
-    delegateEmails: firestoreData.delegateEmails,
-    createdAt: now,
-    updatedAt: now,
-  };
+  if (registration.attachmentUrl) {
+    firestoreData.attachmentUrl = registration.attachmentUrl;
+  }
+  if (registration.attachmentName) {
+    firestoreData.attachmentName = registration.attachmentName;
+  }
 
   try {
     await setDoc(doc(db, 'registrations', regId), firestoreData);
-    saveLocalBackup(clientRecord);
     return regId;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, path);
-    saveLocalBackup(clientRecord);
-    return regId;
+    throw error;
   }
 }
 
+/**
+ * Real-time subscription to registrations in Firestore.
+ * Updates dynamically across all devices whenever any registration is added, edited or updated.
+ */
 export function subscribeToRegistrations(
   onData: (registrations: RegistrationRecord[]) => void,
   onError?: (error: unknown) => void
 ) {
-  // If not signed in to Firebase Auth, serve local cache and avoid firing unauthorized queries
-  if (!auth.currentUser) {
-    onData(getLocalBackups());
-    return () => {};
-  }
-
   const q = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
+
   return onSnapshot(
     q,
     (snapshot) => {
@@ -263,24 +212,53 @@ export function subscribeToRegistrations(
         });
       });
 
-      const local = getLocalBackups();
-      const existingIds = new Set(records.map(r => r.id));
-      for (const loc of local) {
-        if (!existingIds.has(loc.id)) {
-          records.push(loc);
-        }
-      }
-
       onData(records);
     },
     (err) => {
       handleFirestoreError(err, OperationType.LIST, 'registrations');
-      onData(getLocalBackups());
       if (onError) onError(err);
     }
   );
 }
 
+/**
+ * Fetch all registrations from Firestore once.
+ */
+export async function fetchAllRegistrations(): Promise<RegistrationRecord[]> {
+  const q = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
+  try {
+    const snapshot = await getDocs(q);
+    const records: RegistrationRecord[] = [];
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+      records.push({
+        id: docSnap.id,
+        fullName: d.fullName || '',
+        email: d.email || '',
+        phone: d.phone || '',
+        organization: d.organization || '',
+        passOrTier: d.passOrTier || '',
+        notes: d.notes || '',
+        status: d.status || 'pending',
+        adminNotes: d.adminNotes || '',
+        attachmentUrl: d.attachmentUrl,
+        attachmentName: d.attachmentName,
+        delegateNames: d.delegateNames || [],
+        delegateEmails: d.delegateEmails || [],
+        createdAt: d.createdAt || new Date().toISOString(),
+        updatedAt: d.updatedAt || new Date().toISOString(),
+      });
+    });
+    return records;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, 'registrations');
+    throw error;
+  }
+}
+
+/**
+ * Update the status and optional admin note for a registration in Firestore.
+ */
 export async function updateRegistrationStatus(
   id: string,
   status: RegistrationRecord['status'],
@@ -296,52 +274,22 @@ export async function updateRegistrationStatus(
   }
 
   try {
-    const local = getLocalBackups();
-    const idx = local.findIndex(r => r.id === id);
-    if (idx !== -1) {
-      local[idx].status = status;
-      if (adminNotes !== undefined) local[idx].adminNotes = adminNotes;
-      local[idx].updatedAt = new Date().toISOString();
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local));
-    }
-  } catch (e) {
-    console.warn('Local cache update failed:', e);
-  }
-
-  if (!auth.currentUser) {
-    return;
-  }
-
-  try {
     await updateDoc(doc(db, 'registrations', id), updates);
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
+    throw error;
   }
 }
 
+/**
+ * Update delegate names on a team / corporate pack booking.
+ */
 export async function updateBookingDelegateNames(
   bookingId: string,
   delegateNames: string[],
   delegateEmails: string[]
 ) {
   const path = `registrations/${bookingId}`;
-  try {
-    const local = getLocalBackups();
-    const idx = local.findIndex(r => r.id === bookingId);
-    if (idx !== -1) {
-      local[idx].delegateNames = delegateNames;
-      local[idx].delegateEmails = delegateEmails;
-      local[idx].updatedAt = new Date().toISOString();
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local));
-    }
-  } catch (e) {
-    console.warn('Local cache update failed:', e);
-  }
-
-  if (!auth.currentUser) {
-    return;
-  }
-
   try {
     await updateDoc(doc(db, 'registrations', bookingId), {
       delegateNames,
@@ -350,9 +298,13 @@ export async function updateBookingDelegateNames(
     });
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
+    throw error;
   }
 }
 
+/**
+ * Full update of registration fields in Firestore.
+ */
 export async function updateRegistrationRecord(
   id: string,
   updates: Partial<Omit<RegistrationRecord, 'id'>>
@@ -364,58 +316,33 @@ export async function updateRegistrationRecord(
   };
 
   try {
-    const local = getLocalBackups();
-    const idx = local.findIndex(r => r.id === id);
-    if (idx !== -1) {
-      local[idx] = { ...local[idx], ...payload };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(local));
-    }
-  } catch (e) {
-    console.warn('Local cache update failed:', e);
-  }
-
-  if (!auth.currentUser) {
-    return;
-  }
-
-  try {
     await updateDoc(doc(db, 'registrations', id), payload);
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
+    throw error;
   }
 }
 
+/**
+ * Delete a registration document from Firestore.
+ */
 export async function deleteRegistrationRecord(id: string) {
   const path = `registrations/${id}`;
-  try {
-    const local = getLocalBackups();
-    const updated = local.filter(r => r.id !== id);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-  } catch (e) {
-    console.warn('Local cache delete failed:', e);
-  }
-
-  if (!auth.currentUser) {
-    return;
-  }
-
   try {
     await deleteDoc(doc(db, 'registrations', id));
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, path);
+    throw error;
   }
 }
 
 // Ticket functions
 export async function getTicketsForBooking(bookingId: string): Promise<TicketRecord[]> {
-  if (!auth.currentUser) {
-    return [];
-  }
   try {
     const q = query(collection(db, 'tickets'), where('bookingId', '==', bookingId));
     const snapshot = await getDocs(q);
     const tickets: TicketRecord[] = [];
-    snapshot.forEach(docSnap => {
+    snapshot.forEach((docSnap) => {
       const d = docSnap.data();
       tickets.push({
         id: docSnap.id,
@@ -433,7 +360,7 @@ export async function getTicketsForBooking(bookingId: string): Promise<TicketRec
     });
     return tickets;
   } catch (err) {
-    console.error('Error fetching tickets for booking:', err);
+    handleFirestoreError(err, OperationType.GET, 'tickets');
     return [];
   }
 }
@@ -518,8 +445,8 @@ export async function generateTicketsForBooking(
         id: ticketId,
         ...ticketData,
       });
-    } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, `tickets/${ticketId}`);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, `tickets/${ticketId}`);
     }
   }
 
@@ -565,5 +492,3 @@ export async function uploadRegistrationAttachment(
     size: file.size,
   };
 }
-
-export { signInWithPopup, signOut };

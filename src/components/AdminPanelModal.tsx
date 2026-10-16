@@ -11,14 +11,8 @@ import {
   generateTicketsForBooking,
   updateTicketStatus,
   updateBookingDelegateNames,
-  getLocalBackups,
-  auth,
-  googleProvider,
-  signInWithPopup,
-  signOut
 } from '../firebase';
 import { TicketCard } from './TicketCard';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import {
   X,
   Search,
@@ -41,7 +35,10 @@ import {
   Paperclip,
   Check,
   Ticket,
-  Edit3
+  Edit3,
+  Eye,
+  EyeOff,
+  KeyRound
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -50,10 +47,16 @@ interface AdminPanelModalProps {
 }
 
 export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClose }) => {
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [passphrase, setPassphrase] = useState('');
-  const [isUnlockedWithPassphrase, setIsUnlockedWithPassphrase] = useState(false);
+  // Secretariat Access Code authentication (no Google login, universal Firestore sync)
+  const [accessCode, setAccessCode] = useState('');
+  const [showAccessCode, setShowAccessCode] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('bmic_secretariat_unlocked') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [authError, setAuthError] = useState<string | null>(null);
 
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
@@ -220,32 +223,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   });
   const [isCreatingManual, setIsCreatingManual] = useState(false);
 
-  // Default secretariat emergency passcode
-  const SECRET_PASSCODE = 'BMIC2026';
-  const AUTHORIZED_ADMIN_EMAILS = ['quintonbileon@gmail.com', 'gsetlamelo@gmail.com', 'eduvisionbw@gmail.com'];
+  // Accepted Secretariat Access Codes
+  const VALID_ACCESS_CODES = ['BMIC2026', 'bmic2026', 'BMICADMIN', 'bmicadmin'];
 
+  // Subscribe to real-time registrations from Firestore when modal is open and unlocked
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setIsAuthChecking(false);
-    });
-    return () => unsubscribeAuth();
-  }, []);
-
-  const isAuthorized =
-    isUnlockedWithPassphrase ||
-    (currentUser && (AUTHORIZED_ADMIN_EMAILS.includes(currentUser.email || '') || currentUser.email?.endsWith('@continentalmedia.co.bw')));
-
-  // Subscribe to real-time registrations when modal is open and authorized
-  useEffect(() => {
-    if (!isOpen || !isAuthorized) return;
-
-    if (!currentUser) {
-      // Local passcode mode: load cached registrations without attempting unauthenticated Firestore reads
-      setRegistrations(getLocalBackups());
-      setIsLoading(false);
-      return;
-    }
+    if (!isOpen || !isUnlocked) return;
 
     setIsLoading(true);
     const unsubscribeSnapshot = subscribeToRegistrations(
@@ -254,35 +237,40 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         setIsLoading(false);
       },
       (err) => {
-        console.warn('Subscription fallback in admin, using local storage cache:', err);
-        setRegistrations(getLocalBackups());
+        console.error('Firestore live subscription error:', err);
         setIsLoading(false);
       }
     );
 
     return () => unsubscribeSnapshot();
-  }, [isOpen, isAuthorized, currentUser]);
+  }, [isOpen, isUnlocked]);
 
   if (!isOpen) return null;
 
-  const handleGoogleSignIn = async () => {
-    setAuthError(null);
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (err: unknown) {
-      console.error('Google Sign In error:', err);
-      setAuthError('Sign-in cancelled or popup blocked. You can use the secret access key below.');
+  const handleUnlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = accessCode.trim();
+    if (VALID_ACCESS_CODES.includes(trimmed)) {
+      setIsUnlocked(true);
+      try {
+        sessionStorage.setItem('bmic_secretariat_unlocked', 'true');
+      } catch (err) {
+        console.warn('Could not save session:', err);
+      }
+      setAuthError(null);
+    } else {
+      setAuthError('Invalid Access Code. Please enter the official Secretariat Access Code (e.g. BMIC2026).');
     }
   };
 
-  const handlePassphraseUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passphrase.trim() === SECRET_PASSCODE || passphrase.trim().toLowerCase() === 'bmicadmin') {
-      setIsUnlockedWithPassphrase(true);
-      setAuthError(null);
-    } else {
-      setAuthError('Invalid secretariat access code. Try "BMIC2026".');
+  const handleLockConsole = () => {
+    setIsUnlocked(false);
+    try {
+      sessionStorage.removeItem('bmic_secretariat_unlocked');
+    } catch (err) {
+      console.warn('Could not clear session:', err);
     }
+    setAccessCode('');
   };
 
   const handleStatusChange = async (id: string, newStatus: RegistrationRecord['status']) => {
@@ -437,62 +425,62 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
   const estimatedRevenue = calculateRevenue();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#0A1428]/90 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-6xl h-[92vh] bg-[#0E1C38] text-white rounded-[12px] shadow-2xl border border-white/10 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#050B14]/85 backdrop-blur-md animate-fade-in">
+      <div
+        className={`relative w-full ${
+          isUnlocked ? 'max-w-[1440px] h-[94vh]' : 'max-w-md sm:max-w-lg'
+        } bg-[#0A1428] text-white rounded-2xl shadow-2xl border border-white/15 flex flex-col overflow-hidden transition-all duration-300`}
+      >
         {/* Top Header Bar */}
-        <div className="bg-[#0A1428] px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
+        <div className="bg-[#070D18] px-5 sm:px-7 py-3.5 sm:py-4 flex items-center justify-between border-b border-white/10 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-[8px] bg-[#2F6DB5]/20 text-[#2F6DB5]">
+            <div className="p-2.5 rounded-xl bg-[#2F6DB5]/20 text-[#6AA5EE] border border-[#2F6DB5]/30 shadow-inner">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-[#2F6DB5] font-semibold uppercase tracking-wider">
-                  Secretariat Console
+                <span className="text-[10px] sm:text-[11px] text-[#6AA5EE] font-bold uppercase tracking-wider">
+                  BMIC 2026 Secretariat Console
                 </span>
-                {currentUser ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold">
-                    Live Firestore Sync
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-semibold">
-                    Local Passcode Mode
+                {isUnlocked && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold inline-flex items-center gap-1.5 border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="hidden sm:inline">Live Cloud Sync</span>
                   </span>
                 )}
               </div>
-              <h2 className="text-lg font-bold text-white tracking-tight">
-                BMIC 2026 Registration Management
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                Registration &amp; Delegate Management
               </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            {isAuthorized && (
-              <div className="hidden sm:flex items-center gap-2 text-xs text-[#B8C2D6]">
-                <span>Logged in as:</span>
-                <span className="font-semibold text-white">
-                  {currentUser?.email || 'Secretariat Key (Unlocked)'}
-                </span>
-              </div>
-            )}
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            {isUnlocked && (
+              <>
+                <div className="hidden md:flex items-center gap-2 text-xs">
+                  <span className="font-mono text-[11px] px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300">
+                    <strong className="text-white">{registrations.length}</strong> Records
+                  </span>
+                  <span className="font-mono text-[11px] px-3 py-1 rounded-lg bg-[#2F6DB5]/15 border border-[#2F6DB5]/30 text-[#82B1FF]">
+                    P{estimatedRevenue.toLocaleString()} Pipeline
+                  </span>
+                </div>
 
-            {isAuthorized && (
-              <button
-                onClick={() => {
-                  signOut(auth);
-                  setIsUnlockedWithPassphrase(false);
-                }}
-                className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-white/5 cursor-pointer"
-                title="Lock Session"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Lock</span>
-              </button>
+                <button
+                  onClick={handleLockConsole}
+                  className="text-xs text-rose-300 hover:text-white flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 border border-rose-500/20 cursor-pointer transition-colors"
+                  title="Lock Secretariat Console"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline font-medium">Lock Console</span>
+                </button>
+              </>
             )}
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10"
               aria-label="Close admin modal"
             >
               <X className="w-5 h-5" />
@@ -501,145 +489,117 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Lock / Auth Gate */}
-        {!isAuthorized ? (
-          <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
-            <div className="w-full max-w-md bg-[#0A1428] border border-white/10 rounded-[12px] p-8 text-center space-y-6">
-              <div className="w-14 h-14 bg-[#2F6DB5]/20 text-[#2F6DB5] rounded-full flex items-center justify-center mx-auto">
-                <Lock className="w-7 h-7" />
+        {!isUnlocked ? (
+          <div className="p-6 sm:p-8 overflow-y-auto">
+            <div className="w-full text-center space-y-6">
+              <div className="w-14 h-14 bg-[#2F6DB5]/15 text-[#6AA5EE] border border-[#2F6DB5]/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                <KeyRound className="w-7 h-7" />
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-white mb-1.5">
+                <div className="inline-flex items-center gap-2 text-[10px] font-mono text-[#6AA5EE] bg-[#2F6DB5]/10 border border-[#2F6DB5]/25 py-1 px-3 rounded-full mb-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#6AA5EE] animate-pulse" />
+                  <span>Cloud Firestore Sync Active</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 font-display">
                   Secretariat Access Gate
                 </h3>
-                <p className="text-xs text-[#B8C2D6] leading-relaxed">
-                  Confidential congress administration portal. Authenticate via Google ({AUTHORIZED_ADMIN_EMAILS.join(', ')}) or enter the Secretariat Key.
+                <p className="text-xs text-[#B8C2D6] leading-relaxed max-w-sm mx-auto">
+                  Confidential congress administration portal. Enter your Secretariat Access Code to manage registrations, verify payments, and issue badges across all devices.
                 </p>
-                <div className="mt-3 inline-flex items-center gap-2 text-[10px] font-mono text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 py-1 px-3 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Firebase Auth &amp; Storage Active</span>
-                </div>
               </div>
 
               {authError && (
-                <div className="p-3 rounded-[8px] bg-red-500/10 border border-red-500/30 text-red-300 text-xs text-left">
-                  {authError}
+                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs text-left flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <span>{authError}</span>
                 </div>
               )}
 
-              {/* Method 1: Google Login */}
-              <div className="space-y-3">
-                <button
-                  onClick={handleGoogleSignIn}
-                  className="w-full py-3 px-4 rounded-full bg-white text-[#0A1428] font-semibold text-xs hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                    />
-                  </svg>
-                  <span>Sign In with Authorized Google Account</span>
-                </button>
-              </div>
+              {/* Secretariat Access Code Form */}
+              <form onSubmit={handleUnlock} className="space-y-4">
+                <div className="relative">
+                  <input
+                    type={showAccessCode ? 'text' : 'password'}
+                    placeholder="Enter access code (e.g. BMIC2026)..."
+                    value={accessCode}
+                    onChange={(e) => setAccessCode(e.target.value)}
+                    autoFocus
+                    className="w-full px-4 py-3 pr-11 text-xs bg-[#0E1C38] border border-white/15 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#2F6DB5] focus:ring-1 focus:ring-[#2F6DB5] font-mono tracking-wider shadow-inner"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAccessCode(!showAccessCode)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                    title={showAccessCode ? 'Hide access code' : 'Show access code'}
+                  >
+                    {showAccessCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
 
-              <div className="flex items-center gap-3 text-slate-500 text-xs">
-                <div className="flex-1 border-t border-white/10" />
-                <span>or enter access key</span>
-                <div className="flex-1 border-t border-white/10" />
-              </div>
-
-              {/* Method 2: Access Passcode */}
-              <form onSubmit={handlePassphraseUnlock} className="space-y-3">
-                <input
-                  type="password"
-                  placeholder="Enter access code (e.g. BMIC2026)..."
-                  value={passphrase}
-                  onChange={(e) => setPassphrase(e.target.value)}
-                  className="w-full px-4 py-2.5 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white placeholder-slate-500 focus:outline-none focus:border-[#2F6DB5]"
-                />
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-full text-xs font-semibold text-white bg-[#2F6DB5] hover:bg-[#255892] transition-colors cursor-pointer"
+                  className="w-full py-3 rounded-xl text-xs font-bold text-white bg-[#2F6DB5] hover:bg-[#255892] shadow-lg shadow-[#2F6DB5]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
-                  Unlock Management Console
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Unlock Secretariat Console</span>
                 </button>
               </form>
+
+              <div className="pt-3 border-t border-white/10 text-[11px] text-[#B8C2D6] flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Default Secretariat Code: <strong className="text-white font-mono">BMIC2026</strong></span>
+              </div>
             </div>
           </div>
         ) : (
           /* Main Admin Workspace */
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-            {!currentUser && (
-              <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-amber-200 shrink-0">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>
-                    Secretariat Passcode Mode active. Viewing local registrations. Sign in with Google (<strong>eduvisionbw@gmail.com</strong>) for live multi-device Cloud Firestore sync.
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  className="px-3 py-1 bg-white text-[#0A1428] font-bold rounded-full text-[11px] hover:bg-slate-200 transition-colors whitespace-nowrap cursor-pointer shadow-sm"
-                >
-                  Sign in with Google
-                </button>
-              </div>
-            )}
-            {/* Top Toolbar: Tabs + Summary Stats */}
-            <div className="p-4 sm:p-6 border-b border-white/10 bg-[#0A1428]/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-[#0A1428]">
+            {/* Top Toolbar: Tabs + Summary Stats + Actions */}
+            <div className="px-5 sm:px-7 py-3 border-b border-white/10 bg-[#070D18]/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shrink-0">
               {/* Tab Navigation */}
-              <div className="flex items-center gap-6 text-xs font-semibold">
+              <div className="flex items-center gap-1 sm:gap-2 text-xs font-medium bg-[#0E1C38] p-1 rounded-xl border border-white/10">
                 <button
                   onClick={() => setActiveTab('list')}
-                  className={`pb-1 transition-colors cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-2 ${
                     activeTab === 'list'
-                      ? 'text-white border-b-2 border-[#D81B60]'
-                      : 'text-[#B8C2D6] hover:text-white'
+                      ? 'bg-[#2F6DB5] text-white font-semibold shadow-sm'
+                      : 'text-[#B8C2D6] hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Delegates &amp; Bookings ({registrations.length})
+                  <span>Delegates &amp; Bookings</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${activeTab === 'list' ? 'bg-white/20 text-white' : 'bg-white/10 text-slate-300'}`}>
+                    {registrations.length}
+                  </span>
                 </button>
                 <button
                   onClick={() => setActiveTab('add')}
-                  className={`pb-1 transition-colors cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeTab === 'add'
-                      ? 'text-white border-b-2 border-[#D81B60]'
-                      : 'text-[#B8C2D6] hover:text-white'
+                      ? 'bg-[#2F6DB5] text-white font-semibold shadow-sm'
+                      : 'text-[#B8C2D6] hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  + Add Manual Reservation
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Reservation</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('stats')}
-                  className={`pb-1 transition-colors cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeTab === 'stats'
-                      ? 'text-white border-b-2 border-[#D81B60]'
-                      : 'text-[#B8C2D6] hover:text-white'
+                      ? 'bg-[#2F6DB5] text-white font-semibold shadow-sm'
+                      : 'text-[#B8C2D6] hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Financial &amp; Tier Breakdown
+                  <span>Financial &amp; Analytics</span>
                 </button>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons & Summary */}
               <div className="flex items-center gap-3 w-full md:w-auto justify-end">
                 <button
                   onClick={handleExportCsv}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#2F6DB5] hover:bg-[#255892] text-white transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#2F6DB5] hover:bg-[#255892] text-white shadow-md shadow-[#2F6DB5]/20 transition-all cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Export CSV</span>
@@ -651,71 +611,125 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
             {activeTab === 'list' && (
               <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
                 {/* Left Column: Filterable Table */}
-                <div className="flex-1 flex flex-col min-h-0 border-r border-white/10 overflow-hidden">
-                  {/* Search and Filters */}
-                  <div className="p-4 border-b border-white/10 flex flex-wrap items-center gap-3 shrink-0 bg-[#0E1C38]">
-                    <div className="relative flex-1 min-w-[200px]">
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-[#0A1428]">
+                  {/* Search and Filters Bar */}
+                  <div className="p-3 sm:p-4 border-b border-white/10 flex flex-wrap items-center gap-2.5 shrink-0 bg-[#0E1C38]/90">
+                    <div className="relative flex-1 min-w-[220px]">
                       <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="Search by name, email, organization..."
+                        placeholder="Search name, email, organization, pass..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#0A1428] border border-white/10 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5]"
+                        className="w-full pl-8 pr-8 py-2 text-xs bg-[#0A1428] border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#2F6DB5] focus:ring-1 focus:ring-[#2F6DB5] transition-all"
                       />
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
 
                     <select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
-                      className="px-3 py-1.5 text-xs bg-[#0A1428] border border-white/10 rounded-full text-white focus:outline-none focus:border-[#2F6DB5]"
+                      className="px-3 py-2 text-xs bg-[#0A1428] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5] cursor-pointer"
                     >
-                      <option value="all">All Statuses</option>
-                      <option value="pending">Pending</option>
+                      <option value="all">All Statuses ({registrations.length})</option>
+                      <option value="pending">Pending ({registrations.filter(r => r.status === 'pending').length})</option>
                       <option value="contacted">Contacted</option>
                       <option value="approved">Approved</option>
-                      <option value="confirmed">Confirmed</option>
+                      <option value="confirmed">Confirmed / Paid</option>
+                      <option value="Payment verified">Payment Verified</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
 
-                    <div className="text-xs text-slate-400 whitespace-nowrap">
-                      Showing {filteredRegistrations.length} of {registrations.length}
+                    <select
+                      value={selectedPackage}
+                      onChange={(e) => setSelectedPackage(e.target.value)}
+                      className="px-3 py-2 text-xs bg-[#0A1428] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5] cursor-pointer max-w-[210px] truncate"
+                    >
+                      <option value="all">All Pass Tiers</option>
+                      <option value="Free Pass for Exhibition Floor">Free Exhibition Floor Pass</option>
+                      <option value="Standard Delegate">Standard Delegate (P1,500)</option>
+                      <option value="Corporate Delegate">Corporate Delegate (P2,500)</option>
+                      <option value="Corporate Pack (3 Delegates)">Corporate 3-Pack (P5,000)</option>
+                      <option value="Student / Developer">Student / Dev (P950)</option>
+                      <option value="Exhibition Stand">Exhibition Stand (P10,000)</option>
+                      <option value="Headline Sponsor">Headline Sponsor (P150,000)</option>
+                      <option value="AI & Digital Transformation Track">AI Track Sponsor (P50,000)</option>
+                      <option value="Cybersecurity & Digital Trust Track">Cybersecurity Track (P50,000)</option>
+                      <option value="Digital Content Monetisation Track">Content Monetisation Track (P50,000)</option>
+                      <option value="Tech for Good Track">Tech for Good Track (P50,000)</option>
+                    </select>
+
+                    {(searchQuery || selectedStatus !== 'all' || selectedPackage !== 'all') && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSelectedStatus('all');
+                          setSelectedPackage('all');
+                        }}
+                        className="px-2.5 py-1.5 text-[11px] font-medium text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer"
+                      >
+                        Reset Filters
+                      </button>
+                    )}
+
+                    <div className="ml-auto text-xs text-slate-400 font-medium whitespace-nowrap pl-2">
+                      Showing <strong className="text-white font-mono">{filteredRegistrations.length}</strong> of {registrations.length}
                     </div>
                   </div>
 
-                  {/* Registrations Table */}
+                  {/* Registrations Table Container */}
                   <div className="flex-1 overflow-y-auto">
                     {isLoading ? (
-                      <div className="p-12 text-center text-xs text-[#B8C2D6]">
-                        <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#2F6DB5]" />
-                        <span>Synchronizing with Firestore database...</span>
+                      <div className="p-16 text-center text-xs text-[#B8C2D6]">
+                        <RefreshCw className="w-7 h-7 animate-spin mx-auto mb-3 text-[#6AA5EE]" />
+                        <span className="font-medium text-sm text-white block">Synchronizing live records...</span>
+                        <span className="text-[11px] text-slate-400">Connecting to Cloud Firestore database</span>
                       </div>
                     ) : filteredRegistrations.length === 0 ? (
-                      <div className="p-12 text-center text-xs text-[#B8C2D6]">
-                        No registrations matching the selected filters.
+                      <div className="p-16 text-center text-xs text-[#B8C2D6]">
+                        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                          <Search className="w-5 h-5" />
+                        </div>
+                        <span className="font-semibold text-white text-sm block mb-1">No bookings match your filter</span>
+                        <span className="text-slate-400 text-xs">Try clearing search terms or status criteria</span>
                       </div>
                     ) : (
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-[#0A1428] sticky top-0 border-b border-white/10 text-slate-400 uppercase text-[10px] tracking-wider z-10">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead className="bg-[#070D18] sticky top-0 border-b border-white/10 text-slate-400 uppercase text-[10px] font-bold tracking-wider z-10">
                           <tr>
-                            <th className="py-2.5 px-4">Delegate</th>
-                            <th className="py-2.5 px-3">Package / Tier</th>
-                            <th className="py-2.5 px-3">Organization</th>
-                            <th className="py-2.5 px-3">Status</th>
-                            <th className="py-2.5 px-3 text-right">Actions</th>
+                            <th className="py-3 px-4">Delegate</th>
+                            <th className="py-3 px-3">Pass / Package</th>
+                            <th className="py-3 px-3 hidden md:table-cell">Organization</th>
+                            <th className="py-3 px-3">Status</th>
+                            <th className="py-3 px-4 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
                           {filteredRegistrations.map((reg) => {
                             const isSelected = selectedRecord?.id === reg.id;
                             const statusColor =
-                              reg.status === 'confirmed' || reg.status === 'approved'
-                                ? 'bg-emerald-500/20 text-emerald-300'
+                              reg.status === 'confirmed' || reg.status === 'approved' || reg.status === 'Payment verified'
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                                 : reg.status === 'contacted'
-                                ? 'bg-blue-500/20 text-blue-300'
-                                : reg.status === 'cancelled'
-                                ? 'bg-red-500/20 text-red-300'
-                                : 'bg-amber-500/20 text-amber-300';
+                                ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                                : reg.status === 'cancelled' || reg.status === 'Rejected'
+                                ? 'bg-red-500/20 text-red-300 border-red-500/30'
+                                : 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+
+                            // Get initials
+                            const initials = (reg.fullName || 'BM')
+                              .split(' ')
+                              .map((n) => n[0])
+                              .slice(0, 2)
+                              .join('')
+                              .toUpperCase();
 
                             return (
                               <tr
@@ -724,43 +738,54 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                   setSelectedRecord(reg);
                                   setAdminNoteInput(reg.adminNotes || '');
                                 }}
-                                className={`cursor-pointer transition-colors ${
+                                className={`cursor-pointer transition-colors border-l-4 ${
                                   isSelected
-                                    ? 'bg-[#2F6DB5]/20 font-medium'
-                                    : 'hover:bg-white/[0.03]'
+                                    ? 'bg-[#2F6DB5]/20 border-[#2F6DB5]'
+                                    : 'border-transparent hover:bg-white/[0.04]'
                                 }`}
                               >
                                 <td className="py-3 px-4">
-                                  <div className="font-semibold text-white flex items-center gap-1.5">
-                                    <span>{reg.fullName}</span>
-                                    {reg.attachmentUrl && (
-                                      <span title="Contains attached document / PO" className="text-emerald-400">
-                                        <Paperclip className="w-3 h-3" />
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="text-[11px] text-slate-400">
-                                    {reg.email}
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#2F6DB5] to-[#D81B60] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                                      {initials}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <div className="font-bold text-white flex items-center gap-1.5 truncate">
+                                        <span>{reg.fullName}</span>
+                                        {reg.attachmentUrl && (
+                                          <span title="Contains verified attachment" className="text-emerald-400 shrink-0">
+                                            <Paperclip className="w-3 h-3" />
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="text-[11px] text-slate-400 truncate">
+                                        {reg.email}
+                                      </div>
+                                    </div>
                                   </div>
                                 </td>
 
                                 <td className="py-3 px-3">
-                                  <span className="font-medium text-[#B8C2D6]">
+                                  <span className="font-semibold text-slate-200 block text-xs">
                                     {reg.passOrTier}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-mono">
+                                    {new Date(reg.createdAt).toLocaleDateString()}
                                   </span>
                                 </td>
 
-                                <td className="py-3 px-3 text-slate-300">
+                                <td className="py-3 px-3 hidden md:table-cell text-slate-300 max-w-[160px] truncate">
                                   {reg.organization || '—'}
                                 </td>
 
                                 <td className="py-3 px-3">
-                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${statusColor}`}>
-                                    {reg.status}
+                                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusColor}`}>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                    <span>{reg.status}</span>
                                   </span>
                                 </td>
 
-                                <td className="py-3 px-3 text-right whitespace-nowrap">
+                                <td className="py-3 px-4 text-right whitespace-nowrap">
                                   <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
                                     <select
                                       value={reg.status}
@@ -768,7 +793,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                         e.stopPropagation();
                                         handleStatusChange(reg.id, e.target.value as RegistrationRecord['status']);
                                       }}
-                                      className="text-[11px] font-semibold py-1 px-2 rounded-[6px] bg-[#0E1C38] border border-white/15 text-[#B8C2D6] focus:text-white focus:outline-none focus:border-[#2F6DB5] cursor-pointer"
+                                      className="text-[11px] font-semibold py-1 px-2 rounded-lg bg-[#0E1C38] border border-white/20 text-[#B8C2D6] focus:text-white focus:outline-none focus:border-[#2F6DB5] cursor-pointer"
                                       title="Update Status"
                                     >
                                       <option value="pending" className="bg-[#0A1428] text-amber-300">Pending</option>
@@ -785,10 +810,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                         e.stopPropagation();
                                         handleOpenEdit(reg);
                                       }}
-                                      className="p-1.5 rounded-[6px] text-slate-300 hover:text-white hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+                                      className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
                                       title="Edit delegate details"
                                     >
-                                      <Edit3 className="w-3.5 h-3.5 text-[#2F6DB5]" />
+                                      <Edit3 className="w-3.5 h-3.5 text-[#6AA5EE]" />
                                     </button>
                                     <button
                                       type="button"
@@ -796,7 +821,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                         e.stopPropagation();
                                         handleDelete(reg.id, reg.fullName);
                                       }}
-                                      className="p-1.5 rounded-[6px] text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-white/10 cursor-pointer"
                                       title="Delete record"
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
@@ -812,22 +837,31 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                   </div>
                 </div>
 
-                {/* Right Column: Record Detail & Management */}
-                <div className="w-full lg:w-96 bg-[#0A1428] p-6 overflow-y-auto shrink-0 flex flex-col justify-between border-l border-white/5">
+                {/* Right Column: Record Detail Inspector */}
+                <div className="w-full lg:w-[420px] xl:w-[460px] bg-[#070D18] p-5 sm:p-6 overflow-y-auto shrink-0 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/10 shadow-xl">
                   {selectedRecord ? (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                    <div className="space-y-5">
+                      <div className="flex items-center justify-between pb-3.5 border-b border-white/10">
                         <div>
-                          <span className="text-[10px] uppercase font-semibold text-[#2F6DB5] tracking-wider">
-                            Registration Detail
+                          <span className="text-[10px] uppercase font-bold text-[#6AA5EE] tracking-wider">
+                            Delegate Detail
                           </span>
-                          <h3 className="text-base font-bold text-white mt-0.5">
+                          <h3 className="text-lg font-bold text-white mt-0.5">
                             {selectedRecord.fullName}
                           </h3>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">
-                          {selectedRecord.id.substring(0, 10)}...
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
+                            {selectedRecord.id.substring(0, 8)}...
+                          </span>
+                          <button
+                            onClick={() => setSelectedRecord(null)}
+                            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Close inspector"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
 
                       {/* Contact Info */}
@@ -1271,6 +1305,169 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Edit Delegate Record Modal */}
+        {editingRecord && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-[#050B14]/90 backdrop-blur-md animate-fade-in">
+            <div className="relative w-full max-w-xl bg-[#0D1934] rounded-2xl p-6 sm:p-7 border border-white/15 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-white/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-[#2F6DB5]/20 text-[#6AA5EE]">
+                    <Edit3 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Edit Delegate Record</h3>
+                    <p className="text-[11px] text-slate-400 font-mono">ID: {editingRecord.id}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setEditingRecord(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEdit} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.fullName}
+                    onChange={(e) => setEditForm({ ...editForm, fullName: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Organization / Entity</label>
+                    <input
+                      type="text"
+                      value={editForm.organization}
+                      onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Booking Status</label>
+                    <select
+                      value={editForm.status}
+                      onChange={(e) => setEditForm({ ...editForm, status: e.target.value as RegistrationRecord['status'] })}
+                      className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="contacted">Contacted</option>
+                      <option value="approved">Approved</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="Payment verified">Payment verified</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Package / Tier</label>
+                  <select
+                    value={editForm.passOrTier}
+                    onChange={(e) => setEditForm({ ...editForm, passOrTier: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                  >
+                    <option value="Free Pass for Exhibition Floor">Free Pass for Exhibition Floor</option>
+                    <option value="Standard Delegate">Standard Delegate (P1,500)</option>
+                    <option value="Corporate Delegate">Corporate Delegate (P2,500)</option>
+                    <option value="Corporate Pack (3 Delegates)">Corporate Pack (3 Delegates) (P5,000)</option>
+                    <option value="Student / Developer">Student / Developer (P950)</option>
+                    <option value="Exhibition Stand">Exhibition Stand (P10,000)</option>
+                    <option value="Headline Sponsor">Headline Sponsor (P150,000)</option>
+                    <option value="AI & Digital Transformation Track">AI Track Sponsor (P50,000)</option>
+                    <option value="Cybersecurity & Digital Trust Track">Cybersecurity Track (P50,000)</option>
+                    <option value="Digital Content Monetisation Track">Content Monetisation Track (P50,000)</option>
+                    <option value="Tech for Good Track">Tech for Good Track (P50,000)</option>
+                  </select>
+                </div>
+
+                {(editForm.passOrTier.toLowerCase().includes('corporate pack') || editForm.passOrTier.toLowerCase().includes('3 delegates')) && (
+                  <div className="p-3.5 bg-[#070D18] border border-white/10 rounded-xl space-y-2">
+                    <label className="block text-[#6AA5EE] font-bold text-xs">Names for 3 Corporate Delegates</label>
+                    <input
+                      type="text"
+                      placeholder="Delegate 1 Name"
+                      value={editForm.delegateNames[0] || ''}
+                      onChange={(e) => setEditForm({ ...editForm, delegateNames: [e.target.value, editForm.delegateNames[1] || '', editForm.delegateNames[2] || ''] })}
+                      className="w-full px-3 py-1.5 bg-[#0E1C38] border border-white/15 rounded-lg text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Delegate 2 Name"
+                      value={editForm.delegateNames[1] || ''}
+                      onChange={(e) => setEditForm({ ...editForm, delegateNames: [editForm.delegateNames[0] || '', e.target.value, editForm.delegateNames[2] || ''] })}
+                      className="w-full px-3 py-1.5 bg-[#0E1C38] border border-white/15 rounded-lg text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Delegate 3 Name"
+                      value={editForm.delegateNames[2] || ''}
+                      onChange={(e) => setEditForm({ ...editForm, delegateNames: [editForm.delegateNames[0] || '', editForm.delegateNames[1] || '', e.target.value] })}
+                      className="w-full px-3 py-1.5 bg-[#0E1C38] border border-white/15 rounded-lg text-white"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Registrant / Offline Notes</label>
+                  <textarea
+                    rows={2}
+                    value={editForm.notes}
+                    onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                    className="w-full p-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setEditingRecord(null)}
+                    className="px-4 py-2 rounded-xl text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingEdit}
+                    className="px-5 py-2 rounded-xl bg-[#2F6DB5] hover:bg-[#255892] text-white font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+                  >
+                    {isSavingEdit ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 
