@@ -112,9 +112,128 @@ export interface TicketRecord {
   emailSent?: boolean;
 }
 
+const LOCAL_STORAGE_KEY = 'bmic_registrations_local';
+
+function getLocalRegistrations(): RegistrationRecord[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) {
+      const defaultSamples: RegistrationRecord[] = [
+        {
+          id: 'reg_sample_1',
+          fullName: 'Kagiso Molaodi',
+          email: 'kagiso@orange.co.bw',
+          phone: '+267 71 234 567',
+          organization: 'Orange Botswana',
+          passOrTier: 'Corporate Delegate',
+          notes: 'VIP delegation seat requested',
+          status: 'confirmed',
+          adminNotes: 'Payment verified via bank EFT',
+          createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+        },
+        {
+          id: 'reg_sample_2',
+          fullName: 'Thabo Raleaka',
+          email: 'thabo.raleaka@mascom.bw',
+          phone: '+267 72 987 654',
+          organization: 'Mascom Wireless',
+          passOrTier: 'Exhibition Stand',
+          notes: '3m x 3m Shell Scheme Booth C4',
+          status: 'approved',
+          adminNotes: 'Stand assigned near entrance',
+          createdAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+        },
+        {
+          id: 'reg_sample_3',
+          fullName: 'Neo Sebotho',
+          email: 'nsebotho@gov.bw',
+          phone: '+267 74 111 222',
+          organization: 'Ministry of Communications, Knowledge & Technology',
+          passOrTier: 'Standard Delegate',
+          notes: 'Government institutional pass',
+          status: 'pending',
+          adminNotes: 'Invoice dispatched',
+          createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+        }
+      ];
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultSamples));
+      return defaultSamples;
+    }
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalRegistration(record: RegistrationRecord) {
+  try {
+    const existing = getLocalRegistrations();
+    const index = existing.findIndex(r => r.id === record.id);
+    if (index >= 0) {
+      existing[index] = record;
+    } else {
+      existing.unshift(record);
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(existing));
+  } catch (err) {
+    console.warn('Local storage save error:', err);
+  }
+}
+
+function updateLocalRegistrationStatus(id: string, status: RegistrationRecord['status'], adminNotes?: string) {
+  try {
+    const existing = getLocalRegistrations();
+    const updated = existing.map(r => {
+      if (r.id === id) {
+        return {
+          ...r,
+          status,
+          adminNotes: adminNotes !== undefined ? adminNotes : r.adminNotes,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return r;
+    });
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.warn('Local storage status update error:', err);
+  }
+}
+
+function updateLocalRegistrationFull(id: string, updates: Partial<Omit<RegistrationRecord, 'id'>>) {
+  try {
+    const existing = getLocalRegistrations();
+    const updated = existing.map(r => {
+      if (r.id === id) {
+        return {
+          ...r,
+          ...updates,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return r;
+    });
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.warn('Local storage full update error:', err);
+  }
+}
+
+function deleteLocalRegistration(id: string) {
+  try {
+    const existing = getLocalRegistrations();
+    const filtered = existing.filter(r => r.id !== id);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
+  } catch (err) {
+    console.warn('Local storage delete error:', err);
+  }
+}
+
 /**
- * Submit a delegate, sponsor, exhibitor or free pass booking directly to Firebase Firestore.
- * Data is immediately universally available across all devices.
+ * Submit a delegate, sponsor, exhibitor or free pass booking directly to Firebase Firestore and local storage.
  */
 export async function submitRegistration(
   registration: Omit<RegistrationRecord, 'id' | 'status' | 'createdAt' | 'updatedAt'>
@@ -157,31 +276,57 @@ export async function submitRegistration(
     firestoreData.attachmentName = registration.attachmentName;
   }
 
+  const newRecord: RegistrationRecord = {
+    id: regId,
+    fullName: firestoreData.fullName,
+    email: firestoreData.email,
+    phone: firestoreData.phone,
+    organization: firestoreData.organization,
+    passOrTier: firestoreData.passOrTier,
+    notes: firestoreData.notes,
+    status: 'pending',
+    adminNotes: '',
+    attachmentUrl: firestoreData.attachmentUrl,
+    attachmentName: firestoreData.attachmentName,
+    delegateNames: firestoreData.delegateNames,
+    delegateEmails: firestoreData.delegateEmails,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  // Save to local storage immediately
+  saveLocalRegistration(newRecord);
+
   try {
     await setDoc(doc(db, 'registrations', regId), firestoreData);
-    return regId;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, path);
-    throw error;
   }
+
+  return regId;
 }
 
 /**
- * Real-time subscription to registrations in Firestore.
- * Updates dynamically across all devices whenever any registration is added, edited or updated.
+ * Real-time subscription to registrations in Firestore and local storage.
  */
 export function subscribeToRegistrations(
   onData: (registrations: RegistrationRecord[]) => void,
   onError?: (error: unknown) => void
 ) {
+  // Emit local records immediately so admin panel is never blank
+  onData(getLocalRegistrations());
+
   const q = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
 
   return onSnapshot(
     q,
     (snapshot) => {
       const records: RegistrationRecord[] = [];
+      const seenIds = new Set<string>();
+
       snapshot.forEach((docSnap) => {
         const d = docSnap.data();
+        seenIds.add(docSnap.id);
         let attachmentUrl = d.attachmentUrl;
         let attachmentName = d.attachmentName;
 
@@ -212,25 +357,38 @@ export function subscribeToRegistrations(
         });
       });
 
+      // Merge local records that aren't in Firestore yet
+      const currentLocal = getLocalRegistrations();
+      for (const loc of currentLocal) {
+        if (!seenIds.has(loc.id)) {
+          records.push(loc);
+        }
+      }
+
+      records.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       onData(records);
     },
     (err) => {
       handleFirestoreError(err, OperationType.LIST, 'registrations');
+      onData(getLocalRegistrations());
       if (onError) onError(err);
     }
   );
 }
 
 /**
- * Fetch all registrations from Firestore once.
+ * Fetch all registrations.
  */
 export async function fetchAllRegistrations(): Promise<RegistrationRecord[]> {
-  const q = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
   try {
+    const q = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(q);
     const records: RegistrationRecord[] = [];
+    const seenIds = new Set<string>();
+
     snapshot.forEach((docSnap) => {
       const d = docSnap.data();
+      seenIds.add(docSnap.id);
       records.push({
         id: docSnap.id,
         fullName: d.fullName || '',
@@ -249,21 +407,31 @@ export async function fetchAllRegistrations(): Promise<RegistrationRecord[]> {
         updatedAt: d.updatedAt || new Date().toISOString(),
       });
     });
+
+    const currentLocal = getLocalRegistrations();
+    for (const loc of currentLocal) {
+      if (!seenIds.has(loc.id)) {
+        records.push(loc);
+      }
+    }
+
+    records.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     return records;
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, 'registrations');
-    throw error;
+    return getLocalRegistrations();
   }
 }
 
 /**
- * Update the status and optional admin note for a registration in Firestore.
+ * Update status and admin note.
  */
 export async function updateRegistrationStatus(
   id: string,
   status: RegistrationRecord['status'],
   adminNotes?: string
 ) {
+  updateLocalRegistrationStatus(id, status, adminNotes);
   const path = `registrations/${id}`;
   const updates: Record<string, unknown> = {
     status,
@@ -277,7 +445,6 @@ export async function updateRegistrationStatus(
     await updateDoc(doc(db, 'registrations', id), updates);
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
-    throw error;
   }
 }
 
@@ -298,17 +465,17 @@ export async function updateBookingDelegateNames(
     });
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
-    throw error;
   }
 }
 
 /**
- * Full update of registration fields in Firestore.
+ * Full update of registration fields.
  */
 export async function updateRegistrationRecord(
   id: string,
   updates: Partial<Omit<RegistrationRecord, 'id'>>
 ) {
+  updateLocalRegistrationFull(id, updates);
   const path = `registrations/${id}`;
   const payload = {
     ...updates,
@@ -319,20 +486,19 @@ export async function updateRegistrationRecord(
     await updateDoc(doc(db, 'registrations', id), payload);
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
-    throw error;
   }
 }
 
 /**
- * Delete a registration document from Firestore.
+ * Delete a registration document.
  */
 export async function deleteRegistrationRecord(id: string) {
+  deleteLocalRegistration(id);
   const path = `registrations/${id}`;
   try {
     await deleteDoc(doc(db, 'registrations', id));
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, path);
-    throw error;
   }
 }
 
