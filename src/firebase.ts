@@ -438,6 +438,40 @@ export async function getTicketsForBooking(bookingId: string): Promise<TicketRec
   }
 }
 
+export function subscribeToAllTickets(
+  onData: (tickets: TicketRecord[]) => void,
+  onError?: (error: unknown) => void
+) {
+  const q = query(collection(db, 'tickets'), orderBy('createdAt', 'desc'));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const tickets: TicketRecord[] = [];
+      snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        tickets.push({
+          id: docSnap.id,
+          passId: d.passId,
+          token: d.token,
+          bookingId: d.bookingId,
+          delegateName: d.delegateName,
+          organizationName: d.organizationName,
+          tier: d.tier,
+          delegateEmail: d.delegateEmail,
+          status: d.status || 'Valid',
+          createdAt: parseTimestampToIso(d.createdAt),
+          emailSent: d.emailSent || false,
+        });
+      });
+      onData(tickets);
+    },
+    (err) => {
+      console.warn('Tickets live subscription notice:', err);
+      onError?.(err);
+    }
+  );
+}
+
 export async function generateTicketsForBooking(
   booking: RegistrationRecord,
   delegateDetails: { name: string; email?: string }[]
