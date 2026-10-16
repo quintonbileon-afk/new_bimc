@@ -209,6 +209,23 @@ export async function submitRegistration(
 
   try {
     await setDoc(docRef, firestoreData);
+
+    // Fire confirmation email request non-blockingly
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: registration.fullName,
+        email: registration.email,
+        registrationType: registration.passOrTier,
+        referenceId: regId,
+        organization: registration.organization,
+        phone: registration.phone,
+      }),
+    }).catch((err) => {
+      console.warn('Confirmation email dispatch notice:', err);
+    });
+
     return regId;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `registrations/${regId}`);
