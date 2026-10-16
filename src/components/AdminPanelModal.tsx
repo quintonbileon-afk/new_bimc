@@ -460,7 +460,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
       reg.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       reg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (reg.organization || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      reg.passOrTier.toLowerCase().includes(searchQuery.toLowerCase());
+      reg.passOrTier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (reg.referenceNumber || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      reg.id.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus = selectedStatus === 'all' || reg.status === selectedStatus;
     const matchesPackage = selectedPackage === 'all' || reg.passOrTier === selectedPackage;
@@ -1052,6 +1054,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                                       {reg.organization || 'Individual Attendee'}
                                     </span>
                                   </div>
+                                  {reg.referenceNumber && (
+                                    <div className="flex items-center gap-2 text-[#B8C2D6]">
+                                      <FileCheck className="w-3.5 h-3.5 text-[#2F6DB5] shrink-0" />
+                                      <span className="font-mono text-white text-[11px] bg-white/5 px-1.5 py-0.5 rounded">Ref: {reg.referenceNumber}</span>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Registrant Notes */}

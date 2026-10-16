@@ -140,6 +140,7 @@ export interface RegistrationRecord {
   createdAt: string; // ISO string for robust client-side display & sorting
   updatedAt: string;
   serverTimestamp?: any;
+  referenceNumber?: string;
 }
 
 export interface TicketRecord {
@@ -198,6 +199,7 @@ export async function submitRegistration(
     createdAt: now,
     updatedAt: now,
     serverCreatedAt: serverTimestamp(),
+    referenceNumber: (registration.referenceNumber?.trim() || '').substring(0, 100),
   };
 
   if (registration.attachmentUrl) {

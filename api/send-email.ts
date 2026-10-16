@@ -59,16 +59,14 @@ Thank you for registering for the Botswana Mobile Innovation Congress (BMIC 2026
 Your reservation for "${passType}" has been successfully logged with the Secretariat.
 
 Reference ID: ${refId}
+Reference Number: ${req.body.referenceNumber || 'N/A'}
 Organization: ${organization || 'N/A'}
 Phone: ${phone || 'N/A'}
 
-Settlement & Invoicing Details:
-- Account Name: Botswana Mobile Innovation Congress
-- Bank: First National Bank of Botswana (FNBB)
-- Branch Code: 281467
-- Account Number: 62893451202
-- Account Type: Business Cheque
-- Swift Code: FIRNBWMG
+Payment Methods:
+- E-Wallet/Pay2Cell: +26771843386
+- Orange Money: +26772846420
+- Mascom MyZaka: +26771843386
 
 An official VAT invoice and proforma will be sent to your email address, and scannable congress pass credentials will be issued once payment is confirmed or the purchase order is verified.
 
@@ -115,20 +113,18 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
                 </tr>
               </table>
 
-              <!-- Settlement & Invoicing Details -->
-              <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">Settlement &amp; Invoicing Details</h3>
+              <!-- Payment Methods -->
+              <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">Payment Methods</h3>
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0E1C38; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 28px;">
                 <tr>
                   <td style="padding: 20px; font-size: 13px; color: #B8C2D6; line-height: 1.8;">
-                    <strong>Account Name:</strong> Botswana Mobile Innovation Congress<br>
-                    <strong>Bank:</strong> First National Bank of Botswana (FNBB)<br>
-                    <strong>Branch Code:</strong> 281467<br>
-                    <strong>Account Number:</strong> 62893451202<br>
-                    <strong>Account Type:</strong> Business Cheque<br>
-                    <strong>Swift Code:</strong> FIRNBWMG
+                    <strong>E-Wallet/Pay2Cell:</strong> +26771843386<br>
+                    <strong>Orange Money:</strong> +26772846420<br>
+                    <strong>Mascom MyZaka:</strong> +26771843386
                   </td>
                 </tr>
               </table>
+
 
               <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #B8C2D6;">
                 An official VAT invoice and proforma will be sent to your email address, and scannable congress pass credentials will be issued once payment is confirmed or the purchase order is verified.
