@@ -712,6 +712,22 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
             {/* Sub-view: List & Manage — Full Width Rows with Full Details */}
             {activeTab === 'list' && (
               <div className="w-full flex-1 flex flex-col min-h-0 overflow-hidden bg-[#0A1428]">
+                {pendingCount > 0 && (
+                  <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2.5 flex items-center justify-between gap-3 text-xs text-amber-200 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+                      <span>
+                        <strong>Action Required:</strong> <strong>{pendingCount}</strong> new registration{pendingCount > 1 ? 's' : ''} awaiting review &amp; verification.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setSelectedStatus('pending')}
+                      className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 rounded-lg font-semibold transition-colors cursor-pointer"
+                    >
+                      Filter Pending
+                    </button>
+                  </div>
+                )}
                 {/* Search, Filter & Action Toolbar */}
                 <div className="p-3 sm:p-4 border-b border-white/10 flex flex-wrap items-center gap-2.5 shrink-0 bg-[#0E1C38]/90">
                   <div className="relative flex-1 min-w-[220px]">
