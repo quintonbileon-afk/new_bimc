@@ -275,13 +275,28 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
     `.trim();
     }
 
-    const result = await resend.emails.send({
+    const attachments: any[] = [];
+    if (passId && req.body.passImageBase64) {
+      const base64Data = req.body.passImageBase64.replace(/^data:image\/png;base64,/, '');
+      attachments.push({
+        filename: `BMIC-2026-Pass-${passId.trim()}.png`,
+        content: Buffer.from(base64Data, 'base64'),
+      });
+    }
+
+    const emailPayload: any = {
       from: emailFrom,
       to: [cleanEmail],
       subject,
       html: htmlContent,
       text: textContent,
-    });
+    };
+
+    if (attachments.length > 0) {
+      emailPayload.attachments = attachments;
+    }
+
+    const result = await resend.emails.send(emailPayload);
 
     return res.status(200).json({ success: true, id: result.data?.id });
   } catch (error: any) {

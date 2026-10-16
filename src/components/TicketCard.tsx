@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
+import html2canvas from 'html2canvas';
 import { TicketRecord } from '../firebase';
 import { BmicLogo } from './BmicLogo';
 import { Download, CheckCircle, ShieldCheck, Printer, Mail, Loader2 } from 'lucide-react';
@@ -63,6 +64,8 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
 
   const bookingRefShort = ticket.bookingId ? ticket.bookingId.replace('reg_', '').toUpperCase() : 'BMIC2026';
 
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const [isEmailing, setIsEmailing] = useState(false);
   const [emailSentSuccess, setEmailSentSuccess] = useState(false);
 
@@ -70,6 +73,16 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
     setIsEmailing(true);
     setEmailSentSuccess(false);
     try {
+      let passImageBase64 = '';
+      if (cardRef.current) {
+        const canvas = await html2canvas(cardRef.current, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#0A1128',
+        });
+        passImageBase64 = canvas.toDataURL('image/png');
+      }
+
       const res = await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -80,6 +93,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
           delegateEmail: ticket.delegateEmail || '',
           organizationName: ticket.organizationName || '',
           bookingId: ticket.bookingId || '',
+          passImageBase64,
         }),
       });
       const data = await res.json();
@@ -100,7 +114,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
   return (
     <div className="flex flex-col items-center gap-3 w-full my-4">
       {/* Landscape ticket card */}
-      <div className="relative w-full max-w-[720px] bg-[#0A1128] border border-[#1F2D52] rounded-[16px] text-white shadow-2xl overflow-hidden flex flex-col md:flex-row">
+      <div ref={cardRef} className="relative w-full max-w-[720px] bg-[#0A1128] border border-[#1F2D52] rounded-[16px] text-white shadow-2xl overflow-hidden flex flex-col md:flex-row">
         
         {/* Top/Bottom Perforation Notches on Desktop (left/right split) */}
         <div className="absolute top-0 right-[190px] w-6 h-6 rounded-full bg-[#0E1C38] border-b border-[#1F2D52] -translate-y-1/2 z-10 hidden md:block" />
