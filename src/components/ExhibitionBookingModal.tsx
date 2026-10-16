@@ -16,7 +16,8 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
-  Tag
+  Tag,
+  AlertCircle
 } from 'lucide-react';
 
 interface ExhibitionBookingModalProps {
@@ -57,6 +58,7 @@ export const ExhibitionBookingModal: React.FC<ExhibitionBookingModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -116,7 +118,9 @@ export const ExhibitionBookingModal: React.FC<ExhibitionBookingModalProps> = ({
         formData.rep2Email || formData.email,
       ];
 
+      setErrorMessage(null);
       const regId = await submitRegistration({
+        type: 'exhibition',
         fullName: formData.contactPerson.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
@@ -132,7 +136,8 @@ export const ExhibitionBookingModal: React.FC<ExhibitionBookingModalProps> = ({
       setSuccessId(regId);
     } catch (err) {
       console.error('Exhibition reservation error:', err);
-      setSuccessId('exh_' + Date.now());
+      const msg = err instanceof Error ? err.message : 'Failed to save exhibition booking to Cloud Firestore.';
+      setErrorMessage(`Booking failed: ${msg}. Please check your connection and try again.`);
     } finally {
       setIsSubmitting(false);
       setUploadStatus(null);
@@ -141,6 +146,7 @@ export const ExhibitionBookingModal: React.FC<ExhibitionBookingModalProps> = ({
 
   const handleResetAndClose = () => {
     setSuccessId(null);
+    setErrorMessage(null);
     setFormData({
       companyName: '',
       fasciaName: '',
@@ -235,6 +241,12 @@ export const ExhibitionBookingModal: React.FC<ExhibitionBookingModalProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {errorMessage && (
+                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{errorMessage}</span>
+                </div>
+              )}
               {/* Stand Package Summary */}
               <div className="bg-[#0A1428] rounded-2xl p-4 border border-white/5 text-xs text-[#B8C2D6] space-y-2">
                 <div className="flex items-center justify-between text-white font-semibold">

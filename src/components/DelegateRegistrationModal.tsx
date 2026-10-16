@@ -88,6 +88,7 @@ export const DelegateRegistrationModal: React.FC<DelegateRegistrationModalProps>
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccessId, setSubmitSuccessId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialTier) {
@@ -157,7 +158,9 @@ export const DelegateRegistrationModal: React.FC<DelegateRegistrationModalProps>
         ? [delegate1Email || formData.email, delegate2Email || formData.email, delegate3Email || formData.email]
         : [formData.email];
 
+      setSubmitError(null);
       const regId = await submitRegistration({
+        type: 'delegate',
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
@@ -173,7 +176,8 @@ export const DelegateRegistrationModal: React.FC<DelegateRegistrationModalProps>
       setSubmitSuccessId(regId);
     } catch (err) {
       console.error('Delegate registration error:', err);
-      setSubmitSuccessId('reg_' + Date.now());
+      const msg = err instanceof Error ? err.message : 'Failed to save registration to Cloud Firestore.';
+      setSubmitError(`Registration failed: ${msg}. Please check your connection and try again.`);
     } finally {
       setIsSubmitting(false);
       setUploadStatus(null);
@@ -182,6 +186,7 @@ export const DelegateRegistrationModal: React.FC<DelegateRegistrationModalProps>
 
   const handleResetAndClose = () => {
     setSubmitSuccessId(null);
+    setSubmitError(null);
     setFormData({
       fullName: '',
       email: '',
@@ -277,6 +282,12 @@ export const DelegateRegistrationModal: React.FC<DelegateRegistrationModalProps>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {submitError && (
+                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{submitError}</span>
+                </div>
+              )}
               {/* Step 1: Select Delegate Tier */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-2">

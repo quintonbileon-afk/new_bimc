@@ -61,6 +61,14 @@ export const Speakers: React.FC = () => {
       organization: 'Future Trends Group',
       imageUrl: '/speaker3.jpg',
     },
+      {
+      id: 'speaker-4',
+      name: 'Oteng Tabona (PhD)',
+      roleBadge: 'Speaker',
+      title: 'Lecturer & Researcher',
+      organization: 'BIUST',
+      imageUrl: '/speaker4.jpg',
+    },
   ];
 
   const decisionMakers: StakeholderGroup[] = [

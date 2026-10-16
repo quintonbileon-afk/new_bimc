@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Calendar,
   FileText,
-  ArrowRight
+  ArrowRight,
+  AlertCircle
 } from 'lucide-react';
 
 interface SponsorshipInquiryModalProps {
@@ -99,6 +100,7 @@ export const SponsorshipInquiryModal: React.FC<SponsorshipInquiryModalProps> = (
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialPackage) {
@@ -162,7 +164,9 @@ export const SponsorshipInquiryModal: React.FC<SponsorshipInquiryModalProps> = (
         formData.strategicNotes ? `Executive Notes: ${formData.strategicNotes}` : '',
       ].filter(Boolean);
 
+      setErrorMessage(null);
       const regId = await submitRegistration({
+        type: 'sponsorship',
         fullName: formData.executiveName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
@@ -176,7 +180,8 @@ export const SponsorshipInquiryModal: React.FC<SponsorshipInquiryModalProps> = (
       setSuccessId(regId);
     } catch (err) {
       console.error('Sponsorship inquiry error:', err);
-      setSuccessId('spn_' + Date.now());
+      const msg = err instanceof Error ? err.message : 'Failed to save sponsorship inquiry to Cloud Firestore.';
+      setErrorMessage(`Inquiry failed: ${msg}. Please check your connection and try again.`);
     } finally {
       setIsSubmitting(false);
       setUploadStatus(null);
@@ -185,6 +190,7 @@ export const SponsorshipInquiryModal: React.FC<SponsorshipInquiryModalProps> = (
 
   const handleResetAndClose = () => {
     setSuccessId(null);
+    setErrorMessage(null);
     setFormData({
       companyName: '',
       executiveName: '',
@@ -275,6 +281,12 @@ export const SponsorshipInquiryModal: React.FC<SponsorshipInquiryModalProps> = (
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {errorMessage && (
+                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{errorMessage}</span>
+                </div>
+              )}
               {/* Select Package */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-2">

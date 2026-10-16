@@ -93,6 +93,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
       setUploadStatus('Saving registration to congress database...');
       const regId = await submitRegistration({
+        type: 'general',
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phone,

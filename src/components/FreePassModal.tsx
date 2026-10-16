@@ -15,7 +15,8 @@ import {
   Loader2,
   Calendar,
   MapPin,
-  Tag
+  Tag,
+  AlertCircle
 } from 'lucide-react';
 
 interface FreePassModalProps {
@@ -36,6 +37,7 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedTicket, setGeneratedTicket] = useState<TicketRecord | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -56,14 +58,17 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setErrorMessage(null);
     try {
       const regId = await submitRegistration({
+        type: 'free_pass',
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-        organization: formData.organization.trim(),
+        organization: formData.organization.trim() || 'General Attendee',
         passOrTier: 'Free Pass - Exhibition Floor',
         notes: `Area of interest: ${formData.interest}`,
+        status: 'confirmed',
       });
 
       setBookingId(regId);
@@ -72,10 +77,11 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
       const createdTickets = await generateTicketsForBooking(
         {
           id: regId,
+          type: 'free_pass',
           fullName: formData.fullName.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          organization: formData.organization.trim(),
+          organization: formData.organization.trim() || 'General Attendee',
           passOrTier: 'Free Pass - Exhibition Floor',
           status: 'confirmed',
           createdAt: new Date().toISOString(),
@@ -89,20 +95,9 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
       }
     } catch (err) {
       console.error('Error claiming free pass:', err);
-      // Fallback ticket for UI display
-      const fallbackTicket: TicketRecord = {
-        id: 'tkt_' + Date.now(),
-        passId: `BMIC-2026-EXPO-${Math.floor(10000 + Math.random() * 90000)}`,
-        token: 'tok_' + Math.random().toString(36).substring(2, 10),
-        bookingId: 'local_' + Date.now(),
-        delegateName: formData.fullName.trim(),
-        organizationName: formData.organization.trim() || 'Exhibition Visitor',
-        tier: 'Free Pass',
-        delegateEmail: formData.email.trim(),
-        status: 'Valid',
-        createdAt: new Date().toISOString(),
-      };
-      setGeneratedTicket(fallbackTicket);
+      const msg = err instanceof Error ? err.message : 'Failed to register free pass in Cloud Firestore.';
+      setErrorMessage(`Registration error: ${msg}. Please check your connection and try again.`);
+      setGeneratedTicket(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -111,6 +106,7 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
   const handleResetAndClose = () => {
     setGeneratedTicket(null);
     setBookingId(null);
+    setErrorMessage(null);
     setFormData({
       fullName: '',
       email: '',
@@ -200,6 +196,12 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
           ) : (
             /* Registration Form */
             <form onSubmit={handleSubmit} className="space-y-5">
+              {errorMessage && (
+                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{errorMessage}</span>
+                </div>
+              )}
               {/* Value Highlight Banner */}
               <div className="bg-[#0A1428] rounded-2xl p-4 border border-white/5 text-xs text-[#B8C2D6] space-y-2">
                 <div className="flex items-center gap-2 text-white font-semibold">

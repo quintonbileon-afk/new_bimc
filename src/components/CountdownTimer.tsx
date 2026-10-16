@@ -57,63 +57,63 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, clas
       {/* Row of four tiles with thin colon separators */}
       <div className="flex flex-row flex-nowrap items-center justify-start gap-1.5 sm:gap-2.5 mb-1">
         {/* Days Tile */}
-        <div className="w-[56px] sm:w-[72px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-2 text-center relative overflow-hidden shadow-md flex flex-col items-center justify-center">
-          <div className="text-[22px] sm:text-[30px] font-bold font-mono text-white tabular-nums leading-none mb-0.5">
+        <div className="w-[64px] sm:w-[84px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-3 text-center relative overflow-hidden shadow-lg flex flex-col items-center justify-center">
+          <div className="text-[28px] sm:text-[40px] font-bold font-mono text-white tabular-nums leading-none mb-1">
             {String(timeLeft.days).padStart(2, '0')}
           </div>
-          <div className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-[#B8C2D6] font-medium">
+          <div className="text-[10px] sm:text-[12px] uppercase tracking-[0.2em] text-[#B8C2D6] font-semibold">
             Days
           </div>
           <div 
-            className="absolute bottom-0 left-0 h-[2px] bg-[#2F6DB5] transition-all duration-500"
+            className="absolute bottom-0 left-0 h-[3px] bg-[#2F6DB5] transition-all duration-500"
             style={{ width: `${daysProgress}%` }}
           />
         </div>
 
-        <span className="text-slate-600 text-base sm:text-xl font-mono font-bold select-none">:</span>
+        <span className="text-slate-500 text-2xl sm:text-3xl font-mono font-bold select-none px-1">:</span>
 
         {/* Hours Tile */}
-        <div className="w-[56px] sm:w-[72px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-2 text-center relative overflow-hidden shadow-md flex flex-col items-center justify-center">
-          <div className="text-[22px] sm:text-[30px] font-bold font-mono text-white tabular-nums leading-none mb-0.5">
+        <div className="w-[64px] sm:w-[84px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-3 text-center relative overflow-hidden shadow-lg flex flex-col items-center justify-center">
+          <div className="text-[28px] sm:text-[40px] font-bold font-mono text-white tabular-nums leading-none mb-1">
             {String(timeLeft.hours).padStart(2, '0')}
           </div>
-          <div className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-[#B8C2D6] font-medium">
+          <div className="text-[10px] sm:text-[12px] uppercase tracking-[0.2em] text-[#B8C2D6] font-semibold">
             Hours
           </div>
           <div 
-            className="absolute bottom-0 left-0 h-[2px] bg-[#2F6DB5] transition-all duration-500"
+            className="absolute bottom-0 left-0 h-[3px] bg-[#2F6DB5] transition-all duration-500"
             style={{ width: `${hoursProgress}%` }}
           />
         </div>
 
-        <span className="text-slate-600 text-base sm:text-xl font-mono font-bold select-none">:</span>
+        <span className="text-slate-500 text-2xl sm:text-3xl font-mono font-bold select-none px-1">:</span>
 
         {/* Minutes Tile */}
-        <div className="w-[56px] sm:w-[72px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-2 text-center relative overflow-hidden shadow-md flex flex-col items-center justify-center">
-          <div className="text-[22px] sm:text-[30px] font-bold font-mono text-white tabular-nums leading-none mb-0.5">
+        <div className="w-[64px] sm:w-[84px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-3 text-center relative overflow-hidden shadow-lg flex flex-col items-center justify-center">
+          <div className="text-[28px] sm:text-[40px] font-bold font-mono text-white tabular-nums leading-none mb-1">
             {String(timeLeft.minutes).padStart(2, '0')}
           </div>
-          <div className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-[#B8C2D6] font-medium">
+          <div className="text-[10px] sm:text-[12px] uppercase tracking-[0.2em] text-[#B8C2D6] font-semibold">
             Mins
           </div>
           <div 
-            className="absolute bottom-0 left-0 h-[2px] bg-[#2F6DB5] transition-all duration-500"
+            className="absolute bottom-0 left-0 h-[3px] bg-[#2F6DB5] transition-all duration-500"
             style={{ width: `${minutesProgress}%` }}
           />
         </div>
 
-        <span className="text-slate-600 text-base sm:text-xl font-mono font-bold select-none">:</span>
+        <span className="text-slate-500 text-2xl sm:text-3xl font-mono font-bold select-none px-1">:</span>
 
         {/* Seconds Tile */}
-        <div className="w-[56px] sm:w-[72px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-2 text-center relative overflow-hidden shadow-md flex flex-col items-center justify-center">
-          <div className="text-[22px] sm:text-[30px] font-bold font-mono text-white tabular-nums leading-none mb-0.5">
+        <div className="w-[64px] sm:w-[84px] bg-[#132238] border border-[#2F6DB5]/30 rounded-lg p-3 text-center relative overflow-hidden shadow-lg flex flex-col items-center justify-center">
+          <div className="text-[28px] sm:text-[40px] font-bold font-mono text-white tabular-nums leading-none mb-1">
             {String(timeLeft.seconds).padStart(2, '0')}
           </div>
-          <div className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-[#B8C2D6] font-medium">
+          <div className="text-[10px] sm:text-[12px] uppercase tracking-[0.2em] text-[#B8C2D6] font-semibold">
             Secs
           </div>
           <div 
-            className="absolute bottom-0 left-0 h-[2px] bg-[#2F6DB5] transition-all duration-500"
+            className="absolute bottom-0 left-0 h-[3px] bg-[#2F6DB5] transition-all duration-500"
             style={{ width: `${secondsProgress}%` }}
           />
         </div>

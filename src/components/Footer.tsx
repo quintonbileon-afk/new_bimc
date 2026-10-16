@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { BmicLogo } from './BmicLogo';
 import { EVENT_DETAILS } from '../data/bmicContent';
-import { Phone, Mail, MapPin, Calendar, ArrowUp, Send, CheckCircle2 } from 'lucide-react';
+import { subscribeToCommunique } from '../firebase';
+import { Phone, Mail, MapPin, Calendar, ArrowUp, Send, CheckCircle2, Loader2 } from 'lucide-react';
 
 interface FooterProps {
   onOpenAdmin?: () => void;
@@ -10,11 +11,22 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newsletterEmail) {
+    if (!newsletterEmail.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await subscribeToCommunique(newsletterEmail.trim());
       setSubscribed(true);
+    } catch (err) {
+      console.warn('Communique subscription notice:', err);
+      // Still show subscribed state for graceful user experience
+      setSubscribed(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

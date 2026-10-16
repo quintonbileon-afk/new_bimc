@@ -1,8 +1,55 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+
+    // Helper: Verify if user is signed in with Firebase Auth
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 1. Registrations collection:
+    // Public can submit booking inquiries and registrations with required field validation.
+    // Reading, updating, and deleting is strictly restricted to authenticated Secretariat admin users.
+    match /registrations/{registrationId} {
+      allow create: if request.resource.data.fullName is string &&
+                       request.resource.data.fullName.size() > 0 &&
+                       request.resource.data.fullName.size() <= 200 &&
+                       request.resource.data.email is string &&
+                       request.resource.data.email.size() > 0 &&
+                       request.resource.data.email.size() <= 200 &&
+                       request.resource.data.passOrTier is string &&
+                       request.resource.data.passOrTier.size() <= 200;
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    // 2. Delegate & Attendee Tickets:
+    // Allows issuance of pass tickets and verification
+    match /tickets/{ticketId} {
+      allow create, read: if true;
+      allow update, delete: if isAuthenticated();
+    }
+
+    // 3. Ticket sequence counters:
+    match /counters/{counterId} {
       allow read, write: if true;
+    }
+
+    // 4. Communique newsletter subscribers:
+    match /communique_subscribers/{subscriberId} {
+      allow create: if request.resource.data.email is string &&
+                       request.resource.data.email.size() > 0 &&
+                       request.resource.data.email.size() <= 150;
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    // 5. Connectivity health check:
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    // 6. Default Deny catch-all for all other unmapped paths:
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
