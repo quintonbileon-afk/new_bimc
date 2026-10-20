@@ -166,7 +166,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
 
                 <div>
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight font-display text-[#0A1428]">
-                    Free Exhibition Floor Pass
+                    Attend Exhibition for Free
                   </h3>
                   <p className="text-sm sm:text-base text-[#4A5568] mt-2 max-w-3xl leading-relaxed">
                     Explore  exhibits, witness live startup demonstrations, and connect across the main networking floor at the Royal Aria Conference Centre at no cost.
@@ -198,7 +198,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                   className="w-full sm:w-auto btn-cta-magenta px-8 py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2.5 cursor-pointer shadow-[0_8px_25px_rgba(216,27,96,0.35)] hover:scale-[1.02] transition-transform"
                 >
                   <Ticket className="w-4 h-4" />
-                  <span>Claim Free Exhibition Pass</span>
+                  <span>Attend Exhibition for Free</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
               </div>

@@ -503,7 +503,7 @@ export const DELEGATE_PASS_TIERS: DelegatePassTier[] = [
   },
   {
     id: 'free-exhibition-pass',
-    name: 'Free Pass for Exhibition Floor',
+    name: 'Attend Exhibition for Free',
     price: 'Free',
     priceNote: 'Complimentary Access · RSVP Required',
     description: 'Complimentary access to the technology exhibition showcase, live product demonstrations, and innovation activation areas.',
@@ -531,7 +531,7 @@ export const CORPORATE_RATE_CARD = {
     {
       id: 'free-exhibition-pass',
       category: 'delegate' as const,
-      title: 'Free Pass for Exhibition Floor',
+      title: 'Attend Exhibition for Free',
       description: 'Complimentary access to technology exhibition showcase, product demos and public activation areas.',
       price: 'Free',
       priceRaw: 0,

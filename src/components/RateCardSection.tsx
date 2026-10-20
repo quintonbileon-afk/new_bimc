@@ -64,7 +64,7 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
   const delegatePasses = [
     {
       id: 'free-pass',
-      name: 'Free Pass for Exhibition Floor',
+      name: 'Attend Exhibition for Free',
       price: 'P0',
       priceSub: 'Complimentary Access',
       badge: 'Free Registration',
@@ -243,7 +243,7 @@ export const RateCardSection: React.FC<RateCardSectionProps> = ({ onOpenRegister
           </div>
         )}
 
-        {/* Tab 2: Delegate Passes & Free Pass for Exhibition Floor */}
+        {/* Tab 2: Delegate Passes & Attend Exhibition for Free */}
         {activeTab === 'delegates' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-4">
             {delegatePasses.map((pass) => (

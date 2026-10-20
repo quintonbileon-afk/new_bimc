@@ -137,7 +137,7 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
                 </span>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight font-display">
-                Exhibition Floor Pass
+                Attend Exhibition for Free
               </h3>
             </div>
           </div>
@@ -206,7 +206,7 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
               <div className="bg-[#0A1428] rounded-2xl p-4 border border-white/5 text-xs text-[#B8C2D6] space-y-2">
                 <div className="flex items-center gap-2 text-white font-semibold">
                   <Sparkles className="w-4 h-4 text-[#6AA5EE] shrink-0" />
-                  <span>What your Free Exhibition Pass includes:</span>
+                  <span>What attending for free includes:</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11.5px] text-slate-300">
                   <div className="flex items-center gap-1.5">
@@ -338,7 +338,7 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
                   ) : (
                     <>
                       <Ticket className="w-4 h-4" />
-                      <span>Claim Free Exhibition Floor Pass</span>
+                      <span>Attend Exhibition for Free</span>
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </>
                   )}

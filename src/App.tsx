@@ -273,7 +273,7 @@ export default function App() {
           SEPARATE DEDICATED MODALS (NOT A SINGLE MONOLITHIC FORM)
           ========================================================================= */}
       
-      {/* 1. Dedicated Free Exhibition Floor Pass Modal (Instant Confirmation & Ticket) */}
+      {/* 1. Dedicated Attend Exhibition for Free Modal (Instant Confirmation & Ticket) */}
       <FreePassModal
         isOpen={isFreePassOpen}
         onClose={() => setIsFreePassOpen(false)}

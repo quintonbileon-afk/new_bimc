@@ -93,7 +93,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-[#d81b60] to-[#c2185b] hover:from-[#f0467f] hover:to-[#d81b60] transition-all cursor-pointer shadow-sm"
               >
                 <Ticket className="w-4 h-4 text-white" />
-                <span>Get Free Exhibition Pass</span>
+                <span>Attend Exhibition for Free</span>
               </button>
 
               <button
@@ -316,7 +316,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
             Ready to Attend BMIC 2026?
           </h2>
           <p className="text-sm sm:text-base text-[#b6c2dc] leading-relaxed mb-8">
-            Choose between claiming a Complimentary Exhibition Floor Pass or securing an Executive Delegate Pass
+            Choose between attending the exhibition for free or securing an Executive Delegate Pass
             with full access to all 15 sessions, luncheons, and private deal chambers.
           </p>
 
@@ -325,7 +325,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
               onClick={onOpenFreePass}
               className="px-6 py-3 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#d81b60] to-[#c2185b] hover:from-[#f0467f] hover:to-[#d81b60] transition-all cursor-pointer shadow-lg"
             >
-              Get Free Exhibition Pass &rarr;
+              Attend Exhibition for Free &rarr;
             </button>
 
             <button

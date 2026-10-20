@@ -296,21 +296,37 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
 
     setIsLoading(true);
     setLoadError(null);
+
+    const timer = setTimeout(() => {
+      setIsLoading((prev) => {
+        if (prev) {
+          // If still loading after 3.5s, fallback gracefully
+          return false;
+        }
+        return prev;
+      });
+    }, 3500);
+
     const unsubscribeSnapshot = subscribeToRegistrations(
       (data) => {
+        clearTimeout(timer);
         setRegistrations(data);
         setIsLoading(false);
         setLoadError(null);
       },
       (err) => {
+        clearTimeout(timer);
         console.error('Firestore live subscription error:', err);
         setIsLoading(false);
-        const msg = err instanceof Error ? err.message : 'Database permission check';
+        const msg = err instanceof Error ? err.message : 'Database offline mode / connection check';
         setLoadError(msg);
       }
     );
 
-    return () => unsubscribeSnapshot();
+    return () => {
+      clearTimeout(timer);
+      unsubscribeSnapshot();
+    };
   }, [isOpen, isUnlocked]);
 
   if (!isOpen) return null;
@@ -769,7 +785,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     className="px-3 py-2 text-xs bg-[#0A1428] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5] cursor-pointer max-w-[210px] truncate"
                   >
                     <option value="all">All Pass Tiers</option>
-                    <option value="Free Pass for Exhibition Floor">Free Exhibition Floor Pass</option>
+                    <option value="Free Pass for Exhibition Floor">Attend Exhibition for Free</option>
                     <option value="Standard Delegate">Standard Delegate (P1,500)</option>
                     <option value="Corporate Delegate">Corporate Delegate (P2,500)</option>
                     <option value="Corporate Pack (3 Delegates)">Corporate 3-Pack (P5,000)</option>
@@ -1405,7 +1421,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                         onChange={(e) => setManualForm({ ...manualForm, passOrTier: e.target.value })}
                         className="w-full px-3.5 py-2 text-xs bg-[#0E1C38] border border-white/10 rounded-full text-white"
                       >
-                        <option value="Free Pass for Exhibition Floor">Free Pass for Exhibition Floor (Free)</option>
+                        <option value="Free Pass for Exhibition Floor">Attend Exhibition for Free (Free)</option>
                         <option value="Standard Delegate">Standard Delegate (P1,500)</option>
                         <option value="Corporate Delegate">Corporate Delegate (P2,500)</option>
                         <option value="Corporate Pack (3 Delegates)">Corporate Pack (3 Delegates) (P5,000)</option>
@@ -1604,7 +1620,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({ isOpen, onClos
                     onChange={(e) => setEditForm({ ...editForm, passOrTier: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-[#070D18] border border-white/15 rounded-xl text-white focus:outline-none focus:border-[#2F6DB5]"
                   >
-                    <option value="Free Pass for Exhibition Floor">Free Pass for Exhibition Floor</option>
+                    <option value="Free Pass for Exhibition Floor">Attend Exhibition for Free</option>
                     <option value="Standard Delegate">Standard Delegate (P1,500)</option>
                     <option value="Corporate Delegate">Corporate Delegate (P2,500)</option>
                     <option value="Corporate Pack (3 Delegates)">Corporate Pack (3 Delegates) (P5,000)</option>
