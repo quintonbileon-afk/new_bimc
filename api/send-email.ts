@@ -58,11 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const cleanPassId = escapeHtml(passId.trim());
       const cleanTier = escapeHtml((tier || passOrTier || 'General Pass').trim());
       const cleanOrg = escapeHtml((req.body.organizationName || '').trim());
-      const cleanBookingRef = escapeHtml((req.body.bookingId || '').replace('reg_', '').toUpperCase());
-      const isMagentaTier = cleanTier.toLowerCase().includes('corporate delegate') || cleanTier.toLowerCase().includes('corp');
-      const pillBg = isMagentaTier ? '#E0245E' : '#2F6FBA';
-      const accentColor = isMagentaTier ? '#FF6B9A' : '#6AA5EE';
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(cleanPassId)}`;
+      const passImageBase64 = req.body.passImageBase64 || '';
 
       subject = `BMIC 2026 Official Congress Pass – ${cleanPassId}`;
 
@@ -79,7 +75,7 @@ Delegate: ${cleanName} ${cleanOrg ? `(${cleanOrg})` : ''}
 Venue: Royal Aria Conference Centre, Plenary Hall
 Date: 30 October 2026
 
-Please present this Pass ID or QR code at the registration desk upon arrival.
+Your official digital pass image is attached to this email and displayed below. Please present this pass at the registration desk upon arrival.
 
 Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
       `.trim();
@@ -95,93 +91,57 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #050B14; padding: 32px 16px;">
     <tr>
       <td align="center">
-        <!-- Main Ticket Card Table -->
-        <table width="640" border="0" cellspacing="0" cellpadding="0" style="background-color: #0A1128; border: 1px solid #1F2D52; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+        <!-- Container -->
+        <table width="650" border="0" cellspacing="0" cellpadding="0" style="background-color: #0A1128; border: 1px solid #1F2D52; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+          <!-- Header Banner -->
           <tr>
-            <!-- Left Ticket Body -->
-            <td style="padding: 32px; vertical-align: top;">
-              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <td align="center" style="padding: 28px 24px 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+              <span style="font-size: 11px; font-weight: bold; color: #ffffff; letter-spacing: 2px; display: block; margin-bottom: 4px;">BOTSWANA MOBILE &amp; INTERNET CONGRESS</span>
+              <span style="font-size: 13px; font-weight: bold; color: #6AA5EE; letter-spacing: 1px; display: block;">BMIC 2026 OFFICIAL PASS</span>
+            </td>
+          </tr>
+          <!-- Greeting -->
+          <tr>
+            <td style="padding: 24px 32px 16px 32px;">
+              <p style="margin: 0 0 12px 0; font-size: 15px; color: #E2E8F0;">
+                Dear <strong style="color: #ffffff;">${cleanName}</strong>,
+              </p>
+              <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #9AA6C4;">
+                Your official congress pass has been generated. You can view your pass below or use the attached image file when checking in at the Royal Aria Conference Centre.
+              </p>
+            </td>
+          </tr>
+          <!-- Actual Pass Image Display -->
+          <tr>
+            <td align="center" style="padding: 16px 32px 28px 32px;">
+              ${
+                passImageBase64
+                  ? `<img src="${passImageBase64}" alt="BMIC 2026 Official Pass" width="586" style="display: block; width: 100%; max-width: 586px; height: auto; border-radius: 12px; border: 1px solid #2F4275; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />`
+                  : `<div style="padding: 40px; background-color: #0E1C38; border-radius: 12px; color: #6AA5EE; font-family: monospace;">Pass ID: ${cleanPassId} (${cleanTier})</div>`
+              }
+            </td>
+          </tr>
+          <!-- Details & Instructions -->
+          <tr>
+            <td style="padding: 0 32px 32px 32px;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0E1C38; border: 1px solid rgba(47, 109, 181, 0.3); border-radius: 12px; padding: 20px;">
                 <tr>
-                  <td>
-                    <span style="font-size: 11px; font-weight: bold; color: #ffffff; letter-spacing: 1px; display: block;">BOTSWANA MOBILE &amp; INTERNET</span>
-                    <span style="font-size: 11px; font-weight: bold; color: #6AA5EE; letter-spacing: 1px; display: block;">CONGRESS</span>
-                  </td>
-                  <td align="right">
-                    <span style="background-color: ${pillBg}; color: #ffffff; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">
-                      ${cleanTier}
-                    </span>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Date & Location -->
-              <div style="font-size: 10px; font-family: monospace; color: #8A97B8; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 18px; margin-bottom: 24px;">
-                30 OCTOBER 2026 &middot; GABORONE, BOTSWANA
-              </div>
-
-              <!-- Delegate Info -->
-              <div style="margin-bottom: 24px;">
-                <span style="font-size: 9px; font-family: monospace; color: #8A97B8; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 4px;">DELEGATE</span>
-                <h2 style="margin: 0; font-size: 24px; font-weight: 500; color: #ffffff; letter-spacing: -0.5px;">${cleanName}</h2>
-                ${cleanOrg ? `<div style="font-size: 13px; color: #9AA6C4; margin-top: 2px;">${cleanOrg}</div>` : ''}
-              </div>
-
-              <!-- Divider -->
-              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
-                <tr>
-                  <td style="border-top: 1px solid #24366A; font-size: 1px; line-height: 1px;">&nbsp;</td>
-                </tr>
-              </table>
-
-              <!-- Info Grid -->
-              <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td width="50%" style="vertical-align: top; padding-bottom: 16px; padding-right: 12px;">
-                    <span style="font-size: 9px; font-family: monospace; color: #8A97B8; text-transform: uppercase; display: block; margin-bottom: 2px;">VENUE</span>
-                    <span style="font-size: 12px; color: #ffffff; font-weight: 500; line-height: 1.4; display: block;">Royal Aria Conference Centre, Plenary Hall</span>
-                  </td>
-                  <td width="50%" style="vertical-align: top; padding-bottom: 16px; padding-left: 12px;">
-                    <span style="font-size: 9px; font-family: monospace; color: #8A97B8; text-transform: uppercase; display: block; margin-bottom: 2px;">PASS ID</span>
-                    <span style="font-size: 12px; font-family: monospace; color: ${accentColor}; font-weight: bold; display: block;">${cleanPassId}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td width="50%" style="vertical-align: top; padding-right: 12px;">
-                    <span style="font-size: 9px; font-family: monospace; color: #8A97B8; text-transform: uppercase; display: block; margin-bottom: 2px;">ACCESS</span>
-                    <span style="font-size: 11px; color: #ffffff; line-height: 1.4; display: block;">Full congress and exhibition access</span>
-                  </td>
-                  <td width="50%" style="vertical-align: top; padding-left: 12px;">
-                    <span style="font-size: 9px; font-family: monospace; color: #8A97B8; text-transform: uppercase; display: block; margin-bottom: 2px;">BOOKING REF</span>
-                    <span style="font-size: 11px; font-family: monospace; color: #ffffff; display: block;">#${cleanBookingRef || 'BMIC2026'}</span>
+                  <td style="font-size: 13px; color: #B8C2D6; line-height: 1.6;">
+                    <strong style="color: #ffffff; display: block; margin-bottom: 6px;">Important Information:</strong>
+                    &bull; <strong>Date:</strong> 30 October 2026<br>
+                    &bull; <strong>Venue:</strong> Royal Aria Conference Centre, Plenary Hall<br>
+                    &bull; <strong>Pass ID:</strong> <span style="font-family: monospace; color: #6AA5EE;">${cleanPassId}</span><br>
+                    &bull; Present the QR code on your pass at the registration kiosk upon arrival.
                   </td>
                 </tr>
               </table>
             </td>
-
-            <!-- Right Ticket Stub -->
-            <td width="190" style="background-color: #0D1736; border-left: 1px dashed #3B4A78; padding: 28px 20px; vertical-align: middle; text-align: center;">
-              <span style="font-size: 10px; font-family: monospace; font-weight: bold; color: #FF6B9A; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 16px;">ADMIT ONE</span>
-              
-              <!-- QR Code Box -->
-              <table align="center" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; padding: 8px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-                <tr>
-                  <td align="center">
-                    <img src="${qrUrl}" alt="Pass QR Code" width="115" height="115" style="display: block; border-radius: 6px;" />
-                  </td>
-                </tr>
-              </table>
-
-              <span style="font-size: 10px; color: #ffffff; display: block; margin-bottom: 2px;">Scan at registration</span>
-              <span style="font-size: 9px; font-family: monospace; color: #8A97B8; display: block; margin-bottom: 12px; word-break: break-all;">${cleanPassId}</span>
-
-              <!-- Status Pill -->
-              <table align="center" border="0" cellspacing="0" cellpadding="0" style="background-color: rgba(47, 109, 181, 0.2); border: 1px solid rgba(47, 109, 181, 0.4); border-radius: 6px;">
-                <tr>
-                  <td style="padding: 4px 12px; font-size: 9px; font-family: monospace; font-weight: bold; color: #6AA5EE; text-transform: uppercase; letter-spacing: 1px;">
-                    VALID PASS
-                  </td>
-                </tr>
-              </table>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background-color: #070D18; padding: 20px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: #8A99AD;">
+              <p style="margin: 0 0 4px 0;">Botswana Mobile Innovation Congress 2026 &middot; Gaborone, Botswana</p>
+              <p style="margin: 0;">Support: <a href="mailto:info@bmic.co.bw" style="color: #6AA5EE; text-decoration: none;">info@bmic.co.bw</a></p>
             </td>
           </tr>
         </table>
