@@ -8,10 +8,9 @@ interface HeroProps {
   onOpenFreePass?: () => void;
   onDownloadIcs?: () => void;
   onSelectNavTab?: (tab: 'delegates' | 'exhibition' | 'partnerships') => void;
-  onNavigateProgramme?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNavigateProgramme }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSelectNavTab }) => {
   return (
     <section
       className="hero bmic-hero relative overflow-hidden pt-[60px]"
@@ -44,14 +43,15 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNa
                 className="link bmic-link cursor-pointer bg-transparent border-0 text-left"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (onNavigateProgramme) {
-                    onNavigateProgramme();
+                  if (onOpenFreePass) {
+                    onOpenFreePass();
                   } else {
-                    window.location.href = '#programme';
+                    const el = document.getElementById('tickets') || document.getElementById('passes');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
               >
-                View Programme &rarr;
+                Get Free Pass to Exhibition Floor &rarr;
               </button>
             </div>
             <div className="text-left">
@@ -117,7 +117,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNa
                 </div>
                 <button
                   type="button"
-                  className="w-full py-3.5 px-6 rounded-full border-[1.5px] border-white/40 bg-white/[0.12] text-white font-bold text-base hover:bg-white/[0.2] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-[20px]"
+                  className="w-full py-3.5 px-6 rounded-full border-[1.5px] border-white/40 bg-white/[0.12] text-white font-bold text-base hover:bg-white/[0.2] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-1"
                   onClick={(e) => {
                     e.preventDefault();
                     onOpenRegister();
@@ -172,7 +172,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onSelectNavTab, onNa
                 </div>
                 <button
                   type="button"
-                  className="w-full py-3.5 px-6 rounded-full border border-white/20 bg-transparent text-white font-bold text-base hover:border-[#5aa9e6] hover:text-[#5aa9e6] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-[20px]"
+                  className="w-full py-3.5 px-6 rounded-full border border-white/20 bg-transparent text-white font-bold text-base hover:border-[#5aa9e6] hover:text-[#5aa9e6] transition-colors cursor-pointer flex items-center justify-center gap-2 mt-1"
                   onClick={(e) => {
                     e.preventDefault();
                     onSelectNavTab?.('exhibition');

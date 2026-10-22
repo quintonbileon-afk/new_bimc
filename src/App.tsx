@@ -224,7 +224,6 @@ export default function App() {
           onOpenRegister={() => handleSmartRegister()}
           onOpenFreePass={handleOpenFreePass}
           onDownloadIcs={handleDownloadIcs}
-          onNavigateProgramme={handleNavigateProgramme}
         />
 
         {/* 3. About / Theme Section (Light Section with 1px Dividers) */}
