@@ -63,7 +63,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ articleTitle, onClos
           </p>
 
           <p>
-            Key topics explored in this briefing will be debated during the strategic sessions at the Royal Aria Conference Centre on Friday, 30 October 2026, culminating in the adoption of the official BMIC 2026 Congress Communique.
+            Key topics explored in this briefing will be debated during the strategic sessions at the Royal Aria Conference Centre on Friday, 27 November 2026, culminating in the adoption of the official BMIC 2026 Congress Communique.
           </p>
 
           <div className="pt-4 border-t border-white/10 flex justify-end">

@@ -6,8 +6,8 @@ interface CountdownBarProps {
 }
 
 export const CountdownBar: React.FC<CountdownBarProps> = ({ onDownloadIcs }) => {
-  // Target: 30 October 2026, 08:00 CAT (UTC+2)
-  const targetEpoch = new Date('2026-10-30T08:00:00+02:00').getTime();
+  // Target: 27 November 2026, 08:00 CAT (UTC+2)
+  const targetEpoch = new Date('2026-11-27T08:00:00+02:00').getTime();
 
   const [timeLeft, setTimeLeft] = useState<{
     days: number;

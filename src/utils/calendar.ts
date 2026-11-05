@@ -7,9 +7,9 @@ export function generateIcsFile(): void {
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     'UID:bmic-2026-gaborone@bmic.co.bw',
-    'DTSTAMP:20261004T120000Z',
-    'DTSTART:20261030T053000Z', // 07:30 Botswana CAT (UTC+2)
-    'DTEND:20261030T163000Z',   // 18:30 Botswana CAT (UTC+2)
+    'DTSTAMP:20261105T120000Z',
+    'DTSTART:20261127T053000Z', // 07:30 Botswana CAT (UTC+2)
+    'DTEND:20261127T163000Z',   // 18:30 Botswana CAT (UTC+2)
     'SUMMARY:Botswana Mobile & Internet Congress 2026 (BMIC 2026)',
     'DESCRIPTION:Transforming Botswana into the Digital Valley of SADC.\\n\\nOne national digital conversation - moving from policy and strategy to implementation, investment and measurable outcomes.\\n\\nOrganised by Continental Media Group.\\nEnquiries: +267 71 843 386\\nWebsite: www.bmic.co.bw',
     'LOCATION:Royal Aria Conference Centre\\, Gaborone\\, Botswana',

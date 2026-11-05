@@ -227,7 +227,7 @@ export const ExhibitionBookingModal: React.FC<ExhibitionBookingModalProps> = ({
                   <li>Official VAT Proforma invoice sent to <strong className="text-white">{formData.email}</strong>.</li>
                   <li>Continental Media Group operations team will contact you regarding floorplan location selection.</li>
                   <li>Two (2) Exhibitor Delegate Badges are included with full catering access.</li>
-                  <li>Build-up commences on Thursday, 29 October 2026 at Royal Aria Conference Centre.</li>
+                  <li>Build-up commences on Thursday, 26 November 2026 at Royal Aria Conference Centre.</li>
                 </ul>
               </div>
 

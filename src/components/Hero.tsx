@@ -20,7 +20,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister, onOpenFreePass, onSe
         <div className="hero-grid">
           {/* Left Column */}
           <div>
-            <div className="bmic-pill mb-4">30 OCTOBER 2026 &middot; GABORONE, BOTSWANA</div>
+            <div className="bmic-pill mb-4">27 NOVEMBER 2026 &middot; GABORONE, BOTSWANA</div>
             <h1 className="m-0">
               Botswana Mobile &amp; Internet <em>Congress</em> 2026
             </h1>

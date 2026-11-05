@@ -73,7 +73,7 @@ Pass ID: ${cleanPassId}
 Tier: ${cleanTier}
 Delegate: ${cleanName} ${cleanOrg ? `(${cleanOrg})` : ''}
 Venue: Royal Aria Conference Centre, Plenary Hall
-Date: 30 October 2026
+Date: 27 November 2026
 
 Your official digital pass image is attached to this email and displayed below. Please present this pass at the registration desk upon arrival.
 
@@ -128,7 +128,7 @@ Contact: info@bmic.co.bw | Botswana Mobile Innovation Congress 2026
                 <tr>
                   <td style="font-size: 13px; color: #B8C2D6; line-height: 1.6;">
                     <strong style="color: #ffffff; display: block; margin-bottom: 6px;">Important Information:</strong>
-                    &bull; <strong>Date:</strong> 30 October 2026<br>
+                    &bull; <strong>Date:</strong> 27 November 2026<br>
                     &bull; <strong>Venue:</strong> Royal Aria Conference Centre, Plenary Hall<br>
                     &bull; <strong>Pass ID:</strong> <span style="font-family: monospace; color: #6AA5EE;">${cleanPassId}</span><br>
                     &bull; Present the QR code on your pass at the registration kiosk upon arrival.

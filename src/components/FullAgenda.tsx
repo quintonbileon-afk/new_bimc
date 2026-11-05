@@ -44,7 +44,7 @@ export const FullAgenda: React.FC<FullAgendaProps> = ({ onDownloadIcs }) => {
               ONE ACTION AGENDA
             </h2>
             <p className="text-xs sm:text-sm text-[#4A5568] leading-relaxed">
-              Friday, 30 October 2026 · 15 structured sessions moving from policy deliberations to execution.
+              Friday, 27 November 2026 · 15 structured sessions moving from policy deliberations to execution.
             </p>
           </div>
 

@@ -135,7 +135,7 @@ export const VenueSection: React.FC = () => {
               {/* Bottom Card Summary */}
               <div className="p-6 bg-white border-t border-slate-100 flex items-center justify-between text-xs text-[#4A5568]">
                 <div>
-                  <span className="font-bold text-[#0A1428] block">Date: Friday, 30 October 2026</span>
+                  <span className="font-bold text-[#0A1428] block">Date: Friday, 27 November 2026</span>
                   <span>Doors Open: 07:30 CAT · Sessions: 08:30 CAT</span>
                 </div>
                 <div className="text-right font-mono text-[11px] text-[#2F6DB5] font-semibold">

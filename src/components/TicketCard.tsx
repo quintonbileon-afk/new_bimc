@@ -133,7 +133,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onStatusChange }
 
           {/* Date & Location row */}
           <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.14em] text-[#8A97B8] mb-4">
-            <span>30 OCTOBER 2026 · GABORONE, BOTSWANA</span>
+            <span>27 NOVEMBER 2026 · GABORONE, BOTSWANA</span>
           </div>
 
           {/* Delegate Name & Organization */}

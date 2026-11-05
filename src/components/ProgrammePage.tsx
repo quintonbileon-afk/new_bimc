@@ -73,7 +73,7 @@ export const ProgrammePage: React.FC<ProgrammePageProps> = ({
           <div className="max-w-4xl">
             {/* Pill */}
             <div className="bmic-pill pill mb-5">
-              30 OCTOBER 2026 &nbsp;·&nbsp; ROYAL ARIA CONFERENCE CENTRE, GABORONE
+              27 NOVEMBER 2026 &nbsp;·&nbsp; ROYAL ARIA CONFERENCE CENTRE, GABORONE
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.08] mb-5 font-sans">

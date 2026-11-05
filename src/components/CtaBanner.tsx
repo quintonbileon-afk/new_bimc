@@ -16,7 +16,7 @@ export const CtaBanner: React.FC<CtaBannerProps> = ({ onOpenRegister, onNavigate
         <div className="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full bg-slate-200/50 border border-slate-300/50">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2F6DB5]" />
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#2F6DB5] font-semibold">
-            08 / National Convening · 30 October 2026
+            08 / National Convening · 27 November 2026
           </p>
         </div>
 

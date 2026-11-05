@@ -329,7 +329,7 @@ export default function App() {
           <div>
             <div className="font-bold text-white">BMIC 2026 Added to Calendar</div>
             <div className="text-[#B8C2D6] text-[11px] font-normal">
-              Friday, 30 October 2026 · Royal Aria Conference Centre
+              Friday, 27 November 2026 · Royal Aria Conference Centre
             </div>
           </div>
         </div>

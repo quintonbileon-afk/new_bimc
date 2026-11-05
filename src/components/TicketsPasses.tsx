@@ -734,7 +734,7 @@ export const TicketsPasses: React.FC<TicketsPassesProps> = ({
                 </h3>
               </div>
               <div className="font-mono text-xs text-slate-500">
-                30 October 2026 · Royal Aria · 250+ Senior Leaders
+                27 November 2026 · Royal Aria · 250+ Senior Leaders
               </div>
             </div>
 

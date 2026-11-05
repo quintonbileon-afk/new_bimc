@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               Botswana’s flagship technology &amp; communications congress. Moving from policy to implementation, investment, and measurable outcomes.
             </p>
             <div className="font-mono text-[11px] text-slate-400">
-              30 October 2026 · Royal Aria Conference Centre, Gaborone
+              27 November 2026 · Royal Aria Conference Centre, Gaborone
             </div>
             <div className="pt-2 text-xs text-[#B8C2D6] space-y-1">
               <div>Organised by: <span className="text-white font-semibold">{EVENT_DETAILS.organiser}</span></div>
@@ -95,7 +95,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             <div className="space-y-3 text-xs text-[#B8C2D6]">
               <div className="flex items-center gap-2.5">
                 <Calendar className="w-4 h-4 text-[#2F6DB5] shrink-0" />
-                <span className="font-mono text-[11px]">Friday, 30 October 2026</span>
+                <span className="font-mono text-[11px]">Friday, 27 November 2026</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-[#2F6DB5] shrink-0 mt-0.5" />

@@ -345,7 +345,7 @@ export const FreePassModal: React.FC<FreePassModalProps> = ({ isOpen, onClose })
                 </button>
                 <div className="flex items-center justify-center gap-4 mt-3 text-[11px] text-slate-400">
                   <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-[#2F6DB5]" /> Friday, 30 October 2026
+                    <Calendar className="w-3 h-3 text-[#2F6DB5]" /> Friday, 27 November 2026
                   </span>
                   <span>·</span>
                   <span className="flex items-center gap-1">

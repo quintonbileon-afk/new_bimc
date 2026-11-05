@@ -131,7 +131,7 @@ export const ProgrammeTimeline: React.FC = () => {
           <div>
             <div className="mb-4">
               <span className="text-xs uppercase font-semibold tracking-[0.14em] text-[#D81B60]">
-                Friday, 30 October 2026
+                Friday, 27 November 2026
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.03em] leading-[1.12]">
